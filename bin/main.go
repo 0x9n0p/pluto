@@ -7,4 +7,5 @@ import (
 
 func main() {
 	fmt.Printf("%s %s\n", pluto.Name, pluto.Version)
+	select {}
 }

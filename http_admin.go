@@ -32,5 +32,9 @@ func init() {
 		return ctx.NoContent(http.StatusOK)
 	})
 
-	go Log.Fatal("Running HTTP admin server", zap.Error(HTTPAdmin.Start(Env.HTTPAdmin)))
+	go func() {
+		if err := HTTPAdmin.Start(Env.HTTPAdmin); err != nil {
+			Log.Fatal("Running HTTP admin server", zap.Error(err))
+		}
+	}()
 }
