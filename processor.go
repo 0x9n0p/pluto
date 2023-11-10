@@ -1,5 +1,7 @@
 package pluto
 
+var PredefinedProcessors = make(map[string]func() Processor)
+
 type Processor interface {
 	GetDescriptor() ProcessorDescriptor
 	// Process

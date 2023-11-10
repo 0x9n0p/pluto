@@ -12,8 +12,8 @@ var Env EnvSpec
 
 // EnvSpec fields are not required because multiple programs going to use them
 type EnvSpec struct {
-	Debug    bool
-	Database string
+	Debug     bool
+	HTTPAdmin string `envconfig:"http_admin"`
 }
 
 func init() {

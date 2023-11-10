@@ -23,10 +23,12 @@ type ApplicationLogCollector struct {
 type ApplicationLog struct {
 	Message   string         `json:"message"`
 	Extra     map[string]any `json:"extra,omitempty"`
+	Level     string         `json:"level"`
 	CreatedAt time.Time      `json:"created_at"`
 }
 
 func (l *ApplicationLogCollector) Warning(log ApplicationLog) {
+	log.Level = "Warning"
 	log.CreatedAt = time.Now()
 
 	b, err := json.Marshal(log)
