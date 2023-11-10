@@ -39,6 +39,11 @@ func (s *ConditionalProcessor) Fail(fail Processor) *ConditionalProcessor {
 	return s
 }
 
-func (s *ConditionalProcessor) GetName() string {
-	return s.processor.GetName()
+func (s *ConditionalProcessor) GetDescriptor() ProcessorDescriptor {
+	return ProcessorDescriptor{
+		Name:        "Conditional Processor",
+		Description: "Description",
+		Input:       "",
+		Output:      "",
+	}
 }

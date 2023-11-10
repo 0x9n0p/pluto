@@ -14,6 +14,11 @@ func (s *InlineProcessor) Process(processable Processable) (Processable, bool) {
 	return s.f(processable)
 }
 
-func (s *InlineProcessor) GetName() string {
-	return "INLINE_PROCESSOR"
+func (s *InlineProcessor) GetDescriptor() ProcessorDescriptor {
+	return ProcessorDescriptor{
+		Name:        "Inline Processor",
+		Description: "Description",
+		Input:       "",
+		Output:      "",
+	}
 }

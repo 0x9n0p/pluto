@@ -8,11 +8,16 @@ import (
 type PrintProcessor struct {
 }
 
-func (p PrintProcessor) GetName() string {
-	return "PRINT_PROCESSOR"
+func (p PrintProcessor) Process(processable pluto.Processable) (pluto.Processable, bool) {
+	fmt.Printf("%s: %s\n", p.GetDescriptor().Name, processable)
+	return processable, true
 }
 
-func (p PrintProcessor) Process(processable pluto.Processable) (pluto.Processable, bool) {
-	fmt.Printf("%s: %s\n", p.GetName(), processable)
-	return processable, true
+func (p PrintProcessor) GetDescriptor() pluto.ProcessorDescriptor {
+	return pluto.ProcessorDescriptor{
+		Name:        "Print Processor",
+		Description: "Description",
+		Input:       "",
+		Output:      "",
+	}
 }
