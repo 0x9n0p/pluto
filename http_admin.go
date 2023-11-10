@@ -23,7 +23,7 @@ func init() {
 		if reloadConfig {
 			var cfg Config
 			if err := ctx.Bind(&cfg); err != nil {
-				return err
+				return ctx.String(http.StatusBadRequest, err.Error())
 			}
 
 			ReloadExecutionCache(ResolveConfig(cfg))
