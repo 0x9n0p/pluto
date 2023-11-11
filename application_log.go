@@ -27,8 +27,17 @@ type ApplicationLog struct {
 	CreatedAt time.Time      `json:"created_at"`
 }
 
+func (l *ApplicationLogCollector) Debug(log ApplicationLog) {
+	log.Level = "Debug"
+	l.Log(log)
+}
+
 func (l *ApplicationLogCollector) Warning(log ApplicationLog) {
 	log.Level = "Warning"
+	l.Log(log)
+}
+
+func (l *ApplicationLogCollector) Log(log ApplicationLog) {
 	log.CreatedAt = time.Now()
 
 	b, err := json.Marshal(log)

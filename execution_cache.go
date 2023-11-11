@@ -13,15 +13,23 @@ var (
 //
 // TODO:
 //  1. Goroutine pool
-func Process(processable Processable) {
+func Process(processable RoutableProcessable) {
+	if processable.GetConsumer().PredefinedKind() != KindPipeline {
+		ApplicationLogger.Debug(ApplicationLog{
+			Message: "Kind is not supported for processing OutComingProcessable",
+			Extra:   map[string]any{"kind": processable.GetConsumer().PredefinedKind()},
+		})
+		return
+	}
+
 	executionCacheMutex.RLock()
 	defer executionCacheMutex.RUnlock()
 
-	p, found := executionCache[processable.Pipeline]
+	p, found := executionCache[processable.GetConsumer().UniqueProperty()]
 	if !found {
 		ApplicationLogger.Warning(ApplicationLog{
 			Message: "Pipeline not found",
-			Extra:   map[string]any{"pipeline": processable.Pipeline},
+			Extra:   map[string]any{"unique_property": processable.GetConsumer().UniqueProperty()},
 		})
 		return
 	}
