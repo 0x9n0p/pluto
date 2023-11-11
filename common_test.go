@@ -25,3 +25,16 @@ func (p PrintProcessor) GetDescriptor() pluto.ProcessorDescriptor {
 		Output:      "",
 	}
 }
+
+type TestIdentifier struct {
+	Name string
+	Kind string
+}
+
+func (i TestIdentifier) UniqueProperty() string {
+	return i.Name
+}
+
+func (i TestIdentifier) PredefinedKind() string {
+	return i.Kind
+}
