@@ -7,9 +7,14 @@ import (
 	"github.com/google/uuid"
 )
 
+/*
+TODO
+  Support channel expiration
+
 const (
 	MaxChannelLife = time.Hour * 24
 )
+*/
 
 var (
 	Channels      = map[uuid.UUID]Channel{}
@@ -28,7 +33,6 @@ type Channel struct {
 	Members  []Joinable `json:"members"`
 	Capacity uint       `json:"capacity"`
 	Length   uint       `json:"length"`
-	Expires  time.Time  `json:"expires"`
 
 	OnJoin        Processor `json:"-"`
 	OnLeave       Processor `json:"-"`
@@ -43,7 +47,6 @@ func NewChannel(name string, length uint) Channel {
 		Members:       []Joinable{},
 		Capacity:      length,
 		Length:        length,
-		Expires:       time.Now().Add(MaxChannelLife),
 		OnJoin:        EmptyProcessor{},
 		OnLeave:       EmptyProcessor{},
 		OnMaxCapacity: EmptyProcessor{},
@@ -106,6 +109,42 @@ func (c *Channel) PredefinedKind() string {
 	return KindChannel
 }
 
+type LockChannels struct {
+	// TODO: Add support for read locks
+	Write bool
+}
+
+func (p LockChannels) Process(processable Processable) (Processable, bool) {
+	ChannelsMutex.Lock()
+	return processable, true
+}
+
+func (p LockChannels) GetDescriptor() ProcessorDescriptor {
+	return ProcessorDescriptor{
+		Name:        "LOCK_CHANNELS",
+		Description: "",
+		Input:       "",
+		Output:      "",
+	}
+}
+
+type UnLockChannels struct {
+}
+
+func (p UnLockChannels) Process(processable Processable) (Processable, bool) {
+	ChannelsMutex.Unlock()
+	return processable, true
+}
+
+func (p UnLockChannels) GetDescriptor() ProcessorDescriptor {
+	return ProcessorDescriptor{
+		Name:        "UNLOCK_CHANNELS",
+		Description: "",
+		Input:       "",
+		Output:      "",
+	}
+}
+
 func getChannel(id uuid.UUID) (Channel, bool) {
 	for _, channel := range Channels {
 		if channel.ID == id {
@@ -113,8 +152,4 @@ func getChannel(id uuid.UUID) (Channel, bool) {
 		}
 	}
 	return Channel{}, false
-}
-
-func updateChannel(channel Channel) {
-	Channels[channel.ID] = channel
 }
