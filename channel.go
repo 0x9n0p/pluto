@@ -1,6 +1,7 @@
 package pluto
 
 import (
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -8,6 +9,11 @@ import (
 
 const (
 	MaxChannelLife = time.Hour * 24
+)
+
+var (
+	Channels      = map[uuid.UUID]Channel{}
+	ChannelsMutex = new(sync.RWMutex)
 )
 
 type Joinable interface {
@@ -30,8 +36,8 @@ type Channel struct {
 	OnExpire      Processor `json:"-"`
 }
 
-func NewChannel(name string, length uint) *Channel {
-	return &Channel{
+func NewChannel(name string, length uint) Channel {
+	return Channel{
 		ID:            uuid.New(),
 		Name:          name,
 		Members:       []Joinable{},
@@ -98,4 +104,17 @@ func (c *Channel) UniqueProperty() string {
 
 func (c *Channel) PredefinedKind() string {
 	return KindChannel
+}
+
+func getChannel(id uuid.UUID) (Channel, bool) {
+	for _, channel := range Channels {
+		if channel.ID == id {
+			return channel, true
+		}
+	}
+	return Channel{}, false
+}
+
+func updateChannel(channel Channel) {
+	Channels[channel.ID] = channel
 }
