@@ -6,6 +6,38 @@ import (
 	"go.uber.org/zap"
 )
 
+func init() {
+	PredefinedProcessors["WRITE_TO_IO"] = func(r any) Processor {
+		a, ok := r.(Appendable)
+		if !ok {
+			ApplicationLogger.Debug(ApplicationLog{
+				Message: "Cannot create WRITE_TO_IO processor: Body is not appendable",
+			})
+			return nil
+		}
+
+		v, found := a["io_interface"]
+		if !found {
+			ApplicationLogger.Debug(ApplicationLog{
+				Message: "Cannot create WRITE_TO_IO processor: No io_interface found in body",
+			})
+			return nil
+		}
+
+		i, ok := v.(io.Writer)
+		if !ok {
+			ApplicationLogger.Debug(ApplicationLog{
+				Message: "Cannot create WRITE_TO_IO processor: The io_interface is not writer",
+			})
+			return nil
+		}
+
+		return WriteToIOProcessor{
+			Writer: i,
+		}
+	}
+}
+
 type WriteToIOProcessor struct {
 	io.Writer
 }

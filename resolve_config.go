@@ -30,7 +30,7 @@ func ResolveConfig(config Config) (o map[string]Pipeline) {
 			}
 
 			var conditionalProcessor ConditionalProcessor
-			conditionalProcessor.main = processorCreator()
+			conditionalProcessor.main = processorCreator(nil)
 
 			if processor.Success == nil || len(processor.Success) <= 0 {
 				conditionalProcessor.success = ProcessorBucket{make([]Processor, 0)}
@@ -45,7 +45,7 @@ func ResolveConfig(config Config) (o map[string]Pipeline) {
 						continue
 					}
 
-					conditionalProcessor.success.Attach(processorCreator())
+					conditionalProcessor.success.Attach(processorCreator(nil))
 				}
 			}
 
@@ -62,7 +62,7 @@ func ResolveConfig(config Config) (o map[string]Pipeline) {
 						continue
 					}
 
-					conditionalProcessor.fail.Attach(processorCreator())
+					conditionalProcessor.fail.Attach(processorCreator(nil))
 				}
 			}
 

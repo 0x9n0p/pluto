@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	pluto.PredefinedProcessors["Print Processor"] = func() pluto.Processor { return &PrintProcessor{} }
+	pluto.PredefinedProcessors["Print Processor"] = func(any) pluto.Processor { return &PrintProcessor{} }
 }
 
 type PrintProcessor struct {
