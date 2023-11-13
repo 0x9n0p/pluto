@@ -8,6 +8,7 @@ import (
 
 type Processable interface {
 	GetProducer() Identifier
+	SetBody(any)
 	GetBody() any
 }
 
@@ -31,6 +32,10 @@ func (o *OutComingProcessable) GetConsumer() Identifier {
 	return o.Consumer
 }
 
+func (o *OutComingProcessable) SetBody(v any) {
+	o.Body = v
+}
+
 func (o *OutComingProcessable) GetBody() any {
 	return o.Body
 }
@@ -50,6 +55,10 @@ func (o *OutGoingProcessable) GetConsumer() Identifier {
 	return o.Consumer
 }
 
+func (o *OutGoingProcessable) SetBody(v any) {
+	o.Body = v
+}
+
 func (o *OutGoingProcessable) GetBody() any {
 	return o.Body
 }
@@ -61,18 +70,22 @@ type InternalProcessable struct {
 	CreatedAt time.Time  `json:"created_at"`
 }
 
-func (i *InternalProcessable) GetProducer() Identifier {
-	return i.Producer
+func (o *InternalProcessable) GetProducer() Identifier {
+	return o.Producer
 }
 
-func (i *InternalProcessable) GetBody() any {
-	return i.Body
+func (o *InternalProcessable) SetBody(v any) {
+	o.Body = v
 }
 
-func (i *InternalProcessable) UniqueProperty() string {
-	return i.ID.String()
+func (o *InternalProcessable) GetBody() any {
+	return o.Body
 }
 
-func (i *InternalProcessable) PredefinedKind() string {
+func (o *InternalProcessable) UniqueProperty() string {
+	return o.ID.String()
+}
+
+func (o *InternalProcessable) PredefinedKind() string {
 	return KindInternalProcessable
 }
