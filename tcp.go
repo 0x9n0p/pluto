@@ -27,25 +27,14 @@ var Listener = func() net.Listener {
 var ConnectionHandler = Pipeline{
 	Name: "TCP_CONNECTION_HANDLER",
 	ProcessorBucket: ProcessorBucket{Processors: []Processor{
-		// TODO: Close and Remove connection when the processor returns false
+		// TODO:
+		//  2. Risk of the DOS attack
+		acceptor,
 
-		// TODO: Remove the connection from accepted connections
 		&ConnectionDecoder{
 			MaxDecode: 1,
-			// TODO: Authenticator
-			Processor: NewInlineProcessor(func(processable Processable) (Processable, bool) {
-				ApplicationLogger.Debug(ApplicationLog{
-					Message: "Authentication request",
-					Extra:   map[string]any{},
-				})
-				return processable, true
-			}),
+			Processor: authenticator,
 		},
-
-		// TODO: Move conn from accepted connections to authenticated connections
-		NewInlineProcessor(func(processable Processable) (Processable, bool) {
-			return processable, true
-		}),
 
 		// TODO: Remove connection from authenticated connections
 		&ConnectionDecoder{
@@ -71,22 +60,9 @@ func init() {
 				continue
 			}
 
-			acceptedConnection := AcceptedConnection{ID: uuid.New(), Conn: conn}
-
-			AcceptedConnectionsMutex.Lock()
-			AcceptedConnections = append(AcceptedConnections, acceptedConnection)
-			AcceptedConnectionsMutex.Unlock()
-
-			Log.Debug("New connection accepted", zap.String("remote_address", conn.RemoteAddr().String()))
-			ApplicationLogger.Debug(ApplicationLog{
-				Message: "New connection accepted",
-				Extra:   map[string]any{"remote_address": conn.RemoteAddr().String()},
-			})
-
 			go ConnectionHandler.Process(&InternalProcessable{
-				ID: uuid.New(),
-				//Producer:  nil,
-				Body:      Appendable{"connection": acceptedConnection},
+				ID:        uuid.New(),
+				Body:      Appendable{"connection": conn},
 				CreatedAt: time.Now(),
 			})
 		}

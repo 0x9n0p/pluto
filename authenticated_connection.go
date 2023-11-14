@@ -4,24 +4,71 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 var (
-	AuthenticatedConnections      = make([]AuthenticatedConnection, 0)
+	AuthenticatedConnections      = make(map[uuid.UUID]AuthenticatedConnection)
 	AuthenticatedConnectionsMutex = new(sync.RWMutex)
 )
 
 type AuthenticatedConnection struct {
 	AcceptedConnection
-	Credential
+	ProducerCredential Credential
 	// TODO: expires
 }
 
-func GetAuthenticatedConnection(id uuid.UUID) (AuthenticatedConnection, bool) {
-	for _, connection := range AuthenticatedConnections {
-		if connection.ID == id {
-			return connection, true
+var authenticator = NewInlineProcessor(func(processable Processable) (result Processable, succeed bool) {
+	defer func() { succeed = recover() == nil }()
+
+	ApplicationLogger.Debug(ApplicationLog{
+		Message: "Authentication request",
+	})
+
+	var authenticatedConnection AuthenticatedConnection
+
+	// Authenticate Connection
+	{
+		connectionID := uuid.MustParse(processable.GetBody().(Appendable)["connection_id"].(string))
+		connectionToken := processable.GetBody().(Appendable)["connection_token"].(string)
+
+		acceptedConnection, found := GetAcceptedConnection(connectionID)
+		if !found || acceptedConnection.Token == connectionToken {
+			return processable, false
 		}
+
+		authenticatedConnection.AcceptedConnection = acceptedConnection
 	}
-	return AuthenticatedConnection{}, false
-}
+
+	// Authenticate Producer
+	{
+		p := processable.(*OutComingProcessable)
+
+		validated, err := p.ProducerCredential.Validate(p.GetProducer())
+		if err != nil {
+			Log.Debug("Validate producer credential", zap.Error(err))
+			return processable, false
+		}
+
+		if !validated {
+			// TODO: Write to the client that the credential is not valid
+			return processable, false
+		}
+
+		authenticatedConnection.ProducerCredential = p.ProducerCredential
+	}
+
+	// Move the connection from the accepted connections to the authenticated connections
+	{
+		AcceptedConnectionsMutex.Lock()
+		AuthenticatedConnectionsMutex.Lock()
+
+		delete(AcceptedConnections, authenticatedConnection.AcceptedConnection.ID)
+		AuthenticatedConnections[authenticatedConnection.ID] = authenticatedConnection
+
+		AuthenticatedConnectionsMutex.Unlock()
+		AcceptedConnectionsMutex.Unlock()
+	}
+
+	return processable, true
+})

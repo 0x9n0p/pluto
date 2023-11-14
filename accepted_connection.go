@@ -1,22 +1,67 @@
 package pluto
 
 import (
+	"encoding/json"
 	"net"
+	"pluto/pkg/random"
 	"sync"
 
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 )
 
 var (
-	AcceptedConnections      = make([]AcceptedConnection, 0)
+	AcceptedConnections      = make(map[uuid.UUID]AcceptedConnection, 0)
 	AcceptedConnectionsMutex = new(sync.RWMutex)
 )
 
+const ConnectionTokenLength = 32
+
 type AcceptedConnection struct {
-	ID uuid.UUID
-	net.Conn
+	ID       uuid.UUID `json:"connection_id"`
+	Token    string    `json:"connection_token"`
+	net.Conn `json:"-"`
 	// TODO: expires
 }
+
+var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bool) {
+	connection := AcceptedConnection{
+		ID:    uuid.New(),
+		Token: random.String(ConnectionTokenLength),
+		Conn:  processable.GetBody().(Appendable)["connection"].(net.Conn),
+	}
+
+	// TODO: Set write deadline
+
+	b, err := json.Marshal(OutGoingProcessable{
+		Consumer: ExternalIdentifier{
+			Name: "CONNECTION_ACCEPTOR",
+			Kind: KindPipeline,
+		},
+		Body: connection,
+	})
+	if err != nil {
+		Log.Error("Marshal OutGoingProcessable", zap.Error(err))
+		return processable, false
+	}
+
+	if _, err := connection.Write(b); err != nil {
+		Log.Debug("Write bytes to connection", zap.Error(err))
+		return processable, false
+	}
+
+	Log.Debug("New connection accepted", zap.String("remote_address", connection.RemoteAddr().String()))
+	ApplicationLogger.Debug(ApplicationLog{
+		Message: "New connection accepted",
+		Extra:   map[string]any{"remote_address": connection.RemoteAddr().String()},
+	})
+
+	AcceptedConnectionsMutex.Lock()
+	AcceptedConnections[connection.ID] = connection
+	AcceptedConnectionsMutex.Unlock()
+
+	return processable, true
+})
 
 func GetAcceptedConnection(id uuid.UUID) (AcceptedConnection, bool) {
 	for _, connection := range AcceptedConnections {
