@@ -85,6 +85,8 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 			return processable, false
 		}
 
+		_ = acceptedConnection.Close()
+
 		AcceptedConnectionsMutex.Lock()
 		delete(AcceptedConnections, acceptedConnection.ID)
 		AcceptedConnectionsMutex.Unlock()

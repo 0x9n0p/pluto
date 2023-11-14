@@ -16,13 +16,13 @@ func NewConditionalProcessor(processor Processor) *ConditionalProcessor {
 func (s *ConditionalProcessor) Process(processable Processable) (Processable, bool) {
 	res, ok := s.main.Process(processable)
 	if ok {
-		if len(s.success.Processors) <= 0 {
+		if len(s.success.Processors) >= 0 {
 			s.success.Process(res)
 		}
 		return res, true
 	}
 
-	if len(s.fail.Processors) <= 0 {
+	if len(s.fail.Processors) >= 0 {
 		s.fail.Process(processable)
 	}
 
