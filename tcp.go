@@ -27,16 +27,10 @@ var Listener = func() net.Listener {
 var ConnectionHandler = Pipeline{
 	Name: "TCP_CONNECTION_HANDLER",
 	ProcessorBucket: ProcessorBucket{Processors: []Processor{
-		// TODO:
-		//  2. Risk of the DOS attack
 		acceptor,
+		authenticator,
 
-		&ConnectionDecoder{
-			MaxDecode: 1,
-			Processor: authenticator,
-		},
-
-		// TODO: Remove connection from authenticated connections
+		// Expiration will remove connection
 		&ConnectionDecoder{
 			MaxDecode: MAXRequestPerConnection,
 			Processor: NewInlineProcessor(func(processable Processable) (Processable, bool) {
