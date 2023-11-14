@@ -11,7 +11,6 @@ func (p AppendResultProcessor) Process(processable Processable) (Processable, bo
 	if !ok {
 		ApplicationLogger.Debug(ApplicationLog{
 			Message: "Body is not appendable",
-			Extra:   map[string]any{"producer": processable.GetProducer()},
 		})
 		return processable, false
 	}
@@ -26,7 +25,6 @@ func (p AppendResultProcessor) Process(processable Processable) (Processable, bo
 		if !ok {
 			ApplicationLogger.Debug(ApplicationLog{
 				Message: "Body of result is not appendable",
-				Extra:   map[string]any{"producer": r.GetProducer()},
 			})
 			return r, false
 		}

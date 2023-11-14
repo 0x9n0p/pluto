@@ -20,7 +20,6 @@ func (p RuntimeProcessorCreator) Process(processable Processable) (Processable, 
 	if !ok {
 		ApplicationLogger.Debug(ApplicationLog{
 			Message: "Body is not appendable",
-			Extra:   map[string]any{"producer": processable.GetProducer()},
 		})
 		return processable, false
 	}
