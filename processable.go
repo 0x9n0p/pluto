@@ -57,17 +57,10 @@ func (o *OutGoingProcessable) GetBody() any {
 	return o.Body
 }
 
-// InternalProcessable
-// TODO: Do we need producer?
 type InternalProcessable struct {
-	ID        uuid.UUID  `json:"id"`
-	Producer  Identifier `json:"producer"`
-	Body      any        `json:"body"`
-	CreatedAt time.Time  `json:"created_at"`
-}
-
-func (o *InternalProcessable) GetProducer() Identifier {
-	return o.Producer
+	ID        uuid.UUID `json:"id"`
+	Body      any       `json:"body"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func (o *InternalProcessable) SetBody(v any) {
@@ -76,12 +69,4 @@ func (o *InternalProcessable) SetBody(v any) {
 
 func (o *InternalProcessable) GetBody() any {
 	return o.Body
-}
-
-func (o *InternalProcessable) UniqueProperty() string {
-	return o.ID.String()
-}
-
-func (o *InternalProcessable) PredefinedKind() string {
-	return KindInternalProcessable
 }

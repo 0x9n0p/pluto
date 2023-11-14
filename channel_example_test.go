@@ -38,14 +38,12 @@ func TestChannel(t *testing.T) {
 
 	ch.Publish(&pluto.InternalProcessable{
 		ID:        uuid.New(),
-		Producer:  TestIdentifier{Name: "TestChannel", Kind: "Test"},
 		Body:      []byte("Hello World 1\n"),
 		CreatedAt: time.Now(),
 	})
 
 	ch.Publish(&pluto.InternalProcessable{
 		ID:        uuid.New(),
-		Producer:  TestIdentifier{Name: "TestChannel", Kind: "Test"},
 		Body:      []byte("Hello World 2\n"),
 		CreatedAt: time.Now(),
 	})
