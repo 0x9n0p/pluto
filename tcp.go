@@ -21,24 +21,11 @@ var Listener = func() net.Listener {
 	return l
 }()
 
-// ConnectionHandler
-// decoder -> authenticator -> loop{decoder -> execution cache} -> close_connection
-// TODO: This pipeline can be configured using HTTP APIs
 var ConnectionHandler = Pipeline{
 	Name: "TCP_CONNECTION_HANDLER",
 	ProcessorBucket: ProcessorBucket{Processors: []Processor{
 		acceptor,
 		authenticator,
-
-		// Expiration will remove connection
-		&ConnectionDecoder{
-			MaxDecode:    MAXRequestPerConnection,
-			ReadDeadline: time.Hour,
-			Processor: NewInlineProcessor(func(processable Processable) (Processable, bool) {
-				Process(processable.(RoutableProcessable))
-				return processable, true
-			}),
-		},
 
 		NewFinalProcessor(
 			&ConnectionDecoder{

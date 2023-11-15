@@ -5,13 +5,14 @@ import (
 	"net"
 	"pluto/pkg/random"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
 var (
-	AcceptedConnections      = make(map[uuid.UUID]AcceptedConnection, 0)
+	AcceptedConnections      = make(map[uuid.UUID]AcceptedConnection)
 	AcceptedConnectionsMutex = new(sync.RWMutex)
 )
 
@@ -21,7 +22,6 @@ type AcceptedConnection struct {
 	ID       uuid.UUID `json:"connection_id"`
 	Token    string    `json:"connection_token"`
 	net.Conn `json:"-"`
-	// TODO: expires
 }
 
 var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bool) {
@@ -30,8 +30,6 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 		Token: random.String(ConnectionTokenLength),
 		Conn:  processable.GetBody().(Appendable)["connection"].(net.Conn),
 	}
-
-	// TODO: Set write deadline
 
 	b, err := json.Marshal(OutGoingProcessable{
 		Consumer: ExternalIdentifier{
@@ -42,6 +40,11 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 	})
 	if err != nil {
 		Log.Error("Marshal OutGoingProcessable", zap.Error(err))
+		return processable, false
+	}
+
+	if err := connection.SetWriteDeadline(time.Now().Add(time.Second * 2)); err != nil {
+		Log.Error("Set write deadline", zap.Error(err))
 		return processable, false
 	}
 
