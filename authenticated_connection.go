@@ -2,6 +2,7 @@ package pluto
 
 import (
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -19,7 +20,8 @@ type AuthenticatedConnection struct {
 }
 
 var authenticator = NewConditionalProcessor(&ConnectionDecoder{
-	MaxDecode: 1,
+	MaxDecode:    1,
+	ReadDeadline: time.Second * 2,
 	Processor: NewInlineProcessor(func(processable Processable) (result Processable, succeed bool) {
 		defer func() { succeed = recover() == nil }()
 

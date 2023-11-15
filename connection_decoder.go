@@ -2,7 +2,7 @@ package pluto
 
 import (
 	"encoding/json"
-	"io"
+	"net"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,16 +10,23 @@ import (
 )
 
 type ConnectionDecoder struct {
-	MaxDecode uint64
-	// TODO: The Read deadline
-	Processor Processor
+	MaxDecode    uint64
+	ReadDeadline time.Duration
+	Processor    Processor
 }
 
 func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) {
-	decoder := json.NewDecoder(processable.GetBody().(Appendable)["connection"].(io.Reader))
+	conn := processable.GetBody().(Appendable)["connection"].(net.Conn)
+
+	decoder := json.NewDecoder(conn)
 	decoder.UseNumber()
 
 	for i := uint64(0); i < p.MaxDecode; i++ {
+		if err := conn.SetReadDeadline(time.Now().Add(p.ReadDeadline)); err != nil {
+			Log.Error("Set read deadline", zap.Error(err))
+			return processable, false
+		}
+
 		var outComingProcessable OutComingProcessable
 		if err := decoder.Decode(&outComingProcessable); err != nil {
 			Log.Debug("Decoding out-coming processable", zap.Error(err))

@@ -32,12 +32,15 @@ var ConnectionHandler = Pipeline{
 
 		// Expiration will remove connection
 		&ConnectionDecoder{
-			MaxDecode: MAXRequestPerConnection,
+			MaxDecode:    MAXRequestPerConnection,
+			ReadDeadline: time.Hour,
 			Processor: NewInlineProcessor(func(processable Processable) (Processable, bool) {
 				Process(processable.(RoutableProcessable))
 				return processable, true
 			}),
 		},
+
+		// TODO: Remove the authenticated connection
 	}},
 }
 
