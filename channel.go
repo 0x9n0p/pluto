@@ -74,7 +74,7 @@ func (c *Channel) Join(r Joinable) {
 
 	go c.OnJoin.Process(&InternalProcessable{
 		ID: uuid.New(),
-		Body: Appendable{
+		Body: map[string]any{
 			"channel":    c,
 			"identifier": r,
 		},
@@ -84,7 +84,7 @@ func (c *Channel) Join(r Joinable) {
 	if c.Capacity <= 0 {
 		go c.OnMaxCapacity.Process(&InternalProcessable{
 			ID: uuid.New(),
-			Body: Appendable{
+			Body: map[string]any{
 				"channel": c,
 			},
 			CreatedAt: time.Now(),

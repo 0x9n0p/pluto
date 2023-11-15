@@ -28,6 +28,6 @@ func TestRuntimeProcessorCreator(t *testing.T) {
 			Name: "CREATE_WRITE_TO_IO_PROCESSOR",
 			Kind: pluto.KindPipeline,
 		},
-		Body: pluto.Appendable{"io_interface": os.Stdout},
+		Body: map[string]any{"io_interface": os.Stdout},
 	})
 }

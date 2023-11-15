@@ -41,7 +41,7 @@ var ConnectionHandler = Pipeline{
 				AuthenticatedConnectionsMutex.Lock()
 				defer AuthenticatedConnectionsMutex.Unlock()
 				defer func() { recover() }()
-				delete(AuthenticatedConnections, processable.GetBody().(Appendable)["connection_id"].(uuid.UUID))
+				delete(AuthenticatedConnections, processable.GetBody().(map[string]any)["connection_id"].(uuid.UUID))
 				return processable, true
 			}),
 		),
@@ -63,7 +63,7 @@ func init() {
 
 			go ConnectionHandler.Process(&InternalProcessable{
 				ID:        uuid.New(),
-				Body:      Appendable{"connection": conn},
+				Body:      map[string]any{"connection": conn},
 				CreatedAt: time.Now(),
 			})
 		}

@@ -16,10 +16,10 @@ type RuntimeProcessorCreator struct {
 }
 
 func (p RuntimeProcessorCreator) Process(processable Processable) (Processable, bool) {
-	a, ok := processable.GetBody().(Appendable)
+	a, ok := processable.GetBody().(map[string]any)
 	if !ok {
 		ApplicationLogger.Debug(ApplicationLog{
-			Message: "Body is not appendable",
+			Message: "Body is not map[string]any",
 		})
 		return processable, false
 	}

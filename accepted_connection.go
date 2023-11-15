@@ -28,7 +28,7 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 	connection := AcceptedConnection{
 		ID:    uuid.New(),
 		Token: random.String(ConnectionTokenLength),
-		Conn:  processable.GetBody().(Appendable)["connection"].(net.Conn),
+		Conn:  processable.GetBody().(map[string]any)["connection"].(net.Conn),
 	}
 
 	b, err := json.Marshal(OutGoingProcessable{
@@ -63,17 +63,8 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 	AcceptedConnections[connection.ID] = connection
 	AcceptedConnectionsMutex.Unlock()
 
-	processable.GetBody().(Appendable)["connection_id"] = connection.ID
-	processable.GetBody().(Appendable)["connection_token"] = connection.Token
+	processable.GetBody().(map[string]any)["connection_id"] = connection.ID
+	processable.GetBody().(map[string]any)["connection_token"] = connection.Token
 
 	return processable, true
 })
-
-func GetAcceptedConnection(id uuid.UUID) (AcceptedConnection, bool) {
-	for _, connection := range AcceptedConnections {
-		if connection.ID == id {
-			return connection, true
-		}
-	}
-	return AcceptedConnection{}, false
-}

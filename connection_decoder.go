@@ -16,7 +16,7 @@ type ConnectionDecoder struct {
 }
 
 func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) {
-	conn := processable.GetBody().(Appendable)["connection"].(net.Conn)
+	conn := processable.GetBody().(map[string]any)["connection"].(net.Conn)
 
 	decoder := json.NewDecoder(conn)
 	decoder.UseNumber()

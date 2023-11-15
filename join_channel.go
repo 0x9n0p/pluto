@@ -4,7 +4,7 @@ type JoinChannel struct {
 }
 
 func (p JoinChannel) Process(processable Processable) (Processable, bool) {
-	appendable, ok := processable.GetBody().(Appendable)
+	appendable, ok := processable.GetBody().(map[string]any)
 	if !ok {
 		return processable, false
 	}

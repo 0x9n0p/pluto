@@ -16,7 +16,6 @@ var (
 type AuthenticatedConnection struct {
 	AcceptedConnection
 	ProducerCredential Credential
-	// TODO: Authenticated connections can only be removed by expiration
 }
 
 var authenticator = NewConditionalProcessor(&ConnectionDecoder{
@@ -33,13 +32,16 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 
 		// Authenticate Connection
 		{
-			connectionID := uuid.MustParse(processable.GetBody().(Appendable)["connection_id"].(string))
-			connectionToken := processable.GetBody().(Appendable)["connection_token"].(string)
+			connectionID := uuid.MustParse(processable.GetBody().(map[string]any)["connection_id"].(string))
+			connectionToken := processable.GetBody().(map[string]any)["connection_token"].(string)
 
-			acceptedConnection, found := GetAcceptedConnection(connectionID)
+			AcceptedConnectionsMutex.RLock()
+			acceptedConnection, found := AcceptedConnections[connectionID]
 			if !found || acceptedConnection.Token != connectionToken {
+				AcceptedConnectionsMutex.RUnlock()
 				return processable, false
 			}
+			AcceptedConnectionsMutex.RUnlock()
 
 			authenticatedConnection.AcceptedConnection = acceptedConnection
 		}
@@ -80,13 +82,16 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 	NewInlineProcessor(func(processable Processable) (Processable, bool) {
 		defer func() { recover() }()
 
-		connectionID := processable.GetBody().(Appendable)["connection_id"].(uuid.UUID)
-		connectionToken := processable.GetBody().(Appendable)["connection_token"].(string)
+		connectionID := processable.GetBody().(map[string]any)["connection_id"].(uuid.UUID)
+		connectionToken := processable.GetBody().(map[string]any)["connection_token"].(string)
 
-		acceptedConnection, found := GetAcceptedConnection(connectionID)
+		AcceptedConnectionsMutex.RLock()
+		acceptedConnection, found := AcceptedConnections[connectionID]
 		if !found || acceptedConnection.Token != connectionToken {
+			AcceptedConnectionsMutex.RUnlock()
 			return processable, false
 		}
+		AcceptedConnectionsMutex.RUnlock()
 
 		_ = acceptedConnection.Close()
 

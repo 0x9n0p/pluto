@@ -1,16 +1,14 @@
 package pluto
 
-type Appendable map[any]any
-
 type AppendResultProcessor struct {
 	Processor Processor
 }
 
 func (p AppendResultProcessor) Process(processable Processable) (Processable, bool) {
-	a, ok := processable.GetBody().(Appendable)
+	a, ok := processable.GetBody().(map[string]any)
 	if !ok {
 		ApplicationLogger.Debug(ApplicationLog{
-			Message: "Body is not appendable",
+			Message: "Body is not map[string]any",
 		})
 		return processable, false
 	}
@@ -21,10 +19,10 @@ func (p AppendResultProcessor) Process(processable Processable) (Processable, bo
 	}
 
 	{
-		ar, ok := r.GetBody().(Appendable)
+		ar, ok := r.GetBody().(map[string]any)
 		if !ok {
 			ApplicationLogger.Debug(ApplicationLog{
-				Message: "Body of result is not appendable",
+				Message: "Body of result is not map[string]any",
 			})
 			return r, false
 		}
