@@ -11,6 +11,7 @@ import (
 
 type ConnectionDecoder struct {
 	MaxDecode uint64
+	// TODO: The Read deadline
 	Processor Processor
 }
 

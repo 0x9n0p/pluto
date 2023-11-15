@@ -60,6 +60,9 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 	AcceptedConnections[connection.ID] = connection
 	AcceptedConnectionsMutex.Unlock()
 
+	processable.GetBody().(Appendable)["connection_id"] = connection.ID
+	processable.GetBody().(Appendable)["connection_token"] = connection.Token
+
 	return processable, true
 })
 

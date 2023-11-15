@@ -77,7 +77,8 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 }).Fail(ProcessorBucket{Processors: []Processor{
 	NewInlineProcessor(func(processable Processable) (Processable, bool) {
 		defer func() { recover() }()
-		connectionID := uuid.MustParse(processable.GetBody().(Appendable)["connection_id"].(string))
+
+		connectionID := processable.GetBody().(Appendable)["connection_id"].(uuid.UUID)
 		connectionToken := processable.GetBody().(Appendable)["connection_token"].(string)
 
 		acceptedConnection, found := GetAcceptedConnection(connectionID)
