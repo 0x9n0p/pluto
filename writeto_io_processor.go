@@ -8,10 +8,10 @@ import (
 
 func init() {
 	PredefinedProcessors["WRITE_TO_IO"] = func(r any) Processor {
-		a, ok := r.(Appendable)
+		a, ok := r.(map[string]any)
 		if !ok {
 			ApplicationLogger.Debug(ApplicationLog{
-				Message: "Cannot create WRITE_TO_IO processor: Body is not appendable",
+				Message: "Cannot create WRITE_TO_IO processor: Body is not map[string]any",
 			})
 			return nil
 		}

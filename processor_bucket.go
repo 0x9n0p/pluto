@@ -4,14 +4,16 @@ type ProcessorBucket struct {
 	Processors []Processor
 }
 
-func (b *ProcessorBucket) Process(processable Processable) (new Processable, success bool) {
+func (b *ProcessorBucket) Process(processable Processable) (Processable, bool) {
 	for _, processor := range b.Processors {
-		new, success = processor.Process(processable)
+		p, success := processor.Process(processable)
+		processable = p
+
 		if !success {
-			return
+			return processable, false
 		}
 	}
-	return
+	return processable, true
 }
 
 func (b *ProcessorBucket) Attach(processor Processor) {

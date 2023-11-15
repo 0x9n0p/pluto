@@ -16,13 +16,13 @@ func NewConditionalProcessor(processor Processor) *ConditionalProcessor {
 func (s *ConditionalProcessor) Process(processable Processable) (Processable, bool) {
 	res, ok := s.main.Process(processable)
 	if ok {
-		if len(s.success.Processors) <= 0 {
+		if len(s.success.Processors) >= 0 {
 			s.success.Process(res)
 		}
 		return res, true
 	}
 
-	if len(s.fail.Processors) <= 0 {
+	if len(s.fail.Processors) >= 0 {
 		s.fail.Process(processable)
 	}
 
@@ -42,6 +42,41 @@ func (s *ConditionalProcessor) Fail(fail ProcessorBucket) *ConditionalProcessor 
 func (s *ConditionalProcessor) GetDescriptor() ProcessorDescriptor {
 	return ProcessorDescriptor{
 		Name:        "Conditional Processor",
+		Description: "Description",
+		Input:       "",
+		Output:      "",
+	}
+}
+
+type FinalProcessor struct {
+	main  Processor
+	final Processor
+}
+
+func NewFinalProcessor(processor Processor) *FinalProcessor {
+	return &FinalProcessor{
+		main: processor,
+	}
+}
+
+func (s *FinalProcessor) Process(processable Processable) (Processable, bool) {
+	res, ok := s.main.Process(processable)
+
+	if s.final != nil {
+		return s.final.Process(res)
+	}
+
+	return res, ok
+}
+
+func (s *FinalProcessor) Final(final Processor) *FinalProcessor {
+	s.final = final
+	return s
+}
+
+func (s *FinalProcessor) GetDescriptor() ProcessorDescriptor {
+	return ProcessorDescriptor{
+		Name:        "Final Processor",
 		Description: "Description",
 		Input:       "",
 		Output:      "",

@@ -7,21 +7,21 @@ import (
 )
 
 type Processable interface {
-	GetProducer() Identifier
 	SetBody(any)
 	GetBody() any
 }
 
 type RoutableProcessable interface {
 	Processable
+	GetProducer() Identifier
 	GetConsumer() Identifier
 }
 
 type OutComingProcessable struct {
-	Producer           Identifier
-	Consumer           Identifier
-	ProducerCredential Credential
-	Body               any
+	Producer           ExternalIdentifier  `json:"producer"`
+	Consumer           ExternalIdentifier  `json:"consumer"`
+	ProducerCredential OutComingCredential `json:"producer_credential"`
+	Body               any                 `json:"body"`
 }
 
 func (o *OutComingProcessable) GetProducer() Identifier {
@@ -41,14 +41,8 @@ func (o *OutComingProcessable) GetBody() any {
 }
 
 type OutGoingProcessable struct {
-	Producer           Identifier
-	Consumer           Identifier
-	ProducerCredential Credential
-	Body               any
-}
-
-func (o *OutGoingProcessable) GetProducer() Identifier {
-	return o.Producer
+	Consumer ExternalIdentifier `json:"consumer"`
+	Body     any                `json:"body"`
 }
 
 func (o *OutGoingProcessable) GetConsumer() Identifier {
@@ -64,14 +58,9 @@ func (o *OutGoingProcessable) GetBody() any {
 }
 
 type InternalProcessable struct {
-	ID        uuid.UUID  `json:"id"`
-	Producer  Identifier `json:"producer"`
-	Body      any        `json:"body"`
-	CreatedAt time.Time  `json:"created_at"`
-}
-
-func (o *InternalProcessable) GetProducer() Identifier {
-	return o.Producer
+	ID        uuid.UUID `json:"id"`
+	Body      any       `json:"body"`
+	CreatedAt time.Time `json:"created_at"`
 }
 
 func (o *InternalProcessable) SetBody(v any) {
@@ -80,12 +69,4 @@ func (o *InternalProcessable) SetBody(v any) {
 
 func (o *InternalProcessable) GetBody() any {
 	return o.Body
-}
-
-func (o *InternalProcessable) UniqueProperty() string {
-	return o.ID.String()
-}
-
-func (o *InternalProcessable) PredefinedKind() string {
-	return KindInternalProcessable
 }
