@@ -47,3 +47,38 @@ func (s *ConditionalProcessor) GetDescriptor() ProcessorDescriptor {
 		Output:      "",
 	}
 }
+
+type FinalProcessor struct {
+	main  Processor
+	final Processor
+}
+
+func NewFinalProcessor(processor Processor) *FinalProcessor {
+	return &FinalProcessor{
+		main: processor,
+	}
+}
+
+func (s *FinalProcessor) Process(processable Processable) (Processable, bool) {
+	res, ok := s.main.Process(processable)
+
+	if s.final != nil {
+		return s.final.Process(res)
+	}
+
+	return res, ok
+}
+
+func (s *FinalProcessor) Final(final Processor) *FinalProcessor {
+	s.final = final
+	return s
+}
+
+func (s *FinalProcessor) GetDescriptor() ProcessorDescriptor {
+	return ProcessorDescriptor{
+		Name:        "Final Processor",
+		Description: "Description",
+		Input:       "",
+		Output:      "",
+	}
+}

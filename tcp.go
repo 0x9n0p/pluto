@@ -40,7 +40,24 @@ var ConnectionHandler = Pipeline{
 			}),
 		},
 
-		// TODO: Remove the authenticated connection
+		NewFinalProcessor(
+			&ConnectionDecoder{
+				MaxDecode:    MAXRequestPerConnection,
+				ReadDeadline: time.Hour,
+				Processor: NewInlineProcessor(func(processable Processable) (Processable, bool) {
+					Process(processable.(RoutableProcessable))
+					return processable, true
+				}),
+			},
+		).Final(
+			NewInlineProcessor(func(processable Processable) (Processable, bool) {
+				AuthenticatedConnectionsMutex.Lock()
+				defer AuthenticatedConnectionsMutex.Unlock()
+				defer func() { recover() }()
+				delete(AuthenticatedConnections, processable.GetBody().(Appendable)["connection_id"].(uuid.UUID))
+				return processable, true
+			}),
+		),
 	}},
 }
 
