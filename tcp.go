@@ -28,9 +28,22 @@ var ConnectionHandler = Pipeline{
 		authenticator,
 
 		NewFinalProcessor(
+			// TODO: Rename it to StreamDecoder?
 			&ConnectionDecoder{
 				MaxDecode:    MAXRequestPerConnection,
 				ReadDeadline: time.Hour,
+				ProcessableBuilder: func(context Processable, new OutComingProcessable) Processable {
+					defer func() { recover() }()
+
+					AuthenticatedConnectionsMutex.RLock()
+					defer AuthenticatedConnectionsMutex.RUnlock()
+
+					connection := AuthenticatedConnections[context.GetBody().(map[string]any)["connection_id"].(uuid.UUID)]
+					new.Producer = connection.Producer.(ExternalIdentifier)
+					new.ProducerCredential = connection.ProducerCredential.(OutComingCredential)
+
+					return &new
+				},
 				Processor: NewInlineProcessor(func(processable Processable) (Processable, bool) {
 					Process(processable.(RoutableProcessable))
 					return processable, true

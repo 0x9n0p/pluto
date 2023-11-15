@@ -15,12 +15,14 @@ var (
 
 type AuthenticatedConnection struct {
 	AcceptedConnection
+	Producer           Identifier
 	ProducerCredential Credential
 }
 
 var authenticator = NewConditionalProcessor(&ConnectionDecoder{
-	MaxDecode:    1,
-	ReadDeadline: time.Second * 2,
+	MaxDecode:          1,
+	ReadDeadline:       time.Second * 2,
+	ProcessableBuilder: func(context Processable, new OutComingProcessable) Processable { return &new },
 	Processor: NewInlineProcessor(func(processable Processable) (result Processable, succeed bool) {
 		defer func() { succeed = recover() == nil }()
 
@@ -61,6 +63,7 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 				return processable, false
 			}
 
+			authenticatedConnection.Producer = p.Producer
 			authenticatedConnection.ProducerCredential = p.ProducerCredential
 		}
 

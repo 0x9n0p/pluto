@@ -10,9 +10,10 @@ import (
 )
 
 type ConnectionDecoder struct {
-	MaxDecode    uint64
-	ReadDeadline time.Duration
-	Processor    Processor
+	MaxDecode          uint64
+	ReadDeadline       time.Duration
+	ProcessableBuilder func(context Processable, new OutComingProcessable) Processable
+	Processor          Processor
 }
 
 func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) {
@@ -33,7 +34,7 @@ func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) 
 			return processable, false
 		}
 
-		if result, success := p.Processor.Process(&outComingProcessable); !success {
+		if result, success := p.Processor.Process(p.ProcessableBuilder(processable, outComingProcessable)); !success {
 			return result, false
 		}
 	}
