@@ -2,22 +2,27 @@ package pluto
 
 import (
 	"encoding/json"
-	"io"
-	"os"
 	"time"
 
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 )
 
 // ApplicationLogger
 //
 // TODO:
-//  1. The output should be changeable to write to network fd
+//  1. Authorization for ApplicationLogger is required.
 //  2. Add other log levels, error, info ..
-var ApplicationLogger = ApplicationLogCollector{Output: os.Stdout}
+var ApplicationLogger = func() ApplicationLogCollector {
+	logger := ApplicationLogCollector{NewChannel("APPLICATION_LOGGER", 10)}
+	ChannelsMutex.Lock()
+	defer ChannelsMutex.Unlock()
+	Channels[logger.Channel.ID] = logger.Channel
+	return logger
+}()
 
 type ApplicationLogCollector struct {
-	Output io.Writer
+	Channel Channel
 }
 
 type ApplicationLog struct {
@@ -40,15 +45,16 @@ func (l *ApplicationLogCollector) Warning(log ApplicationLog) {
 func (l *ApplicationLogCollector) Log(log ApplicationLog) {
 	log.CreatedAt = time.Now()
 
+	// TODO: Do not convert log to bytes. The subscriber may do it.
 	b, err := json.Marshal(log)
 	if err != nil {
 		Log.Error("Marshalling ApplicationLog", zap.Error(err))
 		return
 	}
 
-	_, err = l.Output.Write(b)
-	if err != nil {
-		Log.Error("Writing ApplicationLog", zap.Error(err))
-		return
-	}
+	l.Channel.Publish(&InternalProcessable{
+		ID:        uuid.New(), // TODO: Do not generate uuid every time!
+		Body:      b,
+		CreatedAt: time.Now(),
+	})
 }
