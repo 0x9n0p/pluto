@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	executionCache      = make(map[string]Pipeline)
-	executionCacheMutex = new(sync.RWMutex)
+	ExecutionCache      = make(map[string]Pipeline)
+	ExecutionCacheMutex = new(sync.RWMutex)
 )
 
 // Process
@@ -22,10 +22,10 @@ func Process(processable RoutableProcessable) {
 		return
 	}
 
-	executionCacheMutex.RLock()
-	defer executionCacheMutex.RUnlock()
+	ExecutionCacheMutex.RLock()
+	defer ExecutionCacheMutex.RUnlock()
 
-	p, found := executionCache[processable.GetConsumer().UniqueProperty()]
+	p, found := ExecutionCache[processable.GetConsumer().UniqueProperty()]
 	if !found {
 		ApplicationLogger.Warning(ApplicationLog{
 			Message: "Pipeline not found",
@@ -38,7 +38,7 @@ func Process(processable RoutableProcessable) {
 }
 
 func ReloadExecutionCache(c map[string]Pipeline) {
-	executionCacheMutex.Lock()
-	defer executionCacheMutex.Unlock()
-	executionCache = c
+	ExecutionCacheMutex.Lock()
+	defer ExecutionCacheMutex.Unlock()
+	ExecutionCache = c
 }
