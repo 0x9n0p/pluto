@@ -108,17 +108,21 @@ func (s *Storage) List() (pipelines []Pipeline, err error) {
 }
 
 func (s *Storage) ReloadExecutionCache() error {
-	//storedPipelines, err :=
+	storedPipelines, err := GetStorage().List()
+	if err != nil {
+		return fmt.Errorf("list pipelines: %v", err)
+	}
 
-	//pluto.ExecutionCacheMutex.Lock()
-	//pluto.ExecutionCache[pipeline.Name] = pluto.Pipeline{
-	//	Name: pipeline.Name,
-	//	// TODO: Find, convert and pass the arguments
-	//	ProcessorBucket: pluto.ProcessorBucket{Processors: pipeline.Processors},
-	//}
-	//pluto.ExecutionCacheMutex.Unlock()
-	//
-	//
+	pipelines := make(map[string]pluto.Pipeline)
+	for _, storedPipeline := range storedPipelines {
+		pipeline, err := storedPipeline.Create()
+		if err != nil {
+			return err
+		}
 
+		pipelines[pipeline.Name] = pipeline
+	}
+
+	pluto.ReloadExecutionCache(pipelines)
 	return nil
 }

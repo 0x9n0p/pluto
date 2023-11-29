@@ -1,14 +1,19 @@
 package pluto
 
-var PredefinedProcessors = make(map[string]func(any) Processor)
+var PredefinedProcessors = make(map[string]func(map[string]Value) Processor)
 
 type Processor interface {
+	// GetDescriptor
+	// Deprecated
 	GetDescriptor() ProcessorDescriptor
+
 	// Process
 	// The boolean indicates that the next processor can be executed or not.
 	Process(Processable) (Processable, bool)
 }
 
+// ProcessorDescriptor
+// Deprecated
 type ProcessorDescriptor struct {
 	Name        string
 	Description string

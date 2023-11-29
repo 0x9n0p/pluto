@@ -1,41 +1,55 @@
 package processor
 
+import (
+	"io"
+	"net/http"
+	"pluto"
+)
+
+const (
+	Category_InputOutpt = "InputOutput"
+)
+
 var Processors = []Descriptor{
 	{
-		Name:        "Create Table",
-		Description: "This is for test",
+		Name:        pluto.ProcessorName_WriteToInputOutput,
+		Description: "Write to Input/Output interfaces directly",
 		Icon:        "https://...",
-		Arguments: map[string]ValueDescriptor{
-			"create_if_not_exists": {
-				Type:    TypeNumeric,
-				Default: 0,
-			},
-			"table_name": {
-				Type:     TypeText,
+		Arguments: map[string]pluto.ValueDescriptor{
+			"io_interface": {
+				Type:     pluto.TypeInternalInterface,
 				Required: true,
+				ValueValidator: func(arg pluto.Value) error {
+					_, ok := arg.Value.(io.Writer)
+					if !ok {
+						return &pluto.Error{
+							HTTPCode: http.StatusBadRequest,
+							Message:  "Value of io_interface is not an io.Writer",
+						}
+					}
+					return nil
+				},
 			},
-			"columns": {
-				Type: TypeList,
-				//Default:  []Value{},
+		},
+		Input: map[string]pluto.ValueDescriptor{
+			/*
+				The processable.body is Processable.GetBody()
+			*/
+			"processable.body": {
+				Type:     pluto.TypeBytes,
 				Required: true,
 			},
 		},
-		Input: map[string]ValueDescriptor{},
-		Output: map[string]ValueDescriptor{
-			"table_id": {
-				Type: TypeText,
-			},
-		},
-		Category: "Storage",
+		Output:   map[string]pluto.ValueDescriptor{},
+		Category: Category_InputOutpt,
 	},
+}
 
-	{
-		Name:        "MY_PROCESSOR",
-		Description: "This is for test",
-		Icon:        "https://...",
-		Arguments:   map[string]ValueDescriptor{},
-		Input:       map[string]ValueDescriptor{},
-		Output:      map[string]ValueDescriptor{},
-		Category:    "Storage",
-	},
+func GetDescriptor(name string) (Descriptor, bool) {
+	for _, processor := range Processors {
+		if name == processor.Name {
+			return processor, true
+		}
+	}
+	return Descriptor{}, false
 }

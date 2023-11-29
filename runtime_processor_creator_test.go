@@ -12,7 +12,7 @@ func TestRuntimeProcessorCreator(t *testing.T) {
 			Name: "CREATE_WRITE_TO_IO_PROCESSOR",
 			ProcessorBucket: pluto.ProcessorBucket{Processors: []pluto.Processor{
 				pluto.RuntimeProcessorCreator{
-					PredefinedProcessorName: "WRITE_TO_IO",
+					PredefinedProcessorName: ProcessorName_WriteToInputOutput,
 					AppendName:              "processor",
 				},
 			}},
