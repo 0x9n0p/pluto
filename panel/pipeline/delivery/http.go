@@ -20,7 +20,9 @@ func init() {
 
 	panel := pluto.FindHTTPHost("panel")
 
-	panel.GET("/pipelines",
+	v1 := panel.Group("/api/v1")
+
+	v1.GET("/pipelines",
 		wrapper.New[wrapper.EmptyRequest](func(request wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {
 			list, err := pipeline.GetStorage().List()
 			if err != nil {
@@ -30,7 +32,7 @@ func init() {
 		}).Handle(),
 	)
 
-	panel.POST("/pipelines",
+	v1.POST("/pipelines",
 		wrapper.New[pipeline.Pipeline](func(p pipeline.Pipeline, writer wrapper.ResponseWriter) error {
 			if err := p.Save(); err != nil {
 				return WriteError(err, writer)
@@ -44,7 +46,7 @@ func init() {
 		}).Handle(),
 	)
 
-	panel.DELETE("/pipelines",
+	v1.DELETE("/pipelines",
 		wrapper.New[struct {
 			Name string `query:"name" validate:"required"`
 		}](func(r struct {
