@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	pluto.HTTPAdmin.GET("/processors",
+	pluto.HTTPServer.GET("/processors",
 		wrapper.New[wrapper.EmptyRequest](func(_ wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {
 			return writer.JSON(http.StatusOK, processor.Processors)
 		}).Handle(),

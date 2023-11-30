@@ -18,7 +18,9 @@ func init() {
 		return writer.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
 	}
 
-	pluto.HTTPAdmin.GET("/pipelines",
+	panel := pluto.HTTPHosts[pluto.MakeHost("panel")]
+
+	panel.GET("/pipelines",
 		wrapper.New[wrapper.EmptyRequest](func(request wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {
 			list, err := pipeline.GetStorage().List()
 			if err != nil {
@@ -28,7 +30,7 @@ func init() {
 		}).Handle(),
 	)
 
-	pluto.HTTPAdmin.POST("/pipelines",
+	panel.POST("/pipelines",
 		wrapper.New[pipeline.Pipeline](func(p pipeline.Pipeline, writer wrapper.ResponseWriter) error {
 			if err := p.Save(); err != nil {
 				return WriteError(err, writer)
@@ -42,7 +44,7 @@ func init() {
 		}).Handle(),
 	)
 
-	pluto.HTTPAdmin.DELETE("/pipelines",
+	panel.DELETE("/pipelines",
 		wrapper.New[struct {
 			Name string `query:"name" validate:"required"`
 		}](func(r struct {
