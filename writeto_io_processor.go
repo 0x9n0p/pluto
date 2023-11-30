@@ -6,34 +6,16 @@ import (
 	"go.uber.org/zap"
 )
 
+const ProcessorName_WriteToInputOutput = "Write to input/output"
+
 func init() {
-	PredefinedProcessors["WRITE_TO_IO"] = func(r any) Processor {
-		a, ok := r.(map[string]any)
-		if !ok {
-			ApplicationLogger.Debug(ApplicationLog{
-				Message: "Cannot create WRITE_TO_IO processor: Body is not map[string]any",
-			})
-			return nil
-		}
-
-		v, found := a["io_interface"]
-		if !found {
-			ApplicationLogger.Debug(ApplicationLog{
-				Message: "Cannot create WRITE_TO_IO processor: No io_interface found in body",
-			})
-			return nil
-		}
-
-		i, ok := v.(io.Writer)
-		if !ok {
-			ApplicationLogger.Debug(ApplicationLog{
-				Message: "Cannot create WRITE_TO_IO processor: The io_interface is not writer",
-			})
-			return nil
-		}
+	PredefinedProcessors[ProcessorName_WriteToInputOutput] = func(args map[string]Value) Processor {
+		defer func() {
+			// TODO: Application log
+		}()
 
 		return WriteToIOProcessor{
-			Writer: i,
+			Writer: args["io_interface"].Value.(io.Writer),
 		}
 	}
 }
@@ -60,7 +42,7 @@ func (p WriteToIOProcessor) Process(processable Processable) (Processable, bool)
 
 func (p WriteToIOProcessor) GetDescriptor() ProcessorDescriptor {
 	return ProcessorDescriptor{
-		Name:        "WRITE_TO_IO",
+		Name:        ProcessorName_WriteToInputOutput,
 		Description: "",
 		Input:       "",
 		Output:      "",

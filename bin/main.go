@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"pluto"
+	_ "pluto/panel"
 )
 
 func init() {

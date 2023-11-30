@@ -1,5 +1,7 @@
 package pluto
 
+// Config
+// Deprecated
 type Config struct {
 	Pipelines []struct {
 		Name       string `json:"name"`
@@ -11,7 +13,8 @@ type Config struct {
 	} `json:"pipelines"`
 }
 
-// ResolveConfig REFACTOR
+// ResolveConfig
+// Deprecated
 func ResolveConfig(config Config) (o map[string]Pipeline) {
 	for _, pipeline := range config.Pipelines {
 		p := Pipeline{
