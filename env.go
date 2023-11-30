@@ -12,8 +12,8 @@ var Env EnvSpec
 
 type EnvSpec struct {
 	Debug             bool
-	HOST              string `envconfig:"HOST"`
-	HTTPServerAddress string `envconfig:"HTTP_SERVER"`
+	Host              []string `envconfig:"HOST" default:"localhost"`
+	HTTPServerAddress string   `envconfig:"HTTP_SERVER" default:"0.0.0.0:80"`
 }
 
 func init() {

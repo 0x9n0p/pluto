@@ -18,7 +18,7 @@ func init() {
 		return writer.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
 	}
 
-	panel := pluto.HTTPHosts[pluto.MakeHost("panel")]
+	panel := pluto.FindHTTPHost("panel")
 
 	panel.GET("/pipelines",
 		wrapper.New[wrapper.EmptyRequest](func(request wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {

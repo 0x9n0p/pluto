@@ -37,12 +37,12 @@ var HTTPServer = func() *echo.Echo {
 func init() {
 	root := echo.New()
 	root.Use(middleware.Recover())
-	HTTPHosts[Env.HOST] = root
-	HTTPHosts[MakeHost("www")] = root
+	RegisterHTTPHost("", root)
+	RegisterHTTPHost("www", root)
 
 	panel := echo.New()
 	panel.Use(middleware.Recover())
-	HTTPHosts[MakeHost("panel")] = panel
+	RegisterHTTPHost("panel", panel)
 
 	if Env.Debug {
 		root.Use(middleware.Logger())
@@ -75,6 +75,25 @@ func init() {
 	}()
 }
 
-func MakeHost(subdomain string) string {
-	return fmt.Sprintf("%s.%s", subdomain, Env.HOST)
+func RegisterHTTPHost(subdomain string, e *echo.Echo) {
+	for _, host := range Env.Host {
+		HTTPHosts[MakeHostName(subdomain, host)] = e
+	}
+}
+
+func FindHTTPHost(subdomain string) *echo.Echo {
+	for _, host := range Env.Host {
+		e, found := HTTPHosts[MakeHostName(subdomain, host)]
+		if found {
+			return e
+		}
+	}
+	return nil
+}
+
+func MakeHostName(subdomain string, host string) string {
+	if subdomain != "" {
+		subdomain += "."
+	}
+	return fmt.Sprintf("%s%s", subdomain, host)
 }

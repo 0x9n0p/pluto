@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	pluto.HTTPHosts[pluto.MakeHost("panel")].GET("/", func(c echo.Context) error {
+	pluto.FindHTTPHost("panel").GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Panel.")
 	})
 
