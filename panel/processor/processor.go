@@ -47,7 +47,7 @@ func (p *Processor) Create() (pluto.Processor, error) {
 
 func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error {
 	for _, descriptor := range descriptors {
-		argument, found := pluto.MayFind(pluto.Value{Name: descriptor.Name}, p.Arguments...)
+		argument, found := pluto.MayFind(descriptor.Name, p.Arguments...)
 		if !found {
 			return &pluto.Error{
 				HTTPCode: http.StatusBadRequest,

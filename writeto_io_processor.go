@@ -15,7 +15,7 @@ func init() {
 		}()
 
 		return WriteToIOProcessor{
-			Writer: Find(Value{Name: "io_interface"}).Value.(io.Writer),
+			Writer: Find("io_interface", args...).Value.(io.Writer),
 		}
 	}
 }

@@ -17,12 +17,8 @@ type ValueDescriptor struct {
 	ValueValidator func(Value) error `json:"-"`
 }
 
-func (v ValueDescriptor) Compare(c Comparable) (equal bool) {
-	t, ok := c.(ValueDescriptor)
-	if !ok {
-		return false
-	}
-	return v.Name == t.Name
+func (v ValueDescriptor) Comparable() any {
+	return v.Name
 }
 
 type Value struct {
@@ -31,10 +27,6 @@ type Value struct {
 	Value any    `json:"value"`
 }
 
-func (v Value) Compare(c Comparable) bool {
-	t, ok := c.(Value)
-	if !ok {
-		return false
-	}
-	return v.Name == t.Name
+func (v Value) Comparable() any {
+	return v.Name
 }
