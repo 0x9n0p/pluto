@@ -10,10 +10,10 @@ const (
 )
 
 type ValueDescriptor struct {
-	Type           string `json:"type"`
-	Required       bool   `json:"required"`
-	Default        any    `json:"default,omitempty"`
-	ValueValidator func(Value) error
+	Type           string            `json:"type"`
+	Required       bool              `json:"required"`
+	Default        any               `json:"default,omitempty"`
+	ValueValidator func(Value) error `json:"-"`
 }
 
 type Value struct {
