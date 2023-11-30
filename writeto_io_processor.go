@@ -9,13 +9,13 @@ import (
 const ProcessorName_WriteToInputOutput = "Write to input/output"
 
 func init() {
-	PredefinedProcessors[ProcessorName_WriteToInputOutput] = func(args map[string]Value) Processor {
+	PredefinedProcessors[ProcessorName_WriteToInputOutput] = func(args []Value) Processor {
 		defer func() {
 			// TODO: Application log
 		}()
 
 		return WriteToIOProcessor{
-			Writer: args["io_interface"].Value.(io.Writer),
+			Writer: Find(Value{Name: "io_interface"}).Value.(io.Writer),
 		}
 	}
 }

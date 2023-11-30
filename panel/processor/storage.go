@@ -15,8 +15,9 @@ var Processors = []Descriptor{
 		Name:        pluto.ProcessorName_WriteToInputOutput,
 		Description: "Write to Input/Output interfaces directly",
 		Icon:        "https://...",
-		Arguments: map[string]pluto.ValueDescriptor{
-			"io_interface": {
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "io_interface",
 				Type:     pluto.TypeInternalInterface,
 				Required: true,
 				ValueValidator: func(arg pluto.Value) error {
@@ -31,16 +32,17 @@ var Processors = []Descriptor{
 				},
 			},
 		},
-		Input: map[string]pluto.ValueDescriptor{
+		Input: []pluto.ValueDescriptor{
 			/*
 				The processable.body is Processable.GetBody()
 			*/
-			"processable.body": {
+			{
+				Name:     "processable.body",
 				Type:     pluto.TypeBytes,
 				Required: true,
 			},
 		},
-		Output:   map[string]pluto.ValueDescriptor{},
+		Output:   []pluto.ValueDescriptor{},
 		Category: Category_InputOutpt,
 	},
 }
