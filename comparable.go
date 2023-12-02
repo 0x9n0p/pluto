@@ -13,11 +13,12 @@ func Find[T comparable, C Comparable](target T, items ...C) (c C) {
 	return
 }
 
-func MayFind[T comparable, C Comparable](target T, items ...C) (c C, f bool) {
-	for _, current := range items {
+// MayFind returns -1 if the item not found.
+func MayFind[T comparable, C Comparable](target T, items ...C) (c C, i int) {
+	for i, current := range items {
 		if current.Comparable() == target {
-			return current, true
+			return current, i
 		}
 	}
-	return
+	return c, -1
 }

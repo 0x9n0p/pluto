@@ -47,8 +47,8 @@ func (p *Processor) Create() (pluto.Processor, error) {
 
 func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error {
 	for _, descriptor := range descriptors {
-		argument, found := pluto.MayFind(descriptor.Name, p.Arguments...)
-		if !found {
+		argument, index := pluto.MayFind(descriptor.Name, p.Arguments...)
+		if index == -1 {
 			return &pluto.Error{
 				HTTPCode: http.StatusBadRequest,
 				Message:  fmt.Sprintf("Argument (%s) is required", descriptor.Name),
@@ -65,6 +65,14 @@ func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error
 		if err := descriptor.ValueValidator(argument); err != nil {
 			return err
 		}
+
+		if descriptor.ValueParser == nil {
+			argument.ValueParser = pluto.NoParserRequired
+		} else {
+			argument.ValueParser = descriptor.ValueParser
+		}
+
+		p.Arguments[index] = argument
 	}
 
 	return nil
