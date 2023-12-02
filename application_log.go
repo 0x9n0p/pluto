@@ -42,6 +42,11 @@ func (l *ApplicationLogCollector) Warning(log ApplicationLog) {
 	l.Log(log)
 }
 
+func (l *ApplicationLogCollector) Error(log ApplicationLog) {
+	log.Level = "Error"
+	l.Log(log)
+}
+
 func (l *ApplicationLogCollector) Log(log ApplicationLog) {
 	log.CreatedAt = time.Now()
 

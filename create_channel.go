@@ -1,48 +1,35 @@
 package pluto
 
+const ProcessorName_CreateChannel = "Create Channel"
+
+func init() {
+	PredefinedProcessors[ProcessorName_CreateChannel] = func(args []Value) Processor {
+		defer func() {
+			ApplicationLogger.Error(ApplicationLog{
+				Message: "Make sure you entered correct arguments",
+				Extra:   map[string]any{"details": recover()},
+			})
+		}()
+
+		return CreateChannel{
+			Name:   Find("Name", args...).Value.(string),
+			Length: Find("Length", args...).Value.(uint),
+		}
+	}
+}
+
 type CreateChannel struct {
+	Name   string
+	Length uint
 }
 
 func (p CreateChannel) Process(processable Processable) (Processable, bool) {
-	appendable, ok := processable.GetBody().(map[string]any)
-	if !ok {
-		return processable, false
-	}
-
-	v, found := appendable["channel_name"]
-	if !found {
-		return processable, false
-	}
-
-	channelName, ok := v.(string)
-	if !ok {
-		return processable, false
-	}
-
-	v, found = appendable["channel_length"]
-	if !found {
-		return processable, false
-	}
-
-	channelLength, ok := v.(uint)
-	if !ok {
-		return processable, false
-	}
-
-	channel := NewChannel(channelName, channelLength)
+	channel := NewChannel(p.Name, p.Length)
 	Channels[channel.ID] = channel
-
-	appendable["channel"] = channel
-	processable.SetBody(appendable)
-
+	processable.SetBody(channel)
 	return processable, true
 }
 
 func (p CreateChannel) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "CREATE_CHANNEL",
-		Description: "",
-		Input:       "channel_name,channel_length",
-		Output:      "channel",
-	}
+	return ProcessorDescriptor{}
 }
