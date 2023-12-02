@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"pluto"
+	"strings"
 )
 
 const (
@@ -54,4 +55,22 @@ func GetDescriptor(name string) (Descriptor, bool) {
 		}
 	}
 	return Descriptor{}, false
+}
+
+type DescriptorFinder struct {
+	Name string `query:"name"`
+}
+
+func (f *DescriptorFinder) Find() []Descriptor {
+	if f.Name == "" {
+		return Processors
+	}
+
+	found := make([]Descriptor, 0)
+	for _, descriptor := range Processors {
+		if strings.Contains(strings.ToLower(descriptor.Name), strings.ToLower(f.Name)) {
+			found = append(found, descriptor)
+		}
+	}
+	return found
 }

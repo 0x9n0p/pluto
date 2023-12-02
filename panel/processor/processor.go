@@ -17,7 +17,7 @@ type Descriptor struct {
 }
 
 type Processor struct {
-	Name      string        `json:"name"`
+	Name      string        `json:"name" query:"name"`
 	Arguments []pluto.Value `json:"arguments"`
 }
 
