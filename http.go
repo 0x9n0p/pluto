@@ -21,14 +21,16 @@ var HTTPServer = func() *echo.Echo {
 		e.Use(middleware.Logger())
 	}
 
-	e.Any("/*", func(c echo.Context) (err error) {
-		host, found := HTTPHosts[c.Request().Host]
-		if found {
-			host.ServeHTTP(c.Response(), c.Request())
-		} else {
-			err = echo.ErrNotFound
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) (err error) {
+			host, found := HTTPHosts[c.Request().Host]
+			if found {
+				host.ServeHTTP(c.Response(), c.Request())
+			} else {
+				err = echo.ErrNotFound
+			}
+			return
 		}
-		return
 	})
 
 	return e
