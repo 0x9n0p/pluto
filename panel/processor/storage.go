@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"pluto"
+	"strings"
 )
 
 const (
@@ -15,8 +16,9 @@ var Processors = []Descriptor{
 		Name:        pluto.ProcessorName_WriteToInputOutput,
 		Description: "Write to Input/Output interfaces directly",
 		Icon:        "https://...",
-		Arguments: map[string]pluto.ValueDescriptor{
-			"io_interface": {
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "io_interface",
 				Type:     pluto.TypeInternalInterface,
 				Required: true,
 				ValueValidator: func(arg pluto.Value) error {
@@ -31,16 +33,17 @@ var Processors = []Descriptor{
 				},
 			},
 		},
-		Input: map[string]pluto.ValueDescriptor{
+		Input: []pluto.ValueDescriptor{
 			/*
 				The processable.body is Processable.GetBody()
 			*/
-			"processable.body": {
+			{
+				Name:     "processable.body",
 				Type:     pluto.TypeBytes,
 				Required: true,
 			},
 		},
-		Output:   map[string]pluto.ValueDescriptor{},
+		Output:   []pluto.ValueDescriptor{},
 		Category: Category_InputOutpt,
 	},
 }
@@ -52,4 +55,22 @@ func GetDescriptor(name string) (Descriptor, bool) {
 		}
 	}
 	return Descriptor{}, false
+}
+
+type DescriptorFinder struct {
+	Name string `query:"name"`
+}
+
+func (f *DescriptorFinder) Find() []Descriptor {
+	if f.Name == "" {
+		return Processors
+	}
+
+	found := make([]Descriptor, 0)
+	for _, descriptor := range Processors {
+		if strings.Contains(strings.ToLower(descriptor.Name), strings.ToLower(f.Name)) {
+			found = append(found, descriptor)
+		}
+	}
+	return found
 }

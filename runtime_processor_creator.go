@@ -2,7 +2,7 @@ package pluto
 
 func init() {
 	// TODO: Runtime processor creators should be added by HTTP APIs.
-	PredefinedProcessors["RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO"] = func(map[string]Value) Processor {
+	PredefinedProcessors["RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO"] = func([]Value) Processor {
 		return RuntimeProcessorCreator{
 			PredefinedProcessorName: ProcessorName_WriteToInputOutput,
 			AppendName:              "processor",
@@ -31,7 +31,7 @@ func (p RuntimeProcessorCreator) Process(processable Processable) (Processable, 
 		return processable, false
 	}
 
-	a[p.AppendName] = creator(processable.GetBody().(map[string]Value))
+	a[p.AppendName] = creator(processable.GetBody().([]Value))
 	processable.SetBody(a)
 
 	return processable, true

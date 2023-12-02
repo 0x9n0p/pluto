@@ -16,10 +16,42 @@ Pluto gives you a single binary file, so you may clone the project and execute t
 go build -o pluto bin/main.go && ./pluto
 ```
 
-The binary file does not take arguments, but you can pass several environment variables to it.
+The binary file does not take arguments, but you can pass environment variables to it.
 
 ```bash
-PLUTO_DEBUG=true PLUTO_HTTP_ADMIN=localhost:9630 ./pluto
+PLUTO_HOST=localhost,127.0.0.1 PLUTO_HTTP_SERVER=0.0.0.0:80 PLUTO_PANEL_STORAGE=./tmp/ PLUTO_DEBUG=true ./pluto
+```
+
+## Panel
+
+### APIs Examples
+
+#### Create/Save pipelines
+
+This API Creates/Saves the pipeline and returns the saved pipeline in response.
+
+```bash
+curl -X POST http://panel.localhost/api/v1/pipelines \                                                                                     
+  -H 'Content-Type: application/json' \
+  -d '{"name":"PIPELINE_NAME","processors":[{"name":"Write to input/output","arguments":[{"name":"io_interface","type":"InternalInterface","value":"ARGUMENT_VALUE"}]}]}'
+```
+
+```json
+{
+  "name": "PIPELINE_NAME",
+  "processors": [
+    {
+      "name": "Write to input/output",
+      "arguments": [
+        {
+          "name": "io_interface",
+          "type": "InternalInterface",
+          "value": "ARGUMENT_VALUE"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ## Configuration

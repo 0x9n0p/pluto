@@ -7,18 +7,18 @@ import (
 )
 
 type Descriptor struct {
-	Name        string                           `json:"name"`
-	Description string                           `json:"description"`
-	Icon        string                           `json:"icon"`
-	Arguments   map[string]pluto.ValueDescriptor `json:"arguments"`
-	Input       map[string]pluto.ValueDescriptor `json:"input"`
-	Output      map[string]pluto.ValueDescriptor `json:"output"`
-	Category    string                           `json:"category"`
+	Name        string                  `json:"name"`
+	Description string                  `json:"description"`
+	Icon        string                  `json:"icon"`
+	Arguments   []pluto.ValueDescriptor `json:"arguments"`
+	Input       []pluto.ValueDescriptor `json:"input"`
+	Output      []pluto.ValueDescriptor `json:"output"`
+	Category    string                  `json:"category"`
 }
 
 type Processor struct {
-	Name      string                 `json:"name"`
-	Arguments map[string]pluto.Value `json:"arguments"`
+	Name      string        `json:"name" query:"name"`
+	Arguments []pluto.Value `json:"arguments"`
 }
 
 func (p *Processor) Create() (pluto.Processor, error) {
@@ -45,13 +45,13 @@ func (p *Processor) Create() (pluto.Processor, error) {
 	return creator(p.Arguments), nil
 }
 
-func (p *Processor) validateArguments(descriptors map[string]pluto.ValueDescriptor) error {
-	for name, descriptor := range descriptors {
-		argument, found := p.Arguments[name]
+func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error {
+	for _, descriptor := range descriptors {
+		argument, found := pluto.MayFind(descriptor.Name, p.Arguments...)
 		if !found {
 			return &pluto.Error{
 				HTTPCode: http.StatusBadRequest,
-				Message:  fmt.Sprintf("Argument (%s) is required", name),
+				Message:  fmt.Sprintf("Argument (%s) is required", descriptor.Name),
 			}
 		}
 
