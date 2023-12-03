@@ -3,18 +3,12 @@ package pluto
 const ProcessorName_CreateChannel = "Create Channel"
 
 func init() {
-	PredefinedProcessors[ProcessorName_CreateChannel] = func(args []Value) Processor {
-		defer func() {
-			ApplicationLogger.Error(ApplicationLog{
-				Message: "Make sure you entered correct arguments",
-				Extra:   map[string]any{"details": recover()},
-			})
-		}()
-
+	PredefinedProcessors[ProcessorName_CreateChannel] = func(args []Value) (p Processor, err error) {
+		defer creatorPanicHandler(ProcessorName_ExecAndJoinResult, &err)
 		return CreateChannel{
 			Name:   Find("Name", args...).Value.(string),
 			Length: Find("Length", args...).Value.(uint),
-		}
+		}, err
 	}
 }
 

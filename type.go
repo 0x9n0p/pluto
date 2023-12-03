@@ -1,9 +1,14 @@
 package pluto
 
 const (
-	TypeText              = "Text"
-	TypeNumeric           = "Numeric"
-	TypeList              = "List" // List of Value
+	TypeText    = "Text"
+	TypeNumeric = "Numeric"
+	TypeList    = "List" // List of Value
+
+	/*
+		TypeProcessor is not a struct.
+		It must be a map[string]any and has two fields 'string name' and '[]any arguments'.
+	*/
 	TypeProcessor         = "Processor"
 	TypeBytes             = "Bytes"
 	TypeInternalInterface = "InternalInterface"
@@ -11,16 +16,10 @@ const (
 
 var (
 	/*
-		These parsers can panic.
+		Parsers can panic.
 	*/
 
-	NoParserRequired    = func(v any) any { return v }
-	TypeProcessorParser = func(v any) any {
-		m := v.(map[string]any)
-		name := m["name"].(string)
-		arguments := m["arguments"].([]Value)
-		return PredefinedProcessors[name](arguments)
-	}
+	NoParserRequired = func(v any) any { return v }
 )
 
 type ValueDescriptor struct {
@@ -29,7 +28,6 @@ type ValueDescriptor struct {
 	Required       bool              `json:"required"`
 	Default        any               `json:"default,omitempty"`
 	ValueValidator func(Value) error `json:"-"`
-	ValueParser    func(any) any     `json:"-"`
 }
 
 func (v ValueDescriptor) Comparable() any {
@@ -41,6 +39,15 @@ type Value struct {
 	Type        string        `json:"type"`
 	Value       any           `json:"value"`
 	ValueParser func(any) any `json:"-"`
+}
+
+// ValueFromMap can panic.
+func ValueFromMap(m map[string]any) Value {
+	return Value{
+		Name:  m["name"].(string),
+		Type:  m["type"].(string),
+		Value: m["value"].(string),
+	}
 }
 
 func (v Value) Get() any {

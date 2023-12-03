@@ -1,12 +1,15 @@
 package pluto
 
+import "fmt"
+
 func init() {
 	// TODO: Runtime processor creators should be added by HTTP APIs.
-	PredefinedProcessors["RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO"] = func([]Value) Processor {
+	PredefinedProcessors["RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO"] = func([]Value) (p Processor, err error) {
+		defer creatorPanicHandler("RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO", &err)
 		return RuntimeProcessorCreator{
 			PredefinedProcessorName: ProcessorName_WriteToInputOutput,
 			AppendName:              "processor",
-		}
+		}, err
 	}
 }
 
@@ -31,7 +34,16 @@ func (p RuntimeProcessorCreator) Process(processable Processable) (Processable, 
 		return processable, false
 	}
 
-	a[p.AppendName] = creator(processable.GetBody().([]Value))
+	processor, err := creator(processable.GetBody().([]Value))
+	if err != nil {
+		ApplicationLogger.Error(ApplicationLog{
+			Message: fmt.Sprintf("Runtime processor creator failed to create the processor (%s)", p.PredefinedProcessorName),
+			Extra:   map[string]any{"details": err},
+		})
+		return processable, false
+	}
+
+	a[p.AppendName] = processor
 	processable.SetBody(a)
 
 	return processable, true

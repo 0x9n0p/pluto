@@ -1,6 +1,16 @@
 package pluto
 
-var PredefinedProcessors = make(map[string]func([]Value) Processor)
+import "fmt"
+
+var PredefinedProcessors = make(map[string]func([]Value) (Processor, error))
+
+func creatorPanicHandler(processorName string, err *error) func() {
+	return func() {
+		if v := recover(); v != nil {
+			*err = fmt.Errorf("make sure you enter the arguments of (%s) correctly: %s", processorName, v.(error))
+		}
+	}
+}
 
 type Processor interface {
 	// GetDescriptor

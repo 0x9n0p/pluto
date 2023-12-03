@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"pluto"
+
+	"go.uber.org/zap"
 )
 
 type Descriptor struct {
@@ -21,7 +23,17 @@ type Processor struct {
 	Arguments []pluto.Value `json:"arguments"`
 }
 
-func (p *Processor) Create() (pluto.Processor, error) {
+func (p *Processor) Create() (processor pluto.Processor, err error) {
+	defer func() {
+		if v := recover(); v != nil {
+			var ok bool
+			err, ok = v.(error)
+			if !ok {
+				pluto.Log.Error("The value of recovered panic is not an error", zap.Any("value", v))
+			}
+		}
+	}()
+
 	descriptor, found := GetDescriptor(p.Name)
 	if !found {
 		return nil, &pluto.Error{
@@ -42,7 +54,8 @@ func (p *Processor) Create() (pluto.Processor, error) {
 		}
 	}
 
-	return creator(p.Arguments), nil
+	processor, err = creator(p.Arguments)
+	return processor, err
 }
 
 func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error {
@@ -51,7 +64,7 @@ func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error
 		if index == -1 {
 			return &pluto.Error{
 				HTTPCode: http.StatusBadRequest,
-				Message:  fmt.Sprintf("Argument (%s) is required", descriptor.Name),
+				Message:  fmt.Sprintf("Argument (%s) for processor (%s) is required", descriptor.Name, p.Name),
 			}
 		}
 
@@ -66,14 +79,36 @@ func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error
 			return err
 		}
 
-		if descriptor.ValueParser == nil {
-			argument.ValueParser = pluto.NoParserRequired
-		} else {
-			argument.ValueParser = descriptor.ValueParser
-		}
-
+		argument.ValueParser = GetParserByType(argument.Type)
 		p.Arguments[index] = argument
 	}
 
 	return nil
+}
+
+func GetParserByType(t string) func(any) any {
+	switch t {
+	case pluto.TypeProcessor:
+		return func(v any) any {
+			m := v.(map[string]any)
+
+			processor := Processor{
+				Name:      m["name"].(string),
+				Arguments: []pluto.Value{},
+			}
+
+			for _, varg := range m["arguments"].([]any) {
+				processor.Arguments = append(processor.Arguments, pluto.ValueFromMap(varg.(map[string]any)))
+			}
+
+			p, err := processor.Create()
+			if err != nil {
+				panic(err)
+			}
+
+			return p
+		}
+	default:
+		return pluto.NoParserRequired
+	}
 }

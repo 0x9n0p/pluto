@@ -1,6 +1,7 @@
 package processor
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"pluto"
@@ -8,6 +9,7 @@ import (
 )
 
 const (
+	Category_Flow       = "Flow"
 	Category_InputOutpt = "InputOutput"
 )
 
@@ -26,7 +28,7 @@ var Processors = []Descriptor{
 					if !ok {
 						return &pluto.Error{
 							HTTPCode: http.StatusBadRequest,
-							Message:  "Value of io_interface is not an io.Writer",
+							Message:  "Value of (io_interface) is not an io.Writer",
 						}
 					}
 					return nil
@@ -45,6 +47,53 @@ var Processors = []Descriptor{
 		},
 		Output:   []pluto.ValueDescriptor{},
 		Category: Category_InputOutpt,
+	},
+	{
+		Name:        "Execute processor and join the result",
+		Description: "Execute processor and join the result ..",
+		Icon:        "https://..",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "Processor",
+				Type:     pluto.TypeProcessor,
+				Required: true,
+				ValueValidator: func(arg pluto.Value) (err error) {
+					m, ok := arg.Value.(map[string]any)
+					if !ok {
+						return &pluto.Error{
+							HTTPCode: http.StatusBadRequest,
+							Message:  "Value of (Processor) is not a processor",
+						}
+					}
+
+					defer func() {
+						if v := recover(); v != nil {
+							err = &pluto.Error{
+								HTTPCode: http.StatusBadRequest,
+								Message:  fmt.Sprintf("Missing fields or incorrect types: %s", v),
+							}
+						}
+
+					}()
+
+					_ = m["name"].(string)
+					_ = m["arguments"].([]any)
+
+					return
+				},
+			},
+		},
+		Input: []pluto.ValueDescriptor{
+			/*
+				Input of the inner processor.
+			*/
+		},
+		Output: []pluto.ValueDescriptor{
+			/*
+				Output of the inner processor.
+			*/
+		},
+		Category: Category_Flow,
 	},
 }
 
