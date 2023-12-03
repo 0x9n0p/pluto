@@ -16,6 +16,7 @@ var HTTPServer = func() *echo.Echo {
 	e.HideBanner = true
 	e.HidePort = true
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORS())
 
 	if Env.Debug {
 		e.Use(middleware.Logger())
@@ -39,11 +40,13 @@ var HTTPServer = func() *echo.Echo {
 func init() {
 	root := echo.New()
 	root.Use(middleware.Recover())
+	root.Use(middleware.CORS())
 	RegisterHTTPHost("", root)
 	RegisterHTTPHost("www", root)
 
 	panel := echo.New()
 	panel.Use(middleware.Recover())
+	panel.Use(middleware.CORS())
 	RegisterHTTPHost("panel", panel)
 
 	if Env.Debug {
