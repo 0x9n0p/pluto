@@ -10,7 +10,7 @@ const ProcessorName_WriteToInputOutput = "Write to input/output"
 
 func init() {
 	PredefinedProcessors[ProcessorName_WriteToInputOutput] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_WriteToInputOutput, &err)
+		defer creatorPanicHandler(ProcessorName_WriteToInputOutput, &err)()
 		return WriteToIOProcessor{
 			Writer: Find("io_interface", args...).Value.(io.Writer),
 		}, err

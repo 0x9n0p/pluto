@@ -4,7 +4,7 @@ const ProcessorName_ExecAndJoinResult = "Execute processor and join the result"
 
 func init() {
 	PredefinedProcessors[ProcessorName_ExecAndJoinResult] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_ExecAndJoinResult, &err)
+		defer creatorPanicHandler(ProcessorName_ExecAndJoinResult, &err)()
 		return ExecAndJoinResult{
 			Processor: Find("Processor", args...).Get().(Processor),
 		}, err

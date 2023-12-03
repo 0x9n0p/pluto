@@ -5,7 +5,7 @@ import "fmt"
 func init() {
 	// TODO: Runtime processor creators should be added by HTTP APIs.
 	PredefinedProcessors["RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO"] = func([]Value) (p Processor, err error) {
-		defer creatorPanicHandler("RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO", &err)
+		defer creatorPanicHandler("RUNTIME_PROCESSOR_CREATOR_WRITE_TO_IO", &err)()
 		return RuntimeProcessorCreator{
 			PredefinedProcessorName: ProcessorName_WriteToInputOutput,
 			AppendName:              "processor",

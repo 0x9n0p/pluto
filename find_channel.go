@@ -4,7 +4,7 @@ const ProcessorName_FindChannel = "Find Channel"
 
 func init() {
 	PredefinedProcessors[ProcessorName_FindChannel] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_FindChannel, &err)
+		defer creatorPanicHandler(ProcessorName_FindChannel, &err)()
 		return FindChannel{
 			Name: Find("Name", args...).Value.(string),
 		}, err

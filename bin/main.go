@@ -21,12 +21,12 @@ func init() {
 						Name: "Processor",
 						Type: pluto.TypeProcessor,
 						Value: map[string]any{
-							"name": pluto.ProcessorName_WriteToInputOutput,
+							"name": pluto.ProcessorName_CreateChannel,
 							"arguments": []pluto.Value{
 								{
-									Name:  "inc",
-									Type:  "df",
-									Value: "asdf",
+									Name:  "Name",
+									Type:  pluto.TypeText,
+									Value: "MyChannel",
 								},
 							},
 						},

@@ -31,8 +31,8 @@ type Channel struct {
 	//OwnerID  uuid.NullUUID `json:"owner_id"`
 	Name     string     `json:"name"`
 	Members  []Joinable `json:"members"`
-	Capacity uint       `json:"capacity"`
-	Length   uint       `json:"length"`
+	Capacity int        `json:"capacity"`
+	Length   int        `json:"length"`
 
 	OnJoin        Processor `json:"-"`
 	OnLeave       Processor `json:"-"`
@@ -40,7 +40,7 @@ type Channel struct {
 	OnExpire      Processor `json:"-"`
 }
 
-func NewChannel(name string, length uint) Channel {
+func NewChannel(name string, length int) Channel {
 	return Channel{
 		ID:            uuid.New(),
 		Name:          name,

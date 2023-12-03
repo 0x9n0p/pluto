@@ -26,23 +26,19 @@ type Processor struct {
 func (p *Processor) Create() (processor pluto.Processor, err error) {
 	defer func() {
 		if v := recover(); v != nil {
-			var ok bool
-			err, ok = v.(error)
+			e, ok := v.(error)
 			if !ok {
 				pluto.Log.Error("The value of recovered panic is not an error", zap.Any("value", v))
+			}
+
+			err = &pluto.Error{
+				HTTPCode: http.StatusBadRequest,
+				Message:  fmt.Sprintf("%v", e),
 			}
 		}
 	}()
 
-	descriptor, found := GetDescriptor(p.Name)
-	if !found {
-		return nil, &pluto.Error{
-			HTTPCode: http.StatusNotFound,
-			Message:  fmt.Sprintf("Processor descriptor (%s) not found", p.Name),
-		}
-	}
-
-	if err := p.validateArguments(descriptor.Arguments); err != nil {
+	if err := p.validateArguments(); err != nil {
 		return nil, err
 	}
 
@@ -58,25 +54,45 @@ func (p *Processor) Create() (processor pluto.Processor, err error) {
 	return processor, err
 }
 
-func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error {
-	for _, descriptor := range descriptors {
-		argument, index := pluto.MayFind(descriptor.Name, p.Arguments...)
+func (p *Processor) validateArguments() error {
+	descriptor, found := GetDescriptor(p.Name)
+	if !found {
+		return &pluto.Error{
+			HTTPCode: http.StatusNotFound,
+			Message:  fmt.Sprintf("Processor descriptor (%s) not found", p.Name),
+		}
+	}
+
+	for _, valueDescriptor := range descriptor.Arguments {
+		argument, index := pluto.MayFind(valueDescriptor.Name, p.Arguments...)
 		if index == -1 {
-			return &pluto.Error{
-				HTTPCode: http.StatusBadRequest,
-				Message:  fmt.Sprintf("Argument (%s) for processor (%s) is required", descriptor.Name, p.Name),
+			if valueDescriptor.Required {
+				return &pluto.Error{
+					HTTPCode: http.StatusBadRequest,
+					Message:  fmt.Sprintf("Argument (%s) for processor (%s) is required", valueDescriptor.Name, p.Name),
+				}
+			} else {
+				argument = pluto.Value{
+					Name:  valueDescriptor.Name,
+					Type:  valueDescriptor.Type,
+					Value: valueDescriptor.Default,
+				}
+				index = len(p.Arguments)
+				p.Arguments = append(p.Arguments, argument)
 			}
 		}
 
-		if descriptor.Type != argument.Type {
-			return &pluto.Error{
-				HTTPCode: http.StatusBadRequest,
-				Message:  fmt.Sprintf("Type (%s) is not the required type (%s)", argument.Type, descriptor.Type),
+		{
+			if valueDescriptor.ValueValidator == nil {
+				valueDescriptor.ValueValidator = pluto.DefaultValueValidator
 			}
-		}
 
-		if err := descriptor.ValueValidator(argument); err != nil {
-			return err
+			if err := valueDescriptor.ValueValidator(argument, valueDescriptor); err != nil {
+				return &pluto.Error{
+					HTTPCode: http.StatusBadRequest,
+					Message:  fmt.Sprintf("%v", err),
+				}
+			}
 		}
 
 		argument.ValueParser = GetParserByType(argument.Type)
@@ -88,6 +104,10 @@ func (p *Processor) validateArguments(descriptors []pluto.ValueDescriptor) error
 
 func GetParserByType(t string) func(any) any {
 	switch t {
+	case pluto.TypeNumeric:
+		return func(v any) any {
+			return int(v.(float64))
+		}
 	case pluto.TypeProcessor:
 		return func(v any) any {
 			m := v.(map[string]any)
@@ -103,6 +123,7 @@ func GetParserByType(t string) func(any) any {
 
 			p, err := processor.Create()
 			if err != nil {
+				// The caller of this parser recovers this error.
 				panic(err)
 			}
 

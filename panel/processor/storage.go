@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	Category_Flow       = "Flow"
-	Category_InputOutpt = "InputOutput"
+	Category_Flow          = "Flow"
+	Category_InputOutpt    = "InputOutput"
+	Category_Communication = "Communication"
 )
 
 var Processors = []Descriptor{
@@ -23,7 +24,7 @@ var Processors = []Descriptor{
 				Name:     "io_interface",
 				Type:     pluto.TypeInternalInterface,
 				Required: true,
-				ValueValidator: func(arg pluto.Value) error {
+				ValueValidator: func(arg pluto.Value, _ pluto.ValueDescriptor) error {
 					_, ok := arg.Value.(io.Writer)
 					if !ok {
 						return &pluto.Error{
@@ -57,7 +58,7 @@ var Processors = []Descriptor{
 				Name:     "Processor",
 				Type:     pluto.TypeProcessor,
 				Required: true,
-				ValueValidator: func(arg pluto.Value) (err error) {
+				ValueValidator: func(arg pluto.Value, _ pluto.ValueDescriptor) (err error) {
 					m, ok := arg.Value.(map[string]any)
 					if !ok {
 						return &pluto.Error{
@@ -94,6 +95,32 @@ var Processors = []Descriptor{
 			*/
 		},
 		Category: Category_Flow,
+	},
+	{
+		Name:        pluto.ProcessorName_CreateChannel,
+		Description: "Creates a channel",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "Name",
+				Type:     pluto.TypeText,
+				Required: true,
+			},
+			{
+				Name:    "Length",
+				Type:    pluto.TypeNumeric,
+				Default: 10,
+			},
+		},
+		Input: []pluto.ValueDescriptor{},
+		Output: []pluto.ValueDescriptor{
+			{
+				Name:     "processable.body",
+				Type:     pluto.TypeChannel,
+				Required: true,
+			},
+		},
+		Category: Category_Communication,
 	},
 }
 

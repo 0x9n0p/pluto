@@ -1,5 +1,7 @@
 package pluto
 
+import "fmt"
+
 const (
 	TypeText    = "Text"
 	TypeNumeric = "Numeric"
@@ -10,6 +12,7 @@ const (
 		It must be a map[string]any and has two fields 'string name' and '[]any arguments'.
 	*/
 	TypeProcessor         = "Processor"
+	TypeChannel           = "Channel"
 	TypeBytes             = "Bytes"
 	TypeInternalInterface = "InternalInterface"
 )
@@ -22,12 +25,62 @@ var (
 	NoParserRequired = func(v any) any { return v }
 )
 
+var (
+	/*
+		Note that cannot use parsers to parse/take values.
+	*/
+
+	DefaultTextValidator = func(v Value, d ValueDescriptor) error {
+		if v.Type != TypeText {
+			return fmt.Errorf("argument (%s) requires a value of type (%s), but a value of type (%s) entered", d.Name, d.Type, v.Type)
+		}
+
+		if v.Value == nil {
+			return fmt.Errorf("argument (%s) is required", d.Name)
+		}
+
+		s, ok := v.Value.(string)
+		if !ok {
+			return fmt.Errorf("value of arguemnt (%s) is not a valid text", d.Name)
+		}
+
+		if d.Required && s == "" {
+			return fmt.Errorf("argument (%s) is required", d.Name)
+		}
+
+		return nil
+	}
+
+	DefaultNumericValidator = func(v Value, d ValueDescriptor) error {
+		if v.Type != TypeNumeric {
+			return fmt.Errorf("argument (%s) requires a value of type (%s), but a value of type (%s) entered", d.Name, d.Type, v.Type)
+		}
+
+		if v.Value == nil {
+			return fmt.Errorf("argument (%s) is required", d.Name)
+		}
+
+		return nil
+	}
+
+	DefaultValueValidator = func(v Value, d ValueDescriptor) error {
+		switch d.Type {
+		case TypeText:
+			return DefaultTextValidator(v, d)
+		case TypeNumeric:
+			return DefaultNumericValidator(v, d)
+		default:
+			return nil
+		}
+	}
+)
+
 type ValueDescriptor struct {
-	Name           string            `json:"name"`
-	Type           string            `json:"type"`
-	Required       bool              `json:"required"`
-	Default        any               `json:"default,omitempty"`
-	ValueValidator func(Value) error `json:"-"`
+	Name           string                             `json:"name"`
+	Type           string                             `json:"type"`
+	Required       bool                               `json:"required"`
+	Default        any                                `json:"default,omitempty"`
+	ValueValidator func(Value, ValueDescriptor) error `json:"-"`
 }
 
 func (v ValueDescriptor) Comparable() any {
@@ -46,7 +99,7 @@ func ValueFromMap(m map[string]any) Value {
 	return Value{
 		Name:  m["name"].(string),
 		Type:  m["type"].(string),
-		Value: m["value"].(string),
+		Value: m["value"].(any),
 	}
 }
 
