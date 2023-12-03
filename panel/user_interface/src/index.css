@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
+  .sidebar__menu-item:not(.sidebar__menu-item--active) {
+    padding: 0 1.5rem;
+  }
+  .sidebar__menu-item--active {
+    background-color: rgba(17, 141, 220, 0.13);
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+  }
+  .sidebar__menu-item--active .sidebar__menu-link {
+    color: rgba(17, 141, 220);
+    font-weight: 700;
+  }
+  .sidebar__menu-item--active .sidebar__menu-icon {
+    background-color: rgba(17, 141, 220, 1);
+    color: white;
+    padding: 0.25rem;
+    border-radius: 100%;
+  }
+  .sidebar__menu-icon {
+    width: 20px;
+    height: 20px;
+    color: #555;
+  }
+  .sidebar__menu-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #555;
+    font-weight: 500;
+    font-size: 15px;
+  }
+}
