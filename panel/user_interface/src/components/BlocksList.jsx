@@ -12,6 +12,7 @@ export default function BlocksList() {
       const data = await response.json();
 
       setBlocks(data);
+      console.log(response);
     };
     fetchBlocks();
   }, [blocks]);
@@ -21,16 +22,30 @@ export default function BlocksList() {
       className="flex flex-col gap-8
     "
     >
-      {blocks.map((item, i) => {
-        return (
-          <BlockBox
-            key={i}
-            icon={item.icon}
-            description={item.description}
-            title={item.name}
-          />
-        );
-      })}
+      {blocks &&
+        blocks.map((item, i) => {
+          return (
+            <BlockBox
+              key={i}
+              icon={item.icon}
+              description={item.description}
+              title={item.name}
+              id={`blocks__box--${i}`}
+            />
+          );
+        })}
+      <BlockBox
+        icon={null}
+        description="test description"
+        title="test"
+        id="s22"
+      />
+      <BlockBox
+        icon={null}
+        description="test description"
+        title="test"
+        id="f11"
+      />
     </div>
   );
 }

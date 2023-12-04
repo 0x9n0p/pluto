@@ -1,36 +1,36 @@
 export default function SalesProjectCard() {
   return (
     <div className="my-sales-project__content">
-      <div className="my-sales-project__box">
+      <div className="p-3 rounded-lg flex flex-col gap-6 relative border border-gray-400">
         {/* My Sale Project Box Header */}
-        <div className="my-sales-project__box-header">
-          <div className="my-sales-project__box-header--right">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <img src="images/githun.png" width="40" alt="" />
-            <span className="my-sales-project__box-title">Github</span>
+            <span className="text-base font-semibold">Github</span>
           </div>
           <div>
             <img
               width="20"
               src="images/delete.png"
-              className="my-sales-project__box-remove"
+              className="cursor-pointer select-none"
             />
           </div>
         </div>
-        <div className="my-sales-project__box-contact">
+        <div className="flex items-center justify-between">
           <span>Contact</span>
-          <div className="my-sales-project__box-contact-person">
-            <img
+          <div className="bg-gray-400 flex items-center justify-between gap-2 rounded-full px-2">
+            {/* <img
               src="images/man-avatar.jpg"
-              className="my-sales-project__box-contact-image"
+              className="align-middle rounded-full"
               width="16"
               alt=""
-            />
+            /> */}
             <span>Amanda.s</span>
           </div>
         </div>
-        <div className="my-sales-project__box-amount">
+        <div className="flex justify-between items-center">
           <span>Amount</span>
-          <span className="my-sales-project__box-number">$100K</span>
+          <span className="font-medium text-gray-700">$100K</span>
         </div>
       </div>
       <span className="divide"></span>

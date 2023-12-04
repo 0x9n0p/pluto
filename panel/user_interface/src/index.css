@@ -33,4 +33,27 @@
     font-weight: 500;
     font-size: 15px;
   }
+  .divide {
+    width: 1.5px;
+    height: 100px;
+    background-color: #999;
+    display: block;
+    margin: 0 auto !important;
+    position: relative;
+  }
+  .divide::after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #999;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .my-sales-project__content:last-of-type .divide {
+    display: none;
+  }
 }
