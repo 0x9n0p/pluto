@@ -3,6 +3,8 @@
 import React, { Component } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Breadcrumb, BreadcrumbItem, Column, Grid } from '@carbon/react';
+import StickyBox from 'react-sticky-box';
+
 
 // fake data generator
 const getItems = (count, offset = 0) =>
@@ -60,8 +62,8 @@ const getListStyle = isDraggingOver => ({
 
 class CreatePipelinePage extends Component {
   state = {
-    items: getItems(10),
-    selected: getItems(5, 10),
+    items: getItems(20),
+    selected: getItems(15, 20),
   };
 
   /**
@@ -184,34 +186,36 @@ class CreatePipelinePage extends Component {
           </Column>
 
           <Column md={4} lg={{ span: 6, offset: 8 }} sm={4}>
-            <Droppable droppableId='droppable2'>
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  style={getListStyle(snapshot.isDraggingOver)}>
-                  {this.state.selected.map((item, index) => (
-                    <Draggable
-                      key={item.id}
-                      draggableId={item.id}
-                      index={index}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={getItemStyle(
-                            snapshot.isDragging,
-                            provided.draggableProps.style,
-                          )}>
-                          {item.content}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+            <StickyBox offsetTop={100} offsetBottom={20}>
+              <Droppable droppableId='droppable2'>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    style={getListStyle(snapshot.isDraggingOver)}>
+                    {this.state.selected.map((item, index) => (
+                      <Draggable
+                        key={item.id}
+                        draggableId={item.id}
+                        index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={getItemStyle(
+                              snapshot.isDragging,
+                              provided.draggableProps.style,
+                            )}>
+                            {item.content}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </StickyBox>
           </Column>
 
         </DragDropContext>
