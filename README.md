@@ -26,6 +26,19 @@ PLUTO_HOST=localhost,127.0.0.1 PLUTO_HTTP_SERVER=0.0.0.0:80 PLUTO_PANEL_STORAGE=
 
 ### APIs Examples
 
+#### Login
+```bash
+curl -X POST http://panel.localhost/api/v1/auth \                                                                  ✔ 
+  -H 'Content-Type: application/json' \
+  -d '{"email":"admin", "password":"admin"}'
+```
+```json
+{
+  "email": "admin",
+  "token": "$TOKEN"
+}
+```
+
 #### Create/Save pipelines
 
 This API Creates/Saves the pipeline and returns the saved pipeline in response.
@@ -33,6 +46,7 @@ This API Creates/Saves the pipeline and returns the saved pipeline in response.
 ```bash
 curl -X POST http://panel.localhost/api/v1/pipelines \                                                                                     
   -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer $TOKEN' \
   -d '{"name":"PIPELINE_NAME","processors":[{"name":"Write to input/output","arguments":[{"name":"io_interface","type":"InternalInterface","value":"ARGUMENT_VALUE"}]}]}'
 ```
 

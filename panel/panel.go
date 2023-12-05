@@ -3,6 +3,7 @@ package panel
 import (
 	"net/http"
 	"pluto"
+	_ "pluto/panel/auth/delivery"
 	"pluto/panel/pipeline"
 	_ "pluto/panel/pipeline/delivery"
 	_ "pluto/panel/processor/delivery"
