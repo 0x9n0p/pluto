@@ -24,7 +24,13 @@ func init() {
 			if err := p.Authenticate(); err != nil {
 				return WriteError(err, writer)
 			}
-			return writer.NoContent(http.StatusOK)
+
+			jwt := auth.NewJsonWebToken(p.Email)
+			if err := jwt.Create(); err != nil {
+				return WriteError(err, writer)
+			}
+
+			return writer.JSON(http.StatusOK, jwt)
 		}).Handle(),
 	)
 }
