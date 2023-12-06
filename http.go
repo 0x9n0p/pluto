@@ -38,15 +38,22 @@ var HTTPServer = func() *echo.Echo {
 }()
 
 func init() {
+	cors := middleware.CORSConfig{
+		Skipper:          middleware.DefaultSkipper,
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+		AllowCredentials: true,
+	}
+
 	root := echo.New()
 	root.Use(middleware.Recover())
-	root.Use(middleware.CORS())
+	root.Use(middleware.CORSWithConfig(cors))
 	RegisterHTTPHost("", root)
 	RegisterHTTPHost("www", root)
 
 	panel := echo.New()
 	panel.Use(middleware.Recover())
-	panel.Use(middleware.CORS())
+	panel.Use(middleware.CORSWithConfig(cors))
 	RegisterHTTPHost("panel", panel)
 
 	if Env.Debug {
@@ -74,7 +81,7 @@ func init() {
 	})
 
 	go func() {
-		if err := HTTPServer.Start(Env.HTTPServerAddress); err != nil {
+		if err := HTTPServer.StartTLS(Env.HTTPServerAddress, "/etc/ssl/certs/plutoengine.crt", "/etc/ssl/private/plutoengine.key"); err != nil {
 			Log.Fatal("Running HTTP admin server", zap.Error(err))
 		}
 	}()
