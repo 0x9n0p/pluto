@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"pluto"
 	_ "pluto/panel/auth/delivery"
+	_ "pluto/panel/logview/delivery"
 	"pluto/panel/pipeline"
 	_ "pluto/panel/pipeline/delivery"
 	_ "pluto/panel/processor/delivery"

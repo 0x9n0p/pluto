@@ -4,6 +4,8 @@ const (
 	KindChannel             = "Channel"
 	KindPipeline            = "Pipeline"
 	KindInternalProcessable = "InternalProcessable"
+
+	KindAdmin = "Admin"
 )
 
 type Identifier interface {

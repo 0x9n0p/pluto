@@ -29,10 +29,11 @@ type Joinable interface {
 type Channel struct {
 	ID uuid.UUID `json:"id"`
 	//OwnerID  uuid.NullUUID `json:"owner_id"`
-	Name     string     `json:"name"`
-	Members  []Joinable `json:"members"`
-	Capacity int        `json:"capacity"`
-	Length   int        `json:"length"`
+	Name                        string     `json:"name"`
+	Members                     []Joinable `json:"members"`
+	Capacity                    int        `json:"capacity"`
+	Length                      int        `json:"length"`
+	DoNotAcceptDuplicateMembers bool       `json:"do_not_accept_duplicate_members"`
 
 	OnJoin        Processor `json:"-"`
 	OnLeave       Processor `json:"-"`
@@ -61,7 +62,7 @@ func (c *Channel) Publish(processable Processable) {
 }
 
 func (c *Channel) Join(r Joinable) {
-	if c.IsMember(r) {
+	if c.IsMember(r) && c.DoNotAcceptDuplicateMembers {
 		return
 	}
 
@@ -78,7 +79,7 @@ func (c *Channel) Join(r Joinable) {
 			"channel":    c,
 			"identifier": r,
 		},
-		CreatedAt: time.Time{},
+		CreatedAt: time.Now(),
 	})
 
 	if c.Capacity <= 0 {
@@ -95,6 +96,25 @@ func (c *Channel) Join(r Joinable) {
 	}
 }
 
+func (c *Channel) Leave(identifier Identifier) {
+	_, index := c.GetMember(identifier)
+	if index == -1 {
+		return
+	}
+
+	c.Members = append(c.Members[:index], c.Members[index+1:]...)
+	c.Capacity += 1
+
+	go c.OnLeave.Process(&InternalProcessable{
+		ID: uuid.New(),
+		Body: map[string]any{
+			"channel":    c,
+			"identifier": identifier,
+		},
+		CreatedAt: time.Now(),
+	})
+}
+
 func (c *Channel) IsMember(identifier Identifier) bool {
 	for _, member := range c.Members {
 		if CompareIdentifiers(identifier, member) {
@@ -102,6 +122,15 @@ func (c *Channel) IsMember(identifier Identifier) bool {
 		}
 	}
 	return false
+}
+
+func (c *Channel) GetMember(identifier Identifier) (Joinable, int) {
+	for i, member := range c.Members {
+		if CompareIdentifiers(identifier, member) {
+			return c.Members[i], i
+		}
+	}
+	return nil, -1
 }
 
 func (c *Channel) UniqueProperty() string {

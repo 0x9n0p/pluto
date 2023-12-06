@@ -11,15 +11,8 @@ import (
 // ApplicationLogger
 //
 // TODO:
-//  1. Authorization for ApplicationLogger is required.
 //  2. Add other log levels, error, info ..
-var ApplicationLogger = func() ApplicationLogCollector {
-	logger := ApplicationLogCollector{NewChannel("APPLICATION_LOGGER", 10)}
-	ChannelsMutex.Lock()
-	defer ChannelsMutex.Unlock()
-	Channels[logger.Channel.ID] = logger.Channel
-	return logger
-}()
+var ApplicationLogger = ApplicationLogCollector{NewChannel("APPLICATION_LOGGER", 10)}
 
 type ApplicationLogCollector struct {
 	Channel Channel

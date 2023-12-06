@@ -1,48 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"pluto"
 	_ "pluto/panel"
-	"pluto/panel/pipeline"
-	"pluto/panel/processor"
+	"time"
 )
 
 func init() {
-	p := pipeline.Pipeline{
-		Name: "my pipeline",
-		Processors: []processor.Processor{
-			{
-				Name: pluto.ProcessorName_ExecAndJoinResult,
-				Arguments: []pluto.Value{
-					{
-						Name: "Processor",
-						Type: pluto.TypeProcessor,
-						Value: map[string]any{
-							"name": pluto.ProcessorName_CreateChannel,
-							"arguments": []pluto.Value{
-								{
-									Name:  "Name",
-									Type:  pluto.TypeText,
-									Value: "MyChannel",
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-
-	b, err := json.Marshal(p)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(b))
-
 	pluto.ApplicationLogger.Channel.Join(pluto.BaseJoinable{
 		Identifier: pluto.ExternalIdentifier{
 			Name: "STD_OUT",
@@ -53,6 +19,15 @@ func init() {
 }
 
 func main() {
+	go func() {
+		for {
+			pluto.ApplicationLogger.Warning(pluto.ApplicationLog{
+				Message: "warning log for test",
+				Extra:   map[string]any{},
+			})
+			<-time.Tick(time.Second * 3)
+		}
+	}()
 	fmt.Printf("%s %s\n", pluto.Name, pluto.Version)
 	select {}
 }
