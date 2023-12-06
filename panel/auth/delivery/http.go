@@ -5,8 +5,11 @@ import (
 	"net/http"
 	"pluto"
 	"pluto/panel/auth"
+	"pluto/panel/delivery"
 	"pluto/panel/pkg/wrapper"
 	"time"
+
+	echojwt "github.com/labstack/echo-jwt/v4"
 )
 
 func init() {
@@ -32,7 +35,7 @@ func init() {
 			}
 
 			{
-				expires := time.Now().Add(auth.JWTExpiration)
+				expires := time.Now().UTC().Add(auth.JWTExpiration)
 
 				writer.SetCookie(&http.Cookie{
 					Name:     "token",
@@ -52,6 +55,27 @@ func init() {
 			}
 
 			return writer.JSON(http.StatusOK, jwt)
+		}).Handle(),
+	)
+
+	/*
+		TODO
+			Use access token and refresh token to improve logout with short token expiration.
+	*/
+
+	v1.Group("", echojwt.WithConfig(delivery.DefaultJWTConfig)).POST("/logout",
+		wrapper.New[wrapper.EmptyRequest](func(_ wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {
+			writer.SetCookie(&http.Cookie{
+				Name:    "token",
+				Expires: time.Now().UTC(),
+			})
+
+			writer.SetCookie(&http.Cookie{
+				Name:    "email",
+				Expires: time.Now().UTC(),
+			})
+
+			return writer.NoContent(http.StatusOK)
 		}).Handle(),
 	)
 }
