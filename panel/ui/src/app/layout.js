@@ -1,5 +1,4 @@
 import './globals.scss';
-import { Providers } from './providers';
 
 export const metadata = {
   title: 'PlutoEngine Panel',
@@ -8,12 +7,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang='en'>
-    <body>
-    <Providers>
-      {children}
-    </Providers>
-    </body>
+    <html lang="en">
+      <body>{children}</body>
     </html>
   );
 }
