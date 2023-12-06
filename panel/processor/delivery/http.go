@@ -3,7 +3,7 @@ package delivery
 import (
 	"net/http"
 	"pluto"
-	"pluto/panel/auth"
+	"pluto/panel/delivery"
 	"pluto/panel/pkg/wrapper"
 	"pluto/panel/processor"
 
@@ -12,7 +12,7 @@ import (
 
 func init() {
 	panel := pluto.FindHTTPHost("panel")
-	v1 := panel.Group("/api/v1", echojwt.WithConfig(echojwt.Config{SigningKey: auth.JWTSecretKey}))
+	v1 := panel.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.GET("/processors",
 		wrapper.New[processor.DescriptorFinder](func(finder processor.DescriptorFinder, writer wrapper.ResponseWriter) error {

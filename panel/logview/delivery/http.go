@@ -2,7 +2,7 @@ package delivery
 
 import (
 	"pluto"
-	"pluto/panel/auth"
+	"pluto/panel/delivery"
 	"pluto/panel/logview"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,7 +13,7 @@ import (
 
 func init() {
 	panel := pluto.FindHTTPHost("panel")
-	v1 := panel.Group("/api/v1", echojwt.WithConfig(echojwt.Config{SigningKey: auth.JWTSecretKey}))
+	v1 := panel.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.GET("/logs/bind", func(c echo.Context) error {
 		ws, err := (&websocket.Upgrader{

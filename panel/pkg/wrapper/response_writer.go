@@ -1,5 +1,7 @@
 package wrapper
 
+import "net/http"
+
 type ResponseWriter interface {
 	// String sends a string response with status code.
 	String(code int, s string) error
@@ -12,4 +14,7 @@ type ResponseWriter interface {
 
 	// NoContent sends a response with no body and a status code.
 	NoContent(code int) error
+
+	// SetCookie adds a `Set-Cookie` header in HTTP response.
+	SetCookie(cookie *http.Cookie)
 }

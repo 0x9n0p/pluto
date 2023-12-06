@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"pluto"
-	"pluto/panel/auth"
+	"pluto/panel/delivery"
 	"pluto/panel/pipeline"
 	"pluto/panel/pkg/wrapper"
 
@@ -22,7 +22,7 @@ func init() {
 	}
 
 	panel := pluto.FindHTTPHost("panel")
-	v1 := panel.Group("/api/v1", echojwt.WithConfig(echojwt.Config{SigningKey: auth.JWTSecretKey}))
+	v1 := panel.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.GET("/pipelines",
 		wrapper.New[wrapper.EmptyRequest](func(request wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {

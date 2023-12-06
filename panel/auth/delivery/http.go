@@ -6,6 +6,7 @@ import (
 	"pluto"
 	"pluto/panel/auth"
 	"pluto/panel/pkg/wrapper"
+	"time"
 )
 
 func init() {
@@ -28,6 +29,26 @@ func init() {
 			jwt := auth.NewJsonWebToken(p.Email)
 			if err := jwt.Create(); err != nil {
 				return WriteError(err, writer)
+			}
+
+			{
+				expires := time.Now().Add(auth.JWTExpiration)
+
+				writer.SetCookie(&http.Cookie{
+					Name:     "token",
+					Value:    jwt.Token,
+					Expires:  expires,
+					Secure:   false,
+					HttpOnly: true,
+				})
+
+				writer.SetCookie(&http.Cookie{
+					Name:     "email",
+					Value:    jwt.Email,
+					Expires:  expires,
+					Secure:   false,
+					HttpOnly: true,
+				})
 			}
 
 			return writer.JSON(http.StatusOK, jwt)
