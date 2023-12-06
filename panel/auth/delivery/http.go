@@ -38,7 +38,7 @@ func init() {
 					Name:     "token",
 					Value:    jwt.Token,
 					Expires:  expires,
-					Secure:   false,
+					Secure:   true,
 					HttpOnly: true,
 				})
 
@@ -46,7 +46,7 @@ func init() {
 					Name:     "email",
 					Value:    jwt.Email,
 					Expires:  expires,
-					Secure:   false,
+					Secure:   true,
 					HttpOnly: true,
 				})
 			}
