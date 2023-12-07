@@ -27,7 +27,9 @@
     "react-dom": "18.2.0",
     "react-router-dom": "^6.20.1",
     "react-sticky-box": "^2.0.5",
-    "sass": "^1.66.1"
+    "react-use-websocket": "^4.5.0",
+    "sass": "^1.66.1",
+    "ws": "^8.14.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",

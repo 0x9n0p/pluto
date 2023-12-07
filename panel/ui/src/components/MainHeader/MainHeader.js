@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Header,
   HeaderContainer,
@@ -28,14 +26,20 @@ const MainHeader = () => (
           onClick={onClickSideNavExpand}
           isActive={isSideNavExpanded}
         />
+
         <Link href="/" passHref legacyBehavior>
           <HeaderName prefix="PlutoEngine">Panel</HeaderName>
         </Link>
+
         <HeaderNavigation aria-label="PlutoEngine">
           <Link href="/pipelines/create" passHref legacyBehavior>
             <HeaderMenuItem>Create a new pipeline</HeaderMenuItem>
           </Link>
+          <Link href="/logsview" passHref legacyBehavior>
+            <HeaderMenuItem>Watch logs in real-time</HeaderMenuItem>
+          </Link>
         </HeaderNavigation>
+
         <SideNav
           aria-label="Side navigation"
           expanded={isSideNavExpanded}
@@ -46,9 +50,14 @@ const MainHeader = () => (
               <Link href="/pipelines/create" passHref legacyBehavior>
                 <HeaderMenuItem>Create a new pipeline</HeaderMenuItem>
               </Link>
+
+              <Link href="/logsview" passHref legacyBehavior>
+                <HeaderMenuItem>Watch logs in real-time</HeaderMenuItem>
+              </Link>
             </HeaderSideNavItems>
           </SideNavItems>
         </SideNav>
+
         <HeaderGlobalBar>
           <HeaderGlobalAction
             aria-label="Notifications"
