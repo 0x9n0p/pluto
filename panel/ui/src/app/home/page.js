@@ -5,13 +5,19 @@ import MainHeader from '@/components/MainHeader/MainHeader';
 
 export default function LandingPage() {
   return (
-    <div>
-      <Theme theme="g100">
-        <MainHeader />
-      </Theme>
-      <Content>
-        <div>LANDING PAGE</div>
-      </Content>
-    </div>
+    <>
+      {localStorage.getItem('token') ? (
+        <div>
+          <Theme theme="g100">
+            <MainHeader />
+          </Theme>
+          <Content>
+            <div>LANDING PAGE</div>
+          </Content>
+        </div>
+      ) : (
+        window.location.assign('/auth')
+      )}
+    </>
   );
 }

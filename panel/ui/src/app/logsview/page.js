@@ -49,85 +49,93 @@ export default function LogviewPage() {
   }, []);
 
   return (
-    <div>
-      <Theme theme="g100">
-        <MainHeader />
-      </Theme>
-      <Content>
-        <Grid className="create-page" fullWidth>
-          <Column
-            lg={16}
-            md={8}
-            sm={4}
-            className="create-page_header"
-            style={{ marginBottom: '48px' }}
-          >
-            {showErrorNotification ? (
-              <InlineNotification
-                title="An error occured"
-                subtitle="Please see console logs to debug or refresh this page to try again. Make sure your login token is not expired."
-              />
-            ) : null}
+    <>
+      {localStorage.getItem('token') ? (
+        <div>
+          <Theme theme="g100">
+            <MainHeader />
+          </Theme>
+          <Content>
+            <Grid className="create-page" fullWidth>
+              <Column
+                lg={16}
+                md={8}
+                sm={4}
+                className="create-page_header"
+                style={{ marginBottom: '48px' }}
+              >
+                {showErrorNotification ? (
+                  <InlineNotification
+                    title="An error occured"
+                    subtitle="Please see console logs to debug or refresh this page to try again. Make sure your login token is not expired."
+                  />
+                ) : null}
 
-            {logs.length ? (
-              logs.map((value, index) => {
-                const d = new Date(value.created_at);
+                {logs.length ? (
+                  logs.map((value, index) => {
+                    const d = new Date(value.created_at);
 
-                let levelColor;
-                switch (value.level) {
-                  case 'Info':
-                    levelColor = '#0077b6';
-                    break;
-                  case 'Warning':
-                    levelColor = '#ee9b00';
-                    break;
-                  case 'Error':
-                    levelColor = '#ef233c';
-                    break;
-                  case 'Panic':
-                    levelColor = '#d90429';
-                    break;
-                  default:
-                    levelColor = 'black';
-                    break;
-                }
+                    let levelColor;
+                    switch (value.level) {
+                      case 'Info':
+                        levelColor = '#0077b6';
+                        break;
+                      case 'Warning':
+                        levelColor = '#ee9b00';
+                        break;
+                      case 'Error':
+                        levelColor = '#ef233c';
+                        break;
+                      case 'Panic':
+                        levelColor = '#d90429';
+                        break;
+                      default:
+                        levelColor = 'black';
+                        break;
+                    }
 
-                return (
-                  <div
-                    key={index}
-                    style={{
-                      marginBottom: '10px',
-                    }}
-                  >
-                    <Grid className="logs" fullWidth>
-                      <Column lg={1} md={8} sm={1}>
-                        <p>
-                          {d.getHours()}:{d.getMinutes()}:{d.getSeconds()}
-                        </p>
-                      </Column>
-                      <Column lg={1} md={8} sm={1}>
-                        <p style={{ fontWeight: 'bold', color: levelColor }}>
-                          {value.level}
-                        </p>
-                      </Column>
-                      <Column lg={8} md={8} sm={4}>
-                        <p>{value.message}</p>
-                      </Column>
-                      <Column lg={6} md={8} sm={4}>
-                        <p style={{ marginLeft: '10px' }}>
-                          {JSON.stringify(value.extra)}
-                        </p>
-                      </Column>
-                    </Grid>
-                  </div>
-                );
-              })
-            ) : !showErrorNotification ? (
-              <p>No log published yet.</p>
-            ) : null}
-          </Column>
-        </Grid>
-      </Content>
-    </div>
+                    return (
+                      <div
+                        key={index}
+                        style={{
+                          marginBottom: '10px',
+                        }}
+                      >
+                        <Grid className="logs" fullWidth>
+                          <Column lg={1} md={8} sm={1}>
+                            <p>
+                              {d.getHours()}:{d.getMinutes()}:{d.getSeconds()}
+                            </p>
+                          </Column>
+                          <Column lg={1} md={8} sm={1}>
+                            <p
+                              style={{ fontWeight: 'bold', color: levelColor }}
+                            >
+                              {value.level}
+                            </p>
+                          </Column>
+                          <Column lg={8} md={8} sm={4}>
+                            <p>{value.message}</p>
+                          </Column>
+                          <Column lg={6} md={8} sm={4}>
+                            <p style={{ marginLeft: '10px' }}>
+                              {JSON.stringify(value.extra)}
+                            </p>
+                          </Column>
+                        </Grid>
+                      </div>
+                    );
+                  })
+                ) : !showErrorNotification ? (
+                  <p>No log published yet.</p>
+                ) : null}
+              </Column>
+            </Grid>
+          </Content>
+        </div>
+      ) : (
+        window.location.assign('/auth')
+      )}
+    </>
   );
 }

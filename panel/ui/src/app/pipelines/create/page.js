@@ -5,10 +5,9 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { Breadcrumb, BreadcrumbItem, Column, Grid } from '@carbon/react';
 import StickyBox from 'react-sticky-box';
 
-
 // fake data generator
 const getItems = (count, offset = 0) =>
-  Array.from({ length: count }, (v, k) => k).map(k => ({
+  Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `item-${k + offset}`,
     content: `item ${k + offset}`,
   }));
@@ -54,7 +53,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle,
 });
 
-const getListStyle = isDraggingOver => ({
+const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? 'lightblue' : 'lightgrey',
   padding: grid,
   width: 250,
@@ -76,9 +75,9 @@ class CreatePipelinePage extends Component {
     droppable2: 'selected',
   };
 
-  getList = id => this.state[this.id2List[id]];
+  getList = (id) => this.state[this.id2List[id]];
 
-  onDragEnd = result => {
+  onDragEnd = (result) => {
     const { source, destination } = result;
 
     // dropped outside the list
@@ -90,7 +89,7 @@ class CreatePipelinePage extends Component {
       const items = reorder(
         this.getList(source.droppableId),
         source.index,
-        destination.index,
+        destination.index
       );
 
       let state = { items };
@@ -105,7 +104,7 @@ class CreatePipelinePage extends Component {
         this.getList(source.droppableId),
         this.getList(destination.droppableId),
         source,
-        destination,
+        destination
       );
 
       this.setState({
@@ -119,107 +118,121 @@ class CreatePipelinePage extends Component {
   // But in this example everything is just done in one place for simplicity
   render() {
     return (
-      <Grid className='create-page' fullWidth>
-        <Column lg={16} md={8} sm={4} className='create-page_header' style={{ marginBottom: '48px' }}>
-          <Breadcrumb noTrailingSlash>
-            <BreadcrumbItem>
-              <a href='/'>Home</a>
-            </BreadcrumbItem>
-            <BreadcrumbItem>
-              <a href='/pipelines'>Pipelines</a>
-            </BreadcrumbItem>
-            <BreadcrumbItem>
-              Create a new pipeline
-            </BreadcrumbItem>
-          </Breadcrumb>
-          <h1 className='create-page__heading'>Create a new pipeline</h1>
-        </Column>
+      <>
+        {localStorage.getItem('token') ? (
+          <Grid className="create-page" fullWidth>
+            <Column
+              lg={16}
+              md={8}
+              sm={4}
+              className="create-page_header"
+              style={{ marginBottom: '48px' }}
+            >
+              <Breadcrumb noTrailingSlash>
+                <BreadcrumbItem>
+                  <a href="/">Home</a>
+                </BreadcrumbItem>
+                <BreadcrumbItem>
+                  <a href="/pipelines">Pipelines</a>
+                </BreadcrumbItem>
+                <BreadcrumbItem>Create a new pipeline</BreadcrumbItem>
+              </Breadcrumb>
+              <h1 className="create-page__heading">Create a new pipeline</h1>
+            </Column>
 
-        <DragDropContext onDragEnd={this.onDragEnd}>
+            <DragDropContext onDragEnd={this.onDragEnd}>
+              <Column md={4} lg={7} sm={4}>
+                <Droppable droppableId="droppable">
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      style={getListStyle(snapshot.isDraggingOver)}
+                    >
+                      {this.state.items.map((item, index) => (
+                        <Draggable
+                          key={item.id}
+                          draggableId={item.id}
+                          index={index}
+                        >
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              style={getItemStyle(
+                                snapshot.isDragging,
+                                provided.draggableProps.style
+                              )}
+                            >
+                              {item.content}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
 
-          <Column md={4} lg={7} sm={4}>
-            <Droppable droppableId='droppable'>
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  style={getListStyle(snapshot.isDraggingOver)}>
-                  {this.state.items.map((item, index) => (
-                    <Draggable
-                      key={item.id}
-                      draggableId={item.id}
-                      index={index}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={getItemStyle(
-                            snapshot.isDragging,
-                            provided.draggableProps.style,
-                          )}>
-                          {item.content}
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
+                {/* TODO: It must be visible if the pipeline is empty. */}
+                {/*<div*/}
+                {/*  style={*/}
+                {/*    {*/}
+                {/*      height: '100px',*/}
+                {/*      border: '2px dashed gray',*/}
+                {/*      borderColor: '#d2d2d2',*/}
+                {/*      borderRadius: '5px',*/}
+                {/*      display: 'flex',*/}
+                {/*      alignItems: 'center',*/}
+                {/*      justifyContent: 'center',*/}
+                {/*    }*/}
+                {/*  }*/}
+                {/*>*/}
+                {/*  <p>Drop a processor here</p>*/}
+                {/*</div>*/}
+              </Column>
 
-            {/* TODO: It must be visible if the pipeline is empty. */}
-            {/*<div*/}
-            {/*  style={*/}
-            {/*    {*/}
-            {/*      height: '100px',*/}
-            {/*      border: '2px dashed gray',*/}
-            {/*      borderColor: '#d2d2d2',*/}
-            {/*      borderRadius: '5px',*/}
-            {/*      display: 'flex',*/}
-            {/*      alignItems: 'center',*/}
-            {/*      justifyContent: 'center',*/}
-            {/*    }*/}
-            {/*  }*/}
-            {/*>*/}
-            {/*  <p>Drop a processor here</p>*/}
-            {/*</div>*/}
-          </Column>
-
-          <Column md={4} lg={{ span: 6, offset: 8 }} sm={4}>
-            <StickyBox offsetTop={100} offsetBottom={20}>
-              <Droppable droppableId='droppable2'>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    style={getListStyle(snapshot.isDraggingOver)}>
-                    {this.state.selected.map((item, index) => (
-                      <Draggable
-                        key={item.id}
-                        draggableId={item.id}
-                        index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={getItemStyle(
-                              snapshot.isDragging,
-                              provided.draggableProps.style,
-                            )}>
-                            {item.content}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </StickyBox>
-          </Column>
-
-        </DragDropContext>
-      </Grid>
+              <Column md={4} lg={{ span: 6, offset: 8 }} sm={4}>
+                <StickyBox offsetTop={100} offsetBottom={20}>
+                  <Droppable droppableId="droppable2">
+                    {(provided, snapshot) => (
+                      <div
+                        ref={provided.innerRef}
+                        style={getListStyle(snapshot.isDraggingOver)}
+                      >
+                        {this.state.selected.map((item, index) => (
+                          <Draggable
+                            key={item.id}
+                            draggableId={item.id}
+                            index={index}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={getItemStyle(
+                                  snapshot.isDragging,
+                                  provided.draggableProps.style
+                                )}
+                              >
+                                {item.content}
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </StickyBox>
+              </Column>
+            </DragDropContext>
+          </Grid>
+        ) : (
+          window.location.assign('/auth')
+        )}
+      </>
     );
   }
 }

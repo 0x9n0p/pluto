@@ -87,6 +87,7 @@ export default function LoginPage() {
                       // TODO: Fix security issues
                       localStorage.setItem('email', response.data.email);
                       localStorage.setItem('token', response.data.token);
+                      window.location.href = '/';
                     } else {
                       setErrorMessage('Unexpected response from server');
                     }
