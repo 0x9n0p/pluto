@@ -1,1 +1,2 @@
-export const Address = 'https://panel.localhost';
+export const HOST = 'panel.localhost';
+export const Address = 'https://' + HOST;

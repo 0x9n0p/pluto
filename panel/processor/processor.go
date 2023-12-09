@@ -65,7 +65,7 @@ func (p *Processor) validateArguments() error {
 
 	for _, valueDescriptor := range descriptor.Arguments {
 		argument, index := pluto.MayFind(valueDescriptor.Name, p.Arguments...)
-		if index == -1 {
+		if index == -1 || argument.Value == nil {
 			if valueDescriptor.Required {
 				return &pluto.Error{
 					HTTPCode: http.StatusBadRequest,
