@@ -21,7 +21,7 @@ export default function LogviewPage() {
   const connection = useRef(null);
   useEffect(() => {
     const socket = new WebSocket(
-      'wss://panel.localhost/api/v1/logs/bind/' + localStorage.getItem('token')
+      'wss://' + HOST + '/api/v1/logs/bind/' + localStorage.getItem('token'),
     );
 
     socket.addEventListener('open', (event) => {
@@ -52,22 +52,22 @@ export default function LogviewPage() {
     <>
       {localStorage.getItem('token') ? (
         <div>
-          <Theme theme="g100">
+          <Theme theme='g100'>
             <MainHeader />
           </Theme>
           <Content>
-            <Grid className="create-page" fullWidth>
+            <Grid className='create-page' fullWidth>
               <Column
                 lg={16}
                 md={8}
                 sm={4}
-                className="create-page_header"
+                className='create-page_header'
                 style={{ marginBottom: '48px' }}
               >
                 {showErrorNotification ? (
                   <InlineNotification
-                    title="An error occured"
-                    subtitle="Please see console logs to debug or refresh this page to try again. Make sure your login token is not expired."
+                    title='An error occured'
+                    subtitle='Please see console logs to debug or refresh this page to try again. Make sure your login token is not expired.'
                   />
                 ) : null}
 
@@ -101,7 +101,7 @@ export default function LogviewPage() {
                           marginBottom: '10px',
                         }}
                       >
-                        <Grid className="logs" fullWidth>
+                        <Grid className='logs' fullWidth>
                           <Column lg={1} md={8} sm={1}>
                             <p>
                               {d.getHours()}:{d.getMinutes()}:{d.getSeconds()}

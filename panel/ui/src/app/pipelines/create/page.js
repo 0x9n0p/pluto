@@ -1,240 +1,351 @@
 'use client';
 
-import React, { Component } from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { Breadcrumb, BreadcrumbItem, Column, Grid } from '@carbon/react';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  Column,
+  Content,
+  Grid,
+  Search,
+  Theme,
+  TextInput,
+  NumberInput,
+  ContainedList,
+  Tag, ExpandableTile, TileAboveTheFoldContent, TileBelowTheFoldContent, InlineNotification, FluidForm,
+} from '@carbon/react';
+import MainHeader from '@/components/MainHeader/MainHeader';
+import React, { useEffect, useRef, useState } from 'react';
 import StickyBox from 'react-sticky-box';
+import axios from 'axios';
+import { Address } from '@/settings';
 
-// fake data generator
-const getItems = (count, offset = 0) =>
-  Array.from({ length: count }, (v, k) => k).map((k) => ({
-    id: `item-${k + offset}`,
-    content: `item ${k + offset}`,
-  }));
+export default function CreatePipelinePage() {
+  const [errorMessage, setErrorMessage] = useState('');
 
-// a little function to help us with reordering the result
-const reorder = (list, startIndex, endIndex) => {
-  const result = Array.from(list);
-  const [removed] = result.splice(startIndex, 1);
-  result.splice(endIndex, 0, removed);
+  const [draggingProcessorIndex, setDraggingProcessorIndex] = useState(-1);
 
-  return result;
-};
+  const [usedProcessors, setUsedProcessors] = useState([]);
 
-/**
- * Moves an item from one list to another list.
- */
-const move = (source, destination, droppableSource, droppableDestination) => {
-  const sourceClone = Array.from(source);
-  const destClone = Array.from(destination);
-  const [removed] = sourceClone.splice(droppableSource.index, 1);
+  const [processors, setProcessors] = useState([]);
 
-  destClone.splice(droppableDestination.index, 0, removed);
+  useEffect(() => {
+    axios.get(Address + '/api/v1/processors', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then(function(response) {
+        if (response.status !== 200) {
+          setErrorMessage('Unexpected response from server');
+          return;
+        }
+        console.log(response.data);
+        setProcessors(response.data);
+      })
+      .catch(function(error) {
+        if (error.response) {
+          if (error.response.status === 401) {
+            window.location.href = '/auth';
+            return;
+          }
+          setErrorMessage(error.response.data.message);
+        } else {
+          setErrorMessage('Unknown Error');
+          console.error(error);
+        }
+      });
+  }, []);
 
-  const result = {};
-  result[droppableSource.droppableId] = sourceClone;
-  result[droppableDestination.droppableId] = destClone;
+  const draggingItem = useRef();
+  const dragOverItem = useRef();
 
-  return result;
-};
-
-const grid = 8;
-
-const getItemStyle = (isDragging, draggableStyle) => ({
-  // some basic styles to make the items look a bit nicer
-  userSelect: 'none',
-  padding: grid * 2,
-  margin: `0 0 ${grid}px 0`,
-
-  // change background colour if dragging
-  background: isDragging ? 'lightgreen' : 'grey',
-
-  // styles we need to apply on draggables
-  ...draggableStyle,
-});
-
-const getListStyle = (isDraggingOver) => ({
-  background: isDraggingOver ? 'lightblue' : 'lightgrey',
-  padding: grid,
-  width: 250,
-});
-
-class CreatePipelinePage extends Component {
-  state = {
-    items: getItems(20),
-    selected: getItems(15, 20),
+  const handleDragStart = (e, position, source) => {
+    draggingItem.current = position;
+    draggingItem.source = source;
   };
 
-  /**
-   * A semi-generic way to handle multiple lists. Matches
-   * the IDs of the droppable container to the names of the
-   * source arrays stored in the state.
-   */
-  id2List = {
-    droppable: 'items',
-    droppable2: 'selected',
+  const handleDragEnter = (e, position, destination) => {
+    dragOverItem.destination = destination;
+    dragOverItem.current = position;
   };
 
-  getList = (id) => this.state[this.id2List[id]];
-
-  onDragEnd = (result) => {
-    const { source, destination } = result;
-
-    // dropped outside the list
-    if (!destination) {
+  const handleDragEnd = (e) => {
+    if (dragOverItem.destination === 'processors') {
       return;
     }
 
-    if (source.droppableId === destination.droppableId) {
-      const items = reorder(
-        this.getList(source.droppableId),
-        source.index,
-        destination.index
-      );
+    const listCopy = [...usedProcessors];
 
-      let state = { items };
-
-      if (source.droppableId === 'droppable2') {
-        state = { selected: items };
+    let draggingItemContent;
+    if (draggingItem.source === 'processors') {
+      draggingItemContent = processors[draggingItem.current];
+      if (dragOverItem.current + 1 === listCopy.length) {
+        listCopy.push(draggingItemContent);
+      } else {
+        listCopy.splice(dragOverItem.current, 0, draggingItemContent);
       }
-
-      this.setState(state);
     } else {
-      const result = move(
-        this.getList(source.droppableId),
-        this.getList(destination.droppableId),
-        source,
-        destination
-      );
+      draggingItemContent = listCopy[draggingItem.current];
+      listCopy.splice(draggingItem.current, 1);
+      listCopy.splice(dragOverItem.current, 0, draggingItemContent);
+    }
 
-      this.setState({
-        items: result.droppable,
-        selected: result.droppable2,
-      });
+
+    draggingItem.current = null;
+    dragOverItem.current = null;
+    setUsedProcessors(listCopy);
+  };
+
+  const categoryToColor = (category) => {
+    switch (category) {
+      case 'Communication':
+        return 'green';
+      case 'Flow':
+        return 'blue';
+      case 'InputOutput':
+        return 'red';
+      default:
+        return '';
     }
   };
 
-  // Normally you would want to split things out into separate components.
-  // But in this example everything is just done in one place for simplicity
-  render() {
-    return (
-      <>
-        {localStorage.getItem('token') ? (
-          <Grid className="create-page" fullWidth>
-            <Column
-              lg={16}
-              md={8}
-              sm={4}
-              className="create-page_header"
-              style={{ marginBottom: '48px' }}
-            >
-              <Breadcrumb noTrailingSlash>
-                <BreadcrumbItem>
-                  <a href="/">Home</a>
-                </BreadcrumbItem>
-                <BreadcrumbItem>
-                  <a href="/pipelines">Pipelines</a>
-                </BreadcrumbItem>
-                <BreadcrumbItem>Create a new pipeline</BreadcrumbItem>
-              </Breadcrumb>
-              <h1 className="create-page__heading">Create a new pipeline</h1>
-            </Column>
+  return (
+    <>
+      {localStorage.getItem('token') ? (
+        <div>
+          <Theme theme='g100'>
+            <MainHeader />
+          </Theme>
+          <Content>
+            <Grid className='create-page' fullWidth>
+              <Column
+                lg={16}
+                md={8}
+                sm={4}
+                className='create-page_header'
+                style={{ marginBottom: '48px' }}
+              >
+                <Breadcrumb>
+                  <BreadcrumbItem>
+                    <a href='/'>Home</a>
+                  </BreadcrumbItem>
+                  <BreadcrumbItem>
+                    <a href='/pipelines'>Pipelines</a>
+                  </BreadcrumbItem>
+                </Breadcrumb>
+                <h1 className='create-page__heading'>Create a new pipeline</h1>
+              </Column>
 
-            <DragDropContext onDragEnd={this.onDragEnd}>
-              <Column md={4} lg={7} sm={4}>
-                <Droppable droppableId="droppable">
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      style={getListStyle(snapshot.isDraggingOver)}
-                    >
-                      {this.state.items.map((item, index) => (
-                        <Draggable
-                          key={item.id}
-                          draggableId={item.id}
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              style={getItemStyle(
-                                snapshot.isDragging,
-                                provided.draggableProps.style
-                              )}
-                            >
-                              {item.content}
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+              <Column md={4} lg={{ span: 7, offset: 1 }} sm={4}>
+                <div
+                  style={{
+                    paddingBottom: '30px',
+                    paddingTop: '30px',
+                  }}
+                >
+                  {
+                    usedProcessors.length ?
+                      usedProcessors.map((item, index) => (
+                        <div onDragStart={(e) => handleDragStart(e, index, 'used_processors')}
+                             onDragOver={(e) => e.preventDefault()}
+                             onDragEnter={(e) => handleDragEnter(e, index, 'used_processors')}
+                             onDragEnd={handleDragEnd}
+                             key={index}
+                             draggable>
+                          <div
+                            style={{
+                              maxWidth: '400px',
+                              padding: '20px 20px',
+                              borderTopRightRadius: '10px',
+                              borderTopLeftRadius: '10px',
+                              background: '#000',
+                            }}
+                          >
+                            <p
+                              style={{
+                                fontSize: '15px',
+                                fontWeight: 'bold',
+                                color: 'white',
+                              }}
+                            >{item.name}</p>
+                          </div>
+                          {
+                            item.arguments.length ? <div
+                              style={{
+                                maxWidth: '400px',
+                                borderBottomRightRadius: '10px',
+                                borderBottomLeftRadius: '10px',
+                                paddingTop: '20px',
+                                paddingBottom: '10px',
+                                background: '#f4f4f4',
+                                marginBottom: '30px',
+                              }}>
+                              {
+                                item.arguments ? item.arguments.map((arg, index) => (
+                                  <div style={{
+                                    marginBottom: '20px',
+                                    marginLeft: '20px',
+                                    marginRight: '20px',
+                                  }}>
+                                    {
+                                      arg.type === 'Text' ?
+                                        (
+                                          <TextInput type='text' required={arg.required} placeholder={arg.name}
+                                                     defaultValue={arg.default} />
+                                        ) : arg.type === 'Numeric' ?
+                                          (
+                                            <NumberInput type='number' required={arg.required} defaultValue={arg.default}
+                                                         placeholder={arg.name} />
+                                          ) :
+                                          <p>'{arg.name}' must be filled by
+                                            processors</p>
+                                    }
 
-                {/* TODO: It must be visible if the pipeline is empty. */}
-                {/*<div*/}
-                {/*  style={*/}
-                {/*    {*/}
-                {/*      height: '100px',*/}
-                {/*      border: '2px dashed gray',*/}
-                {/*      borderColor: '#d2d2d2',*/}
-                {/*      borderRadius: '5px',*/}
-                {/*      display: 'flex',*/}
-                {/*      alignItems: 'center',*/}
-                {/*      justifyContent: 'center',*/}
-                {/*    }*/}
-                {/*  }*/}
-                {/*>*/}
-                {/*  <p>Drop a processor here</p>*/}
-                {/*</div>*/}
+                                    {/*{arg.required ? <p style={{ paddingTop: '3px', color: 'red' }}>*</p> : null}*/}
+                                    {/*<p style={{ fontWeight: 'bold', padding: '3px 10px 0 10px' }}>{arg.type}</p>*/}
+                                    {/*<p*/}
+                                    {/*  style={{ paddingTop: '3px' }}>{arg.name !== 'processable.body' ? arg.name : ''}</p>*/}
+                                  </div>
+                                )) : null
+                              }
+                            </div> : <p>No arguments</p>
+                          }
+                        </div>
+                      )) :
+                      <div
+                        onDragOver={() => {
+                          dragOverItem.destination = 'used_processors';
+                        }}
+                        style={
+                          {
+                            maxWidth: '400px',
+                            height: '100px',
+                            border: '2px dashed gray',
+                            borderColor: '#d2d2d2',
+                            borderRadius: '5px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }
+                        }
+                      >
+                        <p>Drop a processor here</p>
+                      </div>
+                  }
+                </div>
               </Column>
 
               <Column md={4} lg={{ span: 6, offset: 8 }} sm={4}>
                 <StickyBox offsetTop={100} offsetBottom={20}>
-                  <Droppable droppableId="droppable2">
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        style={getListStyle(snapshot.isDraggingOver)}
-                      >
-                        {this.state.selected.map((item, index) => (
-                          <Draggable
-                            key={item.id}
-                            draggableId={item.id}
-                            index={index}
-                          >
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                style={getItemStyle(
-                                  snapshot.isDragging,
-                                  provided.draggableProps.style
-                                )}
-                              >
-                                {item.content}
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
+                  <ContainedList label='Processors' kind='on-page' action={''}>
+                    {/*value={searchTerm}*/}
+                    {/*onChange={handleChange}*/}
+                    <Search placeholder='Filter'
+                            closeButtonLabelText='Clear search input' size='lg' labelText='Filter search' />
+                    {errorMessage !== '' && (
+                      <InlineNotification
+                        aria-label='closes notification'
+                        kind='error'
+                        statusIconDescription='notification'
+                        subtitle={errorMessage}
+                        onClose={() => {
+                          setErrorMessage('');
+                        }}
+                        style={{ marginBottom: '16px' }}
+                      />
                     )}
-                  </Droppable>
+                    {
+                      processors &&
+                      processors.map((item, index) => (
+                        <div
+                          onDragStart={(e) => {
+                            setDraggingProcessorIndex(index);
+                            handleDragStart(e, index, 'processors');
+                          }}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDragEnter={(e) => handleDragEnter(e, index, 'processors')}
+                          onDragEnd={handleDragEnd}
+                          key={index}
+                          draggable
+                        >
+                          <ExpandableTile
+                            style={{
+                              paddingLeft: '20px',
+                              marginTop: '10px',
+                              marginBottom: '10px',
+                            }}
+                            tileCollapsedIconText='Details'
+                            tileExpandedIconText='Details'>
+                            <TileAboveTheFoldContent>
+                              <div>
+                                <h5>{item.name}</h5>
+                                <p style={{
+                                  fontSize: '14px',
+                                }}>{item.description}</p>
+                                <Tag type={categoryToColor(item.category)}>
+                                  {item.category}
+                                </Tag>
+                              </div>
+                            </TileAboveTheFoldContent>
+                            <TileBelowTheFoldContent>
+
+                              <div style={{ marginTop: '10px' }}>
+                                <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Arguments</p>
+                                {
+                                  item.arguments ? item.arguments.map((arg, index) => (
+                                    <div style={{ display: 'flex' }}>
+                                      {arg.required ? <p style={{ paddingTop: '3px', color: 'red' }}>*</p> : null}
+                                      <p style={{ fontWeight: 'bold', padding: '3px 10px 0 10px' }}>{arg.type}</p>
+                                      <p
+                                        style={{ paddingTop: '3px' }}>{arg.name !== 'processable.body' ? arg.name : ''}</p>
+                                    </div>
+                                  )) : <p>No arguments</p>
+                                }
+                              </div>
+
+                              <div style={{ marginTop: '10px' }}>
+                                <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Input</p>
+                                {
+                                  item.input ? item.input.map((arg, index) => (
+                                    <div style={{ display: 'flex' }}>
+                                      {arg.required ? <p style={{ paddingTop: '3px', color: 'red' }}>*</p> : null}
+                                      <p style={{ fontWeight: 'bold', padding: '3px 10px 0 10px' }}>{arg.type}</p>
+                                      <p
+                                        style={{ paddingTop: '3px' }}>{arg.name !== 'processable.body' ? arg.name : ''}</p>
+                                    </div>
+                                  )) : <p>No input</p>
+                                }
+                              </div>
+
+                              <div style={{ marginTop: '10px' }}>
+                                <p style={{ fontWeight: 'bold', fontSize: '18px' }}>Output</p>
+                                {
+                                  item.output ? item.output.map((arg, index) => (
+                                    <div style={{ display: 'flex' }}>
+                                      {arg.required ? <p style={{ paddingTop: '3px', color: 'red' }}>*</p> : null}
+                                      <p style={{ fontWeight: 'bold', padding: '3px 10px 0 10px' }}>{arg.type}</p>
+                                      <p
+                                        style={{ paddingTop: '3px' }}>{arg.name !== 'processable.body' ? arg.name : ''}</p>
+                                    </div>
+                                  )) : <p>No output</p>
+                                }
+                              </div>
+
+                            </TileBelowTheFoldContent>
+                          </ExpandableTile>
+                        </div>
+                      ))
+                    }
+                  </ContainedList>
                 </StickyBox>
               </Column>
-            </DragDropContext>
-          </Grid>
-        ) : (
-          window.location.assign('/auth')
-        )}
-      </>
-    );
-  }
-}
 
-export default CreatePipelinePage;
+            </Grid>
+          </Content>
+        </div>
+      ) : (
+        window.location.assign('/auth')
+      )}
+    </>
+  );
+}
