@@ -8,18 +8,12 @@ import {
   HeaderGlobalBar,
   HeaderGlobalAction,
   SkipToContent,
-  SideNav,
-  SideNavItems,
-  HeaderSideNavItems,
-  SideNavMenu,
-  SideNavMenuItem,
-  SideNavLink,
-  StoryContent,
-  HeaderMenu,
   SwitcherItem,
   HeaderPanel,
   SwitcherDivider,
   Switcher,
+  OverflowMenuItem,
+  OverflowMenu,
 } from '@carbon/react';
 import {
   Switcher as SwitcherIcon,
@@ -27,18 +21,14 @@ import {
 } from '@carbon/icons-react';
 
 import Link from 'next/link';
+import axios from 'axios';
+import { Address } from '@/settings';
+import React from 'react';
 
 const MainHeader = () => (
   <HeaderContainer
     render={({ isSideNavExpanded, onClickSideNavExpand }) => (
       <Header aria-label="PlutoEngine">
-        <SkipToContent />
-        <HeaderMenuButton
-          aria-label="Open menu"
-          onClick={onClickSideNavExpand}
-          isActive={isSideNavExpanded}
-        />
-
         <Link href="/" passHref legacyBehavior>
           <HeaderName prefix="PlutoEngine">Panel</HeaderName>
         </Link>
@@ -53,14 +43,50 @@ const MainHeader = () => (
         </HeaderNavigation>
 
         <HeaderGlobalBar>
-          {/*<HeaderGlobalAction*/}
-          {/*  aria-label="Notifications"*/}
-          {/*  tooltipAlignment="center"*/}
-          {/*>*/}
-          {/*  <Notification size={20} />*/}
-          {/*</HeaderGlobalAction>*/}
-          <HeaderGlobalAction aria-label="User" tooltipAlignment="center">
-            <UserAvatarIcon size={20} />
+          <HeaderGlobalAction tooltipAlignment="hide">
+            <OverflowMenu
+              size={'lg'}
+              renderIcon={UserAvatarIcon}
+              flipped={document?.dir === 'rtl'}
+              menuOffset={{ left: -60 }}
+            >
+              <OverflowMenuItem itemText="Add a new admin" disabled />
+              <OverflowMenuItem itemText="Change password" disabled />
+              <OverflowMenuItem
+                hasDivider
+                isDelete
+                itemText="Logout"
+                onClick={(e) => {
+                  axios
+                    .post(Address + '/api/v1/logout', {
+                      headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                          'token'
+                        )}`,
+                      },
+                    })
+                    .then(function (response) {
+                      localStorage.removeItem('email');
+                      localStorage.removeItem('token');
+                      if (response.status === 200) {
+                        window.location.href = '/auth';
+                      }
+                    })
+                    .catch(function (error) {
+                      localStorage.removeItem('email');
+                      localStorage.removeItem('token');
+                      if (error.response) {
+                        if (error.response.status === 401) {
+                          window.location.href = '/auth';
+                          return;
+                        }
+                        window.location.href = '/auth';
+                        console.error(error);
+                      }
+                    });
+                }}
+              />
+            </OverflowMenu>
           </HeaderGlobalAction>
           <HeaderGlobalAction
             aria-label={isSideNavExpanded ? 'Close switcher' : 'Open switcher'}
@@ -124,37 +150,54 @@ const MainHeader = () => (
     )}
   />
 );
+
 export const UnAuthenticatedHeader = () => (
   <HeaderContainer
     render={({ isSideNavExpanded, onClickSideNavExpand }) => (
       <Header aria-label="PlutoEngine">
-        <SkipToContent />
-        <HeaderMenuButton
-          aria-label="Open menu"
-          onClick={onClickSideNavExpand}
-          isActive={isSideNavExpanded}
-        />
         <Link href="/" passHref legacyBehavior>
           <HeaderName prefix="PlutoEngine">Panel</HeaderName>
         </Link>
 
         <HeaderGlobalBar>
           <HeaderGlobalAction
-            aria-label="Notifications"
-            tooltipAlignment="center"
+            aria-label={isSideNavExpanded ? 'Close switcher' : 'Open switcher'}
+            aria-expanded={isSideNavExpanded}
+            isActive={isSideNavExpanded}
+            onClick={onClickSideNavExpand}
+            tooltipAlignment="end"
+            id="switcher-button"
           >
-            <Notification size={20} />
-          </HeaderGlobalAction>
-          <HeaderGlobalAction
-            aria-label="User Avatar"
-            tooltipAlignment="center"
-          >
-            <UserAvatar size={20} />
-          </HeaderGlobalAction>
-          <HeaderGlobalAction aria-label="App Switcher" tooltipAlignment="end">
             <SwitcherIcon size={20} />
           </HeaderGlobalAction>
         </HeaderGlobalBar>
+
+        <HeaderPanel
+          expanded={isSideNavExpanded}
+          onHeaderPanelFocus={onClickSideNavExpand}
+          href="#switcher-button"
+        >
+          <Switcher aria-label="Switcher" expanded={isSideNavExpanded}>
+            <SwitcherItem
+              href="https://plutoengine.ir/docs/"
+              aria-label="Documentation"
+            >
+              Documentation
+            </SwitcherItem>
+            <SwitcherItem
+              href="https://t.me/PlutoEngineCommunity"
+              aria-label="Community"
+            >
+              Community
+            </SwitcherItem>
+            <SwitcherItem
+              href="https://github.com/0x9n0p/pluto"
+              aria-label="Source Code"
+            >
+              Source Code
+            </SwitcherItem>
+          </Switcher>
+        </HeaderPanel>
       </Header>
     )}
   />
