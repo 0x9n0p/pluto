@@ -19,7 +19,7 @@ type Statistics struct {
 
 	RunningGoroutines int `json:"running_goroutines"`
 
-	Uptime time.Duration `json:"uptime"`
+	Uptime uint64 `json:"uptime"`
 
 	TotalMemory  uint64 `json:"total_memory"`
 	UsedMemory   uint64 `json:"used_memory"`
@@ -56,7 +56,7 @@ func Get() (s Statistics) {
 			up = time.Hour * 999
 		}
 
-		s.Uptime = up
+		s.Uptime = uint64(up.Seconds())
 	}
 
 	// Memory

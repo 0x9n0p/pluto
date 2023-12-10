@@ -127,7 +127,7 @@ const MainHeader = () => (
             {/*<SwitcherDivider />*/}
 
             <SwitcherItem
-              href="https://plutoengine.ir/docs/"
+              href="https://github.com/0x9n0p/pluto/wiki"
               aria-label="Documentation"
             >
               Documentation
@@ -179,7 +179,7 @@ export const UnAuthenticatedHeader = () => (
         >
           <Switcher aria-label="Switcher" expanded={isSideNavExpanded}>
             <SwitcherItem
-              href="https://plutoengine.ir/docs/"
+              href="https://github.com/0x9n0p/pluto/wiki"
               aria-label="Documentation"
             >
               Documentation
