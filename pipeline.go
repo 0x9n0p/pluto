@@ -6,7 +6,6 @@ import (
 
 var (
 	PipelineNotFound = &Error{
-		Code:     1,
 		HTTPCode: http.StatusNotFound,
 		Message:  "Pipeline not found",
 	}

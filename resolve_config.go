@@ -1,5 +1,7 @@
 package pluto
 
+// Config
+// Deprecated
 type Config struct {
 	Pipelines []struct {
 		Name       string `json:"name"`
@@ -11,7 +13,8 @@ type Config struct {
 	} `json:"pipelines"`
 }
 
-// ResolveConfig REFACTOR
+// ResolveConfig
+// Deprecated
 func ResolveConfig(config Config) (o map[string]Pipeline) {
 	for _, pipeline := range config.Pipelines {
 		p := Pipeline{
@@ -30,7 +33,7 @@ func ResolveConfig(config Config) (o map[string]Pipeline) {
 			}
 
 			var conditionalProcessor ConditionalProcessor
-			conditionalProcessor.main = processorCreator(nil)
+			conditionalProcessor.main, _ = processorCreator(nil)
 
 			if processor.Success == nil || len(processor.Success) <= 0 {
 				conditionalProcessor.success = ProcessorBucket{make([]Processor, 0)}
@@ -45,7 +48,8 @@ func ResolveConfig(config Config) (o map[string]Pipeline) {
 						continue
 					}
 
-					conditionalProcessor.success.Attach(processorCreator(nil))
+					pr, _ := processorCreator(nil)
+					conditionalProcessor.success.Attach(pr)
 				}
 			}
 
@@ -62,7 +66,8 @@ func ResolveConfig(config Config) (o map[string]Pipeline) {
 						continue
 					}
 
-					conditionalProcessor.fail.Attach(processorCreator(nil))
+					pr, _ := processorCreator(nil)
+					conditionalProcessor.fail.Attach(pr)
 				}
 			}
 

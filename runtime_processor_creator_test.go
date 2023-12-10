@@ -12,7 +12,7 @@ func TestRuntimeProcessorCreator(t *testing.T) {
 			Name: "CREATE_WRITE_TO_IO_PROCESSOR",
 			ProcessorBucket: pluto.ProcessorBucket{Processors: []pluto.Processor{
 				pluto.RuntimeProcessorCreator{
-					PredefinedProcessorName: "WRITE_TO_IO",
+					PredefinedProcessorName: pluto.ProcessorName_WriteToInputOutput,
 					AppendName:              "processor",
 				},
 			}},
@@ -20,14 +20,20 @@ func TestRuntimeProcessorCreator(t *testing.T) {
 	})
 
 	pluto.Process(&pluto.OutComingProcessable{
-		Producer: TestIdentifier{
+		Producer: pluto.ExternalIdentifier(TestIdentifier{
 			Name: "TEST_PRODUCER",
 			Kind: pluto.KindPipeline,
-		},
-		Consumer: TestIdentifier{
+		}),
+		Consumer: pluto.ExternalIdentifier(TestIdentifier{
 			Name: "CREATE_WRITE_TO_IO_PROCESSOR",
 			Kind: pluto.KindPipeline,
+		}),
+		Body: []pluto.Value{
+			{
+				Name:  "io_interface",
+				Type:  pluto.TypeInternalInterface,
+				Value: os.Stdout,
+			},
 		},
-		Body: map[string]any{"io_interface": os.Stdout},
 	})
 }

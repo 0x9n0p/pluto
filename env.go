@@ -10,10 +10,10 @@ import (
 
 var Env EnvSpec
 
-// EnvSpec fields are not required because multiple programs going to use them
 type EnvSpec struct {
-	Debug     bool
-	HTTPAdmin string `envconfig:"http_admin"`
+	Debug             bool
+	Host              []string `envconfig:"HOST" default:"localhost"`
+	HTTPServerAddress string   `envconfig:"HTTP_SERVER" default:"0.0.0.0:80"`
 }
 
 func init() {

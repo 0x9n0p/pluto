@@ -1,49 +1,39 @@
 package pluto
 
+const ProcessorName_FindChannel = "Find Channel"
+
+func init() {
+	PredefinedProcessors[ProcessorName_FindChannel] = func(args []Value) (p Processor, err error) {
+		defer creatorPanicHandler(ProcessorName_FindChannel, &err)()
+		return FindChannel{
+			Name: Find("Name", args...).Value.(string),
+		}, err
+	}
+}
+
 type FindChannel struct {
+	Name string
 }
 
 func (p FindChannel) Process(processable Processable) (Processable, bool) {
-	appendable, ok := processable.GetBody().(map[string]any)
-	if !ok {
-		return processable, false
+	for _, channel := range Channels {
+		if channel.Name == p.Name {
+			processable.SetBody(channel)
+			return processable, true
+		}
 	}
-
-	v, found := appendable["channel_name"]
-	if !found {
-		return processable, false
-	}
-
-	channelName, ok := v.(string)
-	if !ok {
-		return processable, false
-	}
-
-	channel, found := findChannel(channelName)
-	if !found {
-		return processable, false
-	}
-
-	appendable["channel"] = channel
-	processable.SetBody(appendable)
-
-	return processable, true
+	return processable, false
 }
 
 func (p FindChannel) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "FIND_CHANNEL",
-		Description: "",
-		Input:       "channel_name",
-		Output:      "channel",
-	}
+	return ProcessorDescriptor{}
 }
 
-func findChannel(name string) (Channel, bool) {
-	for _, channel := range Channels {
-		if channel.Name == name {
-			return channel, true
-		}
-	}
-	return Channel{}, false
-}
+//func findChannel(name string) (Channel, bool) {
+//	for _, channel := range Channels {
+//		if channel.Name == name {
+//			return channel, true
+//		}
+//	}
+//	return Channel{}, false
+//}

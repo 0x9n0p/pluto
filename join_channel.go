@@ -1,5 +1,14 @@
 package pluto
 
+const ProcessorName_JoinChannel = "Join Channel"
+
+func init() {
+	PredefinedProcessors[ProcessorName_JoinChannel] = func(args []Value) (p Processor, err error) {
+		defer creatorPanicHandler(ProcessorName_JoinChannel, &err)()
+		return JoinChannel{}, err
+	}
+}
+
 type JoinChannel struct {
 }
 
@@ -39,21 +48,16 @@ func (p JoinChannel) Process(processable Processable) (Processable, bool) {
 		return processable, false
 	}
 
-	channel.Join(&DynamicJoinable{identifier, processor})
+	channel.Join(&BaseJoinable{identifier, processor})
 
 	return processable, true
 }
 
 func (p JoinChannel) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "JOIN_CHANNEL",
-		Description: "",
-		Input:       "channel,identifier,processor",
-		Output:      "",
-	}
+	return ProcessorDescriptor{}
 }
 
-type DynamicJoinable struct {
+type BaseJoinable struct {
 	Identifier
 	Processor
 }

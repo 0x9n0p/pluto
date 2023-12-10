@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 	"pluto"
+	_ "pluto/panel"
 )
 
 func init() {
-	pluto.ApplicationLogger.Channel.Join(pluto.DynamicJoinable{
+	pluto.ApplicationLogger.Channel.Join(pluto.BaseJoinable{
 		Identifier: pluto.ExternalIdentifier{
 			Name: "STD_OUT",
 			Kind: "LocalStream",

@@ -1,14 +1,29 @@
 package pluto
 
-var PredefinedProcessors = make(map[string]func(any) Processor)
+import "fmt"
+
+var PredefinedProcessors = make(map[string]func([]Value) (Processor, error))
+
+func creatorPanicHandler(processorName string, err *error) func() {
+	return func() {
+		if v := recover(); v != nil {
+			*err = fmt.Errorf("make sure you enter the arguments of (%s) correctly: %s", processorName, v.(error))
+		}
+	}
+}
 
 type Processor interface {
+	// GetDescriptor
+	// Deprecated
 	GetDescriptor() ProcessorDescriptor
+
 	// Process
 	// The boolean indicates that the next processor can be executed or not.
 	Process(Processable) (Processable, bool)
 }
 
+// ProcessorDescriptor
+// Deprecated
 type ProcessorDescriptor struct {
 	Name        string
 	Description string
