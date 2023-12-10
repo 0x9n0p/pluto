@@ -8,6 +8,7 @@ import (
 	"pluto/panel/pipeline"
 	_ "pluto/panel/pipeline/delivery"
 	_ "pluto/panel/processor/delivery"
+	_ "pluto/panel/statistics/delivery"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"

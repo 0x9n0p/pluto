@@ -90,7 +90,7 @@ func (v ValueDescriptor) Comparable() any {
 type Value struct {
 	Name        string        `json:"name"`
 	Type        string        `json:"type"`
-	Value       any           `json:"value"`
+	Value       any           `json:"value,omitempty"`
 	ValueParser func(any) any `json:"-"`
 }
 

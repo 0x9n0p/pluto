@@ -1,8 +1,9 @@
 package delivery
 
 import (
+	"net/http"
 	"pluto"
-	"pluto/panel/delivery"
+	"pluto/panel/auth"
 	"pluto/panel/logview"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -12,11 +13,12 @@ import (
 )
 
 func init() {
-	panel := pluto.FindHTTPHost("panel")
-	v1 := panel.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
-
-	v1.GET("/logs/bind", func(c echo.Context) error {
+	pluto.FindHTTPHost("panel").GET("/api/v1/logs/bind/:token", func(c echo.Context) error {
 		ws, err := (&websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				// TODO: Check the origin
+				return true
+			},
 			// TODO: No need to have read buffer
 		}).Upgrade(c.Response(), c.Request(), nil)
 		if err != nil {
@@ -31,7 +33,12 @@ func init() {
 			Writer: &WSConnWrapper{Conn: ws},
 		}).Bind()
 		return nil
-	})
+	},
+		echojwt.WithConfig(echojwt.Config{
+			SigningKey:  auth.JWTSecretKey,
+			TokenLookup: "param:token",
+		}),
+	)
 }
 
 type WSConnWrapper struct {
