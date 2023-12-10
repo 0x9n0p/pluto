@@ -26,6 +26,7 @@ require (
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/klauspost/compress v1.12.3 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect
+	github.com/mackerelio/go-osstat v0.2.4 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
