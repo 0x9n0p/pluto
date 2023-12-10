@@ -1,6 +1,8 @@
 # Pluto
 
-No code is needed to launch multiplayer game servers. Customize the config file and enjoy the server!
+No code is needed to launch multiplayer game servers.
+
+![](docs/dashboard.png "Dashboard")
 
 ## SDK
 
@@ -27,11 +29,13 @@ PLUTO_HOST=localhost,127.0.0.1 PLUTO_HTTP_SERVER=0.0.0.0:80 PLUTO_PANEL_STORAGE=
 ### APIs Examples
 
 #### Login
+
 ```bash
 curl -X POST http://panel.localhost/api/v1/auth \                                                                  ✔ 
   -H 'Content-Type: application/json' \
   -d '{"email":"admin", "password":"admin"}'
 ```
+
 ```json
 {
   "email": "admin",
