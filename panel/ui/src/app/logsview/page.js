@@ -10,7 +10,7 @@ import {
 import MainHeader from '@/components/MainHeader/MainHeader';
 import { useEffect, useRef, useState } from 'react';
 import 'ws';
-import { HOST } from '@/settings';
+import { getValueFromLocalStorage } from '@/settings';
 
 export default function LogviewPage() {
   // TODO: Move it to the settings.
@@ -22,7 +22,7 @@ export default function LogviewPage() {
   const connection = useRef(null);
   useEffect(() => {
     const socket = new WebSocket(
-      'wss://' + HOST + '/api/v1/logs/bind/' + localStorage.getItem('token')
+      'wss://' + getValueFromLocalStorage('base_host') + '/api/v1/logs/bind/' + localStorage.getItem('token')
     );
 
     socket.addEventListener('open', (event) => {

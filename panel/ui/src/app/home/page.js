@@ -18,19 +18,19 @@ export default function HomePage() {
 
   function loadData() {
     axios
-      .get(Address + '/api/v1/statistics', {
+      .get(Address() + '/api/v1/statistics', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       })
-      .then(function (response) {
+      .then(function(response) {
         if (response.status !== 200) {
           setErrorMessage('Unexpected response from server');
           return;
         }
         setStatistics(response.data);
       })
-      .catch(function (error) {
+      .catch(function(error) {
         if (error.response) {
           if (error.response.status === 401) {
             window.location.href = '/auth';
@@ -47,7 +47,7 @@ export default function HomePage() {
   useEffect(() => {
     const interval = setInterval(() => {
       loadData();
-    }, 3000);
+    }, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -116,25 +116,25 @@ export default function HomePage() {
   return (
     <>
       <div>
-        <Theme theme="g100">
+        <Theme theme='g100'>
           <MainHeader />
         </Theme>
         <Content>
-          <Grid className="panel-page" fullWidth>
+          <Grid className='panel-page' fullWidth>
             <Column
               lg={16}
               md={8}
               sm={4}
-              className="panel-page_header"
+              className='panel-page_header'
               style={{ marginBottom: '48px' }}
             >
-              <h1 className="panel-page__heading">Dashboard</h1>
+              <h1 className='panel-page__heading'>Dashboard</h1>
 
               {errorMessage !== '' && (
                 <InlineNotification
-                  aria-label="closes notification"
-                  kind="error"
-                  statusIconDescription="notification"
+                  aria-label='closes notification'
+                  kind='error'
+                  statusIconDescription='notification'
                   subtitle={errorMessage}
                   onClose={() => {
                     setErrorMessage('');

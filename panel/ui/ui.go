@@ -32,7 +32,7 @@ var (
 )
 
 func init() {
-	p := pluto.FindHTTPHost("panel")
+	p := pluto.FindHTTPHost(pluto.PanelSubdomain)
 	p.StaticFS("/", UIPublicDir)
 	p.FileFS("/", "index.html", echo.MustSubFS(PageHome, "out"))
 	p.FileFS("/404", "404.html", echo.MustSubFS(PageNotFound, "out"))

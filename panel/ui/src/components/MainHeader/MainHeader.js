@@ -58,7 +58,7 @@ const MainHeader = () => (
                 itemText="Logout"
                 onClick={(e) => {
                   axios
-                    .post(Address + '/api/v1/logout', {
+                    .post(Address() + '/api/v1/logout', {
                       headers: {
                         Authorization: `Bearer ${localStorage.getItem(
                           'token'

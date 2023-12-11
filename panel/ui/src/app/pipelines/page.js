@@ -28,7 +28,7 @@ export default function LandingPage() {
 
   const syncPipelines = () => {
     axios
-      .get(Address + '/api/v1/pipelines', {
+      .get(Address() + '/api/v1/pipelines', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -167,7 +167,7 @@ export default function LandingPage() {
                                   onClick={(e) => {
                                     axios
                                       .delete(
-                                        Address +
+                                        Address() +
                                           '/api/v1/pipelines?name=' +
                                           item.name,
                                         {

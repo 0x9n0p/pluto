@@ -49,7 +49,7 @@ export default function CreatePipelinePage() {
 
   useEffect(() => {
     axios
-      .get(Address + '/api/v1/processors', {
+      .get(Address() + '/api/v1/processors', {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -215,7 +215,7 @@ export default function CreatePipelinePage() {
                     onClick={(event) => {
                       axios
                         .post(
-                          Address + '/api/v1/pipelines',
+                          Address() + '/api/v1/pipelines',
                           {
                             name: pipelineName,
                             processors: usedProcessors,
