@@ -1,14 +1,10 @@
-`use client`;
+'use client';
 
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  Button,
   Column,
   Content,
   Grid,
   InlineNotification,
-  Row,
   Theme,
 } from '@carbon/react';
 import MainHeader from '@/components/MainHeader/MainHeader';
@@ -114,320 +110,317 @@ export default function HomePage() {
     }
   }
 
+  if (typeof window !== 'undefined')
+    if (!localStorage.getItem('token')) window.location.assign('/auth');
+
   return (
     <>
-      {localStorage.getItem('token') ? (
-        <div>
-          <Theme theme="g100">
-            <MainHeader />
-          </Theme>
-          <Content>
-            <Grid className="panel-page" fullWidth>
-              <Column
-                lg={16}
-                md={8}
-                sm={4}
-                className="panel-page_header"
-                style={{ marginBottom: '48px' }}
-              >
-                <h1 className="panel-page__heading">Dashboard</h1>
+      <div>
+        <Theme theme="g100">
+          <MainHeader />
+        </Theme>
+        <Content>
+          <Grid className="panel-page" fullWidth>
+            <Column
+              lg={16}
+              md={8}
+              sm={4}
+              className="panel-page_header"
+              style={{ marginBottom: '48px' }}
+            >
+              <h1 className="panel-page__heading">Dashboard</h1>
 
-                {errorMessage !== '' && (
-                  <InlineNotification
-                    aria-label="closes notification"
-                    kind="error"
-                    statusIconDescription="notification"
-                    subtitle={errorMessage}
-                    onClose={() => {
-                      setErrorMessage('');
-                    }}
-                    style={{ marginTop: '16px' }}
-                  />
-                )}
-              </Column>
+              {errorMessage !== '' && (
+                <InlineNotification
+                  aria-label="closes notification"
+                  kind="error"
+                  statusIconDescription="notification"
+                  subtitle={errorMessage}
+                  onClose={() => {
+                    setErrorMessage('');
+                  }}
+                  style={{ marginTop: '16px' }}
+                />
+              )}
+            </Column>
 
-              <Column
-                lg={4}
-                md={8}
-                sm={4}
+            <Column
+              lg={4}
+              md={8}
+              sm={4}
+              style={{
+                marginBottom: '48px',
+                background: '#fbfbfb',
+                padding: '20px',
+              }}
+            >
+              <div
                 style={{
-                  marginBottom: '48px',
-                  background: '#fbfbfb',
-                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <h3>Memory Usage</h3>
+                <p style={{ color: '#616161', marginBottom: '15px' }}>
+                  4 fields found
+                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: '40px',
+                      color: hasLowMem(statistics.free_memory),
+                    }}
+                  >
+                    {formatBytes(statistics.free_memory)}
+                  </p>
+                  <p style={{ fontSize: '18px' }}>
+                    {formatBytes(statistics.total_memory)}
+                  </p>
+                </div>
+              </div>
+            </Column>
+
+            <Column lg={4} md={8} sm={4} style={{ marginBottom: '48px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
                 <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
+                    marginBottom: '10px',
+                    background: '#fbfbfb',
+                    padding: '20px',
                   }}
                 >
-                  <h3>Memory Usage</h3>
-                  <p style={{ color: '#616161', marginBottom: '15px' }}>
-                    4 fields found
-                  </p>
+                  <h3>Load Average</h3>
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: 'column',
+                      flexDirection: 'row',
+                      justifyContent: 'space-evenly',
+                      paddingTop: '11px',
                     }}
                   >
-                    <p
-                      style={{
-                        fontSize: '40px',
-                        color: hasLowMem(statistics.free_memory),
-                      }}
-                    >
-                      {formatBytes(statistics.free_memory)}
-                    </p>
-                    <p style={{ fontSize: '18px' }}>
-                      {formatBytes(statistics.total_memory)}
-                    </p>
-                  </div>
-                </div>
-              </Column>
-
-              <Column lg={4} md={8} sm={4} style={{ marginBottom: '48px' }}>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      marginBottom: '10px',
-                      background: '#fbfbfb',
-                      padding: '20px',
-                    }}
-                  >
-                    <h3>Load Average</h3>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-evenly',
-                        paddingTop: '11px',
-                      }}
-                    >
-                      {statistics.load_average_1 && (
-                        <p
-                          style={{
-                            fontSize: '25px',
-                            fontWeight: 'bold',
-                            color: avgToColor(statistics.load_average_1),
-                          }}
-                        >
-                          {statistics.load_average_1.toFixed(1)}
-                        </p>
-                      )}
-                      {statistics.load_average_5 && (
-                        <p
-                          style={{
-                            fontSize: '25px',
-                            fontWeight: 'bold',
-                            color: avgToColor(statistics.load_average_5),
-                          }}
-                        >
-                          {statistics.load_average_5.toFixed(1)}
-                        </p>
-                      )}
-                      {statistics.load_average_15 && (
-                        <p
-                          style={{
-                            fontSize: '25px',
-                            fontWeight: 'bold',
-                            color: avgToColor(statistics.load_average_15),
-                          }}
-                        >
-                          {statistics.load_average_15.toFixed(1)}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      background: '#fbfbfb',
-                      padding: '20px',
-                    }}
-                  >
-                    <h3>Uptime</h3>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <p style={{ fontSize: '40px' }}>
-                        {secToDuration(statistics.uptime)}
+                    {statistics.load_average_1 && (
+                      <p
+                        style={{
+                          fontSize: '25px',
+                          fontWeight: 'bold',
+                          color: avgToColor(statistics.load_average_1),
+                        }}
+                      >
+                        {statistics.load_average_1.toFixed(1)}
                       </p>
-                    </div>
+                    )}
+                    {statistics.load_average_5 && (
+                      <p
+                        style={{
+                          fontSize: '25px',
+                          fontWeight: 'bold',
+                          color: avgToColor(statistics.load_average_5),
+                        }}
+                      >
+                        {statistics.load_average_5.toFixed(1)}
+                      </p>
+                    )}
+                    {statistics.load_average_15 && (
+                      <p
+                        style={{
+                          fontSize: '25px',
+                          fontWeight: 'bold',
+                          color: avgToColor(statistics.load_average_15),
+                        }}
+                      >
+                        {statistics.load_average_15.toFixed(1)}
+                      </p>
+                    )}
                   </div>
                 </div>
-              </Column>
 
-              <Column
-                lg={4}
-                md={8}
-                sm={4}
-                style={{
-                  marginBottom: '48px',
-                  background: '#fbfbfb',
-                  padding: '20px',
-                }}
-              >
                 <div
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
+                    background: '#fbfbfb',
+                    padding: '20px',
                   }}
                 >
-                  <h3>Concurrent Tasks</h3>
-                  <p style={{ color: '#616161', marginBottom: '15px' }}>
-                    Running Goroutines
-                  </p>
+                  <h3>Uptime</h3>
                   <div
                     style={{
                       display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'start',
-                      alignItems: 'baseline',
+                      flexDirection: 'column',
                     }}
                   >
-                    <p style={{ fontSize: '80px' }}>
-                      {statistics.running_goroutines}
+                    <p style={{ fontSize: '40px' }}>
+                      {secToDuration(statistics.uptime)}
                     </p>
-                    <p>G</p>
                   </div>
                 </div>
-              </Column>
-            </Grid>
+              </div>
+            </Column>
 
-            <Grid>
-              <Column
-                lg={4}
-                md={8}
-                sm={4}
+            <Column
+              lg={4}
+              md={8}
+              sm={4}
+              style={{
+                marginBottom: '48px',
+                background: '#fbfbfb',
+                padding: '20px',
+              }}
+            >
+              <div
                 style={{
-                  marginBottom: '48px',
-                  background: '#fbfbfb',
-                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
+                <h3>Concurrent Tasks</h3>
+                <p style={{ color: '#616161', marginBottom: '15px' }}>
+                  Running Goroutines
+                </p>
                 <div
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexDirection: 'row',
+                    justifyContent: 'start',
+                    alignItems: 'baseline',
                   }}
                 >
-                  <h3>Connected Clients</h3>
-                  <p style={{ color: '#616161', marginBottom: '15px' }}>
-                    Accepted and authenticated
+                  <p style={{ fontSize: '80px' }}>
+                    {statistics.running_goroutines}
                   </p>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'start',
-                      alignItems: 'baseline',
-                    }}
-                  >
-                    <p style={{ fontSize: '80px' }}>
-                      {statistics.connected_clients}
-                    </p>
-                    <p style={{ color: '#616161', fontSize: '13px' }}>
-                      Connection
-                    </p>
-                  </div>
+                  <p>G</p>
                 </div>
-              </Column>
+              </div>
+            </Column>
+          </Grid>
 
-              <Column
-                lg={4}
-                md={8}
-                sm={4}
+          <Grid>
+            <Column
+              lg={4}
+              md={8}
+              sm={4}
+              style={{
+                marginBottom: '48px',
+                background: '#fbfbfb',
+                padding: '20px',
+              }}
+            >
+              <div
                 style={{
-                  marginBottom: '48px',
-                  background: '#fbfbfb',
-                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
+                <h3>Connected Clients</h3>
+                <p style={{ color: '#616161', marginBottom: '15px' }}>
+                  Accepted and authenticated
+                </p>
                 <div
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexDirection: 'row',
+                    justifyContent: 'start',
+                    alignItems: 'baseline',
                   }}
                 >
-                  <h3>Waiting Clients</h3>
-                  <p style={{ color: '#616161', marginBottom: '15px' }}>
-                    Waiting to complete authentication
+                  <p style={{ fontSize: '80px' }}>
+                    {statistics.connected_clients}
                   </p>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'start',
-                      alignItems: 'baseline',
-                    }}
-                  >
-                    <p style={{ fontSize: '80px' }}>
-                      {statistics.waiting_clients}
-                    </p>
-                    <p style={{ color: '#616161', fontSize: '13px' }}>
-                      Request
-                    </p>
-                  </div>
+                  <p style={{ color: '#616161', fontSize: '13px' }}>
+                    Connection
+                  </p>
                 </div>
-              </Column>
+              </div>
+            </Column>
 
-              <Column
-                lg={4}
-                md={8}
-                sm={4}
+            <Column
+              lg={4}
+              md={8}
+              sm={4}
+              style={{
+                marginBottom: '48px',
+                background: '#fbfbfb',
+                padding: '20px',
+              }}
+            >
+              <div
                 style={{
-                  marginBottom: '48px',
-                  background: '#fbfbfb',
-                  padding: '20px',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               >
+                <h3>Waiting Clients</h3>
+                <p style={{ color: '#616161', marginBottom: '15px' }}>
+                  Waiting to complete authentication
+                </p>
                 <div
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexDirection: 'row',
+                    justifyContent: 'start',
+                    alignItems: 'baseline',
                   }}
                 >
-                  <h3>Active Pipelines</h3>
-                  <p style={{ color: '#616161', marginBottom: '15px' }}>
-                    Ready to handle requests
+                  <p style={{ fontSize: '80px' }}>
+                    {statistics.waiting_clients}
                   </p>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
-                      justifyContent: 'start',
-                      alignItems: 'baseline',
-                    }}
-                  >
-                    <p style={{ fontSize: '80px' }}>
-                      {statistics.active_pipelines}
-                    </p>
-                    <p style={{ color: '#616161', fontSize: '13px' }}>
-                      Pipelines
-                    </p>
-                  </div>
+                  <p style={{ color: '#616161', fontSize: '13px' }}>Request</p>
                 </div>
-              </Column>
-            </Grid>
-          </Content>
-        </div>
-      ) : (
-        window.location.assign('/auth')
-      )}
+              </div>
+            </Column>
+
+            <Column
+              lg={4}
+              md={8}
+              sm={4}
+              style={{
+                marginBottom: '48px',
+                background: '#fbfbfb',
+                padding: '20px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <h3>Active Pipelines</h3>
+                <p style={{ color: '#616161', marginBottom: '15px' }}>
+                  Ready to handle requests
+                </p>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'start',
+                    alignItems: 'baseline',
+                  }}
+                >
+                  <p style={{ fontSize: '80px' }}>
+                    {statistics.active_pipelines}
+                  </p>
+                  <p style={{ color: '#616161', fontSize: '13px' }}>
+                    Pipelines
+                  </p>
+                </div>
+              </div>
+            </Column>
+          </Grid>
+        </Content>
+      </div>
     </>
   );
 }

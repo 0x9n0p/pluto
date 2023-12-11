@@ -47,7 +47,7 @@ const MainHeader = () => (
             <OverflowMenu
               size={'lg'}
               renderIcon={UserAvatarIcon}
-              flipped={document?.dir === 'rtl'}
+              // flipped={document?.dir === 'rtl'}
               menuOffset={{ left: -60 }}
             >
               <OverflowMenuItem itemText="Add a new admin" disabled />
