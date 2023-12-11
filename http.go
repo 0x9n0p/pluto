@@ -9,6 +9,10 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	PanelSubdomain = ""
+)
+
 var HTTPHosts = map[string]*echo.Echo{}
 
 var HTTPServer = func() *echo.Echo {
@@ -25,11 +29,10 @@ var HTTPServer = func() *echo.Echo {
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
 			host, found := HTTPHosts[c.Request().Host]
-			if found {
-				host.ServeHTTP(c.Response(), c.Request())
-			} else {
-				err = echo.ErrNotFound
+			if !found {
+				host = FindHTTPHost("")
 			}
+			host.ServeHTTP(c.Response(), c.Request())
 			return
 		}
 	})
@@ -51,14 +54,8 @@ func init() {
 	RegisterHTTPHost("", root)
 	RegisterHTTPHost("www", root)
 
-	panel := echo.New()
-	panel.Use(middleware.Recover())
-	panel.Use(middleware.CORSWithConfig(cors))
-	RegisterHTTPHost("panel", panel)
-
 	if Env.Debug {
 		root.Use(middleware.Logger())
-		panel.Use(middleware.Logger())
 	}
 
 	root.GET("/", func(c echo.Context) error {

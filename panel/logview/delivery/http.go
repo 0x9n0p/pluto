@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	pluto.FindHTTPHost("panel").GET("/api/v1/logs/bind/:token", func(c echo.Context) error {
+	pluto.FindHTTPHost(pluto.PanelSubdomain).GET("/api/v1/logs/bind/:token", func(c echo.Context) error {
 		ws, err := (&websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				// TODO: Check the origin

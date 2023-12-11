@@ -21,7 +21,7 @@ func init() {
 		return writer.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
 	}
 
-	v1 := pluto.FindHTTPHost("panel").Group("/api/v1")
+	v1 := pluto.FindHTTPHost(pluto.PanelSubdomain).Group("/api/v1")
 
 	v1.POST("/auth",
 		wrapper.New[auth.PasswordAuthenticator](func(p auth.PasswordAuthenticator, writer wrapper.ResponseWriter) error {

@@ -21,7 +21,7 @@ func init() {
 		return writer.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
 	}
 
-	panel := pluto.FindHTTPHost("panel")
+	panel := pluto.FindHTTPHost(pluto.PanelSubdomain)
 	v1 := panel.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.GET("/pipelines",

@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	panel := pluto.FindHTTPHost("panel")
+	panel := pluto.FindHTTPHost(pluto.PanelSubdomain)
 	v1 := panel.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.GET("/processors",
