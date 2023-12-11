@@ -11,9 +11,11 @@ import (
 var Env EnvSpec
 
 type EnvSpec struct {
-	Debug             bool
-	Host              []string `envconfig:"HOST" default:"localhost"`
-	HTTPServerAddress string   `envconfig:"HTTP_SERVER" default:"0.0.0.0:80"`
+	Debug               bool
+	Host                []string `envconfig:"HOST" default:"localhost"`
+	HTTPServerAddress   string   `envconfig:"HTTP_SERVER" default:"0.0.0.0:80"`
+	HTTPCertificatePath string   `envconfig:"HTTP_CERTIFICATE_PATH" default:"ssl/plutoengine.crt"`
+	HTTPKeyPath         string   `envconfig:"HTTP_KEY_PATH" default:"ssl/plutoengine.key"`
 }
 
 func init() {

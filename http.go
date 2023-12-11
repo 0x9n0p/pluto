@@ -78,7 +78,7 @@ func init() {
 	})
 
 	go func() {
-		if err := HTTPServer.StartTLS(Env.HTTPServerAddress, "/etc/ssl/certs/plutoengine.crt", "/etc/ssl/private/plutoengine.key"); err != nil {
+		if err := HTTPServer.StartTLS(Env.HTTPServerAddress, Env.HTTPCertificatePath, Env.HTTPKeyPath); err != nil {
 			Log.Fatal("Running HTTP admin server", zap.Error(err))
 		}
 	}()

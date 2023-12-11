@@ -12,7 +12,7 @@ import (
 var Env EnvSpec
 
 type EnvSpec struct {
-	StoragePath string `envconfig:"PANEL_STORAGE" required:"true"`
+	StoragePath string `envconfig:"PANEL_STORAGE" default:"/var/plutoengine/panel/"`
 }
 
 func init() {
