@@ -13,6 +13,7 @@ const (
 	*/
 	TypeProcessor         = "Processor"
 	TypeChannel           = "Channel"
+	TypeIdentifier        = "Identifier"
 	TypeBytes             = "Bytes"
 	TypeInternalInterface = "InternalInterface"
 )

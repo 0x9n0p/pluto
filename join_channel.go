@@ -1,6 +1,6 @@
 package pluto
 
-const ProcessorName_JoinChannel = "Join Channel"
+const ProcessorName_JoinChannel = "JOIN_CHANNEL"
 
 func init() {
 	PredefinedProcessors[ProcessorName_JoinChannel] = func(args []Value) (p Processor, err error) {

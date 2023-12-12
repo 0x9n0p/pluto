@@ -8,12 +8,12 @@ import (
 
 func TestRuntimeProcessorCreator(t *testing.T) {
 	pluto.ReloadExecutionCache(map[string]pluto.Pipeline{
-		"CREATE_WRITE_TO_IO_PROCESSOR": {
-			Name: "CREATE_WRITE_TO_IO_PROCESSOR",
+		"TEST_PIPELINE": {
+			Name: "TEST_PIPELINE",
 			ProcessorBucket: pluto.ProcessorBucket{Processors: []pluto.Processor{
 				pluto.RuntimeProcessorCreator{
-					PredefinedProcessorName: pluto.ProcessorName_WriteToInputOutput,
-					AppendName:              "processor",
+					ProcessorName: pluto.ProcessorName_IOWriter,
+					AppendName:    "processor",
 				},
 			}},
 		},

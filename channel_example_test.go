@@ -12,26 +12,26 @@ import (
 func TestChannel(t *testing.T) {
 	ch := pluto.NewChannel("MY_CHANNEL", 10)
 
-	ch.Join(&pluto.ChannelJoinableProcessor{
+	ch.Join(&ChannelJoinableProcessor{
 		Name: "OUT_1",
 		Kind: "STD_IO",
-		Processor: pluto.WriteToIOProcessor{
+		Processor: pluto.IOWriter{
 			Writer: os.Stdout,
 		},
 	})
 
-	ch.Join(&pluto.ChannelJoinableProcessor{
+	ch.Join(&ChannelJoinableProcessor{
 		Name: "OUT_2",
 		Kind: "STD_IO",
-		Processor: pluto.WriteToIOProcessor{
+		Processor: pluto.IOWriter{
 			Writer: os.Stdout,
 		},
 	})
 
-	ch.Join(&pluto.ChannelJoinableProcessor{
+	ch.Join(&ChannelJoinableProcessor{
 		Name: "OUT_3",
 		Kind: "STD_IO",
-		Processor: pluto.WriteToIOProcessor{
+		Processor: pluto.IOWriter{
 			Writer: os.Stdout,
 		},
 	})
@@ -49,4 +49,19 @@ func TestChannel(t *testing.T) {
 	})
 
 	<-time.Tick(time.Second)
+}
+
+// TODO: Remove it and use pluto.BaseJoinable instead
+type ChannelJoinableProcessor struct {
+	Name string
+	Kind string
+	pluto.Processor
+}
+
+func (c *ChannelJoinableProcessor) UniqueProperty() string {
+	return c.Name
+}
+
+func (c *ChannelJoinableProcessor) PredefinedKind() string {
+	return c.Kind
 }

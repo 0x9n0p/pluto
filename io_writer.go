@@ -6,22 +6,22 @@ import (
 	"go.uber.org/zap"
 )
 
-const ProcessorName_WriteToInputOutput = "Write to input/output"
+const ProcessorName_IOWriter = "IO_WRITER"
 
 func init() {
-	PredefinedProcessors[ProcessorName_WriteToInputOutput] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_WriteToInputOutput, &err)()
-		return WriteToIOProcessor{
+	PredefinedProcessors[ProcessorName_IOWriter] = func(args []Value) (p Processor, err error) {
+		defer creatorPanicHandler(ProcessorName_IOWriter, &err)()
+		return IOWriter{
 			Writer: Find("io_interface", args...).Value.(io.Writer),
 		}, err
 	}
 }
 
-type WriteToIOProcessor struct {
+type IOWriter struct {
 	io.Writer
 }
 
-func (p WriteToIOProcessor) Process(processable Processable) (Processable, bool) {
+func (p IOWriter) Process(processable Processable) (Processable, bool) {
 	b, ok := processable.GetBody().([]byte)
 	if !ok {
 		Log.Error("Channels only support []byte to publish")
@@ -37,9 +37,9 @@ func (p WriteToIOProcessor) Process(processable Processable) (Processable, bool)
 	return processable, true
 }
 
-func (p WriteToIOProcessor) GetDescriptor() ProcessorDescriptor {
+func (p IOWriter) GetDescriptor() ProcessorDescriptor {
 	return ProcessorDescriptor{
-		Name:        ProcessorName_WriteToInputOutput,
+		Name:        ProcessorName_IOWriter,
 		Description: "",
 		Input:       "",
 		Output:      "",

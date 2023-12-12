@@ -13,7 +13,7 @@ func init() {
 			Name: "STD_OUT",
 			Kind: "LocalStream",
 		},
-		Processor: pluto.WriteToIOProcessor{Writer: os.Stdout},
+		Processor: pluto.IOWriter{Writer: os.Stdout},
 	})
 }
 

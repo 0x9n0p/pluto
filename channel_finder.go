@@ -1,26 +1,26 @@
 package pluto
 
-const ProcessorName_FindChannel = "Find Channel"
+const ProcessorName_ChannelFinder = "CHANNEL_FINDER"
 
 func init() {
-	PredefinedProcessors[ProcessorName_FindChannel] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_FindChannel, &err)()
-		return FindChannel{
-			Name: Find("Name", args...).Value.(string),
+	PredefinedProcessors[ProcessorName_ChannelFinder] = func(args []Value) (p Processor, err error) {
+		defer creatorPanicHandler(ProcessorName_ChannelFinder, &err)()
+		return ChannelFinder{
+			Name: Find("name", args...).Value.(string),
 		}, err
 	}
 }
 
-type FindChannel struct {
+type ChannelFinder struct {
 	Name string
 }
 
-func (p FindChannel) Process(processable Processable) (Processable, bool) {
+func (p ChannelFinder) Process(processable Processable) (Processable, bool) {
 	appendable, ok := processable.GetBody().(map[string]any)
 	if !ok {
 		ApplicationLogger.Debug(ApplicationLog{
 			Message: "The body does not support the append operation",
-			Extra:   map[string]any{"issuer": ProcessorName_FindChannel},
+			Extra:   map[string]any{"issuer": ProcessorName_ChannelFinder},
 		})
 		return processable, false
 	}
@@ -35,7 +35,7 @@ func (p FindChannel) Process(processable Processable) (Processable, bool) {
 	return processable, false
 }
 
-func (p FindChannel) GetDescriptor() ProcessorDescriptor {
+func (p ChannelFinder) GetDescriptor() ProcessorDescriptor {
 	return ProcessorDescriptor{}
 }
 
