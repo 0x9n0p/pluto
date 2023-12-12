@@ -96,6 +96,47 @@ var Processors = []Descriptor{
 	//	Category: Category_Flow,
 	//},
 	{
+		Name:        pluto.ProcessorName_PipelineExecuter,
+		Description: "Executes the pipeline",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "name",
+				Type:     pluto.TypeText,
+				Required: true,
+			},
+		},
+		Input:    []pluto.ValueDescriptor{},
+		Output:   []pluto.ValueDescriptor{},
+		Category: Category_Flow,
+	},
+	{
+		Name:        pluto.ProcessorName_RuntimeProcessorCreator,
+		Description: "Creates the processor and adds it to the body",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "processor_name",
+				Type:     pluto.TypeText,
+				Required: true,
+			},
+			{
+				Name:     "append_name",
+				Type:     pluto.TypeText,
+				Required: true,
+			},
+		},
+		Input: []pluto.ValueDescriptor{},
+		Output: []pluto.ValueDescriptor{
+			{
+				Name:     "$append_name",
+				Type:     pluto.TypeProcessor,
+				Required: true,
+			},
+		},
+		Category: Category_Flow,
+	},
+	{
 		Name:        pluto.ProcessorName_ChannelCreator,
 		Description: "Creates a channel",
 		Icon:        "https://...",

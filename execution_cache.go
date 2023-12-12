@@ -23,16 +23,18 @@ func Process(processable RoutableProcessable) {
 	}
 
 	ExecutionCacheMutex.RLock()
-	defer ExecutionCacheMutex.RUnlock()
 
 	p, found := ExecutionCache[processable.GetConsumer().UniqueProperty()]
 	if !found {
+		ExecutionCacheMutex.RUnlock()
 		ApplicationLogger.Warning(ApplicationLog{
 			Message: "Pipeline not found",
 			Extra:   map[string]any{"unique_property": processable.GetConsumer().UniqueProperty()},
 		})
 		return
 	}
+
+	ExecutionCacheMutex.RUnlock()
 
 	p.Process(processable)
 }
