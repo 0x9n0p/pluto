@@ -1,7 +1,6 @@
 package pluto_test
 
 import (
-	"os"
 	"pluto"
 	"testing"
 )
@@ -20,20 +19,14 @@ func TestRuntimeProcessorCreator(t *testing.T) {
 	})
 
 	pluto.Process(&pluto.OutComingProcessable{
-		Producer: pluto.ExternalIdentifier(TestIdentifier{
+		Producer: pluto.ExternalIdentifier{
 			Name: "TEST_PRODUCER",
 			Kind: pluto.KindPipeline,
-		}),
-		Consumer: pluto.ExternalIdentifier(TestIdentifier{
-			Name: "CREATE_WRITE_TO_IO_PROCESSOR",
-			Kind: pluto.KindPipeline,
-		}),
-		Body: []pluto.Value{
-			{
-				Name:  "io_interface",
-				Type:  pluto.TypeInternalInterface,
-				Value: os.Stdout,
-			},
 		},
+		Consumer: pluto.ExternalIdentifier{
+			Name: "TEST_PIPELINE",
+			Kind: pluto.KindPipeline,
+		},
+		Body: map[string]any{},
 	})
 }

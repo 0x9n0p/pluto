@@ -2,6 +2,10 @@ package pluto
 
 import "fmt"
 
+/*
+	RUNTIME_PROCESSOR_CREATOR can not pass arguments to the processor creator.
+*/
+
 const ProcessorName_RuntimeProcessorCreator = "RUNTIME_PROCESSOR_CREATOR"
 
 func init() {
@@ -34,7 +38,8 @@ func (p RuntimeProcessorCreator) Process(processable Processable) (Processable, 
 		return processable, false
 	}
 
-	processor, err := creator(processable.GetBody().([]Value))
+	// TODO: Should we take/parse the arguments from the body?
+	processor, err := creator([]Value{})
 	if err != nil {
 		ApplicationLogger.Error(ApplicationLog{
 			Message: fmt.Sprintf("Runtime processor creator failed to create the processor (%s)", p.ProcessorName),
