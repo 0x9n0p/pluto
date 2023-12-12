@@ -1,23 +1,23 @@
 package pluto
 
-const ProcessorName_PipelineExecuter = "PIPELINE_EXECUTER"
+const ProcessorName_Execute = "EXECUTE"
 
 func init() {
-	PredefinedProcessors[ProcessorName_PipelineExecuter] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_PipelineExecuter, &err)()
-		return PipelineExecuter{
+	PredefinedProcessors[ProcessorName_Execute] = func(args []Value) (p Processor, err error) {
+		defer creatorPanicHandler(ProcessorName_Execute, &err)()
+		return Execute{
 			Name:         Find("name", args...).Get().(string),
 			AppendResult: Find("append_result", args...).Get().(bool),
 		}, err
 	}
 }
 
-type PipelineExecuter struct {
+type Execute struct {
 	Name         string
 	AppendResult bool
 }
 
-func (p PipelineExecuter) Process(processable Processable) (Processable, bool) {
+func (p Execute) Process(processable Processable) (Processable, bool) {
 	ExecutionCacheMutex.RLock()
 
 	pipeline, found := ExecutionCache[p.Name]
@@ -40,7 +40,7 @@ func (p PipelineExecuter) Process(processable Processable) (Processable, bool) {
 			if !ok {
 				ApplicationLogger.Debug(ApplicationLog{
 					Message: "The body does not support the append operation",
-					Extra:   map[string]any{"issuer": ProcessorName_PipelineExecuter},
+					Extra:   map[string]any{"issuer": ProcessorName_Execute},
 				})
 				return processable, false
 			}
@@ -49,7 +49,7 @@ func (p PipelineExecuter) Process(processable Processable) (Processable, bool) {
 			if !ok {
 				ApplicationLogger.Debug(ApplicationLog{
 					Message: "The result body does not support the append operation",
-					Extra:   map[string]any{"issuer": ProcessorName_PipelineExecuter},
+					Extra:   map[string]any{"issuer": ProcessorName_Execute},
 				})
 				return processable, false
 			}

@@ -14,40 +14,6 @@ const (
 )
 
 var Processors = []Descriptor{
-	{
-		Name:        pluto.ProcessorName_IOWriter,
-		Description: "Write to Input/Output interfaces directly",
-		Icon:        "https://...",
-		Arguments: []pluto.ValueDescriptor{
-			{
-				Name:     "io_interface",
-				Type:     pluto.TypeInternalInterface,
-				Required: true,
-				ValueValidator: func(arg pluto.Value, _ pluto.ValueDescriptor) error {
-					_, ok := arg.Value.(io.Writer)
-					if !ok {
-						return &pluto.Error{
-							HTTPCode: http.StatusBadRequest,
-							Message:  "Value of (io_interface) is not an io.Writer",
-						}
-					}
-					return nil
-				},
-			},
-		},
-		Input: []pluto.ValueDescriptor{
-			/*
-				The processable.body is Processable.GetBody()
-			*/
-			{
-				Name:     "processable.body",
-				Type:     pluto.TypeBytes,
-				Required: true,
-			},
-		},
-		Output:   []pluto.ValueDescriptor{},
-		Category: Category_InputOutpt,
-	},
 	//{
 	//	Name:        "Execute processor and join the result",
 	//	Description: "Execute processor and join the result ..",
@@ -96,7 +62,7 @@ var Processors = []Descriptor{
 	//	Category: Category_Flow,
 	//},
 	{
-		Name:        pluto.ProcessorName_PipelineExecuter,
+		Name:        pluto.ProcessorName_Execute,
 		Description: "Executes the pipeline",
 		Icon:        "https://...",
 		Arguments: []pluto.ValueDescriptor{
@@ -110,6 +76,21 @@ var Processors = []Descriptor{
 				Type:     pluto.TypeBoolean,
 				Required: false,
 				Default:  false,
+			},
+		},
+		Input:    []pluto.ValueDescriptor{},
+		Output:   []pluto.ValueDescriptor{},
+		Category: Category_Flow,
+	},
+	{
+		Name:        pluto.ProcessorName_Fork,
+		Description: "Executes the pipeline in background",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "name",
+				Type:     pluto.TypeText,
+				Required: true,
 			},
 		},
 		Input:    []pluto.ValueDescriptor{},
@@ -213,6 +194,40 @@ var Processors = []Descriptor{
 		},
 		Output:   []pluto.ValueDescriptor{},
 		Category: Category_Communication,
+	},
+	{
+		Name:        pluto.ProcessorName_IOWriter,
+		Description: "Write to Input/Output interfaces directly",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "io_interface",
+				Type:     pluto.TypeInternalInterface,
+				Required: true,
+				ValueValidator: func(arg pluto.Value, _ pluto.ValueDescriptor) error {
+					_, ok := arg.Value.(io.Writer)
+					if !ok {
+						return &pluto.Error{
+							HTTPCode: http.StatusBadRequest,
+							Message:  "Value of (io_interface) is not an io.Writer",
+						}
+					}
+					return nil
+				},
+			},
+		},
+		Input: []pluto.ValueDescriptor{
+			/*
+				The processable.body is Processable.GetBody()
+			*/
+			{
+				Name:     "processable.body",
+				Type:     pluto.TypeBytes,
+				Required: true,
+			},
+		},
+		Output:   []pluto.ValueDescriptor{},
+		Category: Category_InputOutpt,
 	},
 }
 
