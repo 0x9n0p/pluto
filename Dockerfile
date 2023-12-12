@@ -20,5 +20,5 @@ RUN go build -o plutoengine ./bin/main.go
 
 RUN mkdir -p /var/plutoengine/
 
-EXPOSE 80
+EXPOSE 443
 ENTRYPOINT ["./plutoengine"]
