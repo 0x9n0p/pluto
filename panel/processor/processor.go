@@ -77,8 +77,13 @@ func (p *Processor) validateArguments() error {
 					Type:  valueDescriptor.Type,
 					Value: valueDescriptor.Default,
 				}
-				index = len(p.Arguments)
-				p.Arguments = append(p.Arguments, argument)
+
+				if index == -1 {
+					index = len(p.Arguments)
+					p.Arguments = append(p.Arguments, argument)
+				} else {
+					p.Arguments[index] = argument
+				}
 			}
 		}
 
