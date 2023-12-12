@@ -58,25 +58,6 @@ func init() {
 		root.Use(middleware.Logger())
 	}
 
-	root.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "PlutoEngine.")
-	})
-
-	root.POST("/reload", func(ctx echo.Context) error {
-		reloadConfig := ctx.QueryParam("config") == "true"
-
-		if reloadConfig {
-			var cfg Config
-			if err := ctx.Bind(&cfg); err != nil {
-				return ctx.String(http.StatusBadRequest, err.Error())
-			}
-
-			ReloadExecutionCache(ResolveConfig(cfg))
-		}
-
-		return ctx.NoContent(http.StatusOK)
-	})
-
 	go func() {
 		if err := HTTPServer.StartTLS(Env.HTTPServerAddress, Env.HTTPCertificatePath, Env.HTTPKeyPath); err != nil {
 			Log.Fatal("Running HTTP admin server", zap.Error(err))
