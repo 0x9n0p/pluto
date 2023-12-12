@@ -24,9 +24,19 @@ type CreateChannel struct {
 }
 
 func (p CreateChannel) Process(processable Processable) (Processable, bool) {
+	appendable, ok := processable.GetBody().(map[string]any)
+	if !ok {
+		ApplicationLogger.Debug(ApplicationLog{
+			Message: "The body does not support the append operation",
+			Extra:   map[string]any{"issuer": ProcessorName_CreateChannel},
+		})
+		return processable, false
+	}
+
 	channel := NewChannel(p.Name, p.Length)
 	Channels[channel.ID] = channel
-	processable.SetBody(channel)
+	appendable["channel"] = channel
+	processable.SetBody(appendable)
 	return processable, true
 }
 

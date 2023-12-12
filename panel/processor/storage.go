@@ -115,7 +115,28 @@ var Processors = []Descriptor{
 		Input: []pluto.ValueDescriptor{},
 		Output: []pluto.ValueDescriptor{
 			{
-				Name:     "processable.body",
+				Name:     "channel",
+				Type:     pluto.TypeChannel,
+				Required: true,
+			},
+		},
+		Category: Category_Communication,
+	},
+	{
+		Name:        pluto.ProcessorName_FindChannel,
+		Description: "Finds channel by the given name",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "Name",
+				Type:     pluto.TypeText,
+				Required: true,
+			},
+		},
+		Input: []pluto.ValueDescriptor{},
+		Output: []pluto.ValueDescriptor{
+			{
+				Name:     "channel",
 				Type:     pluto.TypeChannel,
 				Required: true,
 			},
