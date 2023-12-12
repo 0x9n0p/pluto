@@ -63,6 +63,10 @@ func init() {
 				return WriteError(err, writer)
 			}
 
+			if err := pipeline.GetStorage().ReloadExecutionCache(); err != nil {
+				return WriteError(fmt.Errorf("reload execution cache: %v", err), writer)
+			}
+
 			return writer.JSON(http.StatusOK, p)
 		}).Handle(),
 	)
