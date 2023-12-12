@@ -3,6 +3,7 @@ package pluto
 import "fmt"
 
 const (
+	TypeBoolean = "Boolean"
 	TypeText    = "Text"
 	TypeNumeric = "Numeric"
 	TypeList    = "List" // List of Value

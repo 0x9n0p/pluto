@@ -105,6 +105,12 @@ var Processors = []Descriptor{
 				Type:     pluto.TypeText,
 				Required: true,
 			},
+			{
+				Name:     "append_result",
+				Type:     pluto.TypeBoolean,
+				Required: false,
+				Default:  false,
+			},
 		},
 		Input:    []pluto.ValueDescriptor{},
 		Output:   []pluto.ValueDescriptor{},
