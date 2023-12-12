@@ -53,10 +53,6 @@ func (p JoinChannel) Process(processable Processable) (Processable, bool) {
 	return processable, true
 }
 
-func (p JoinChannel) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{}
-}
-
 type BaseJoinable struct {
 	Identifier
 	Processor

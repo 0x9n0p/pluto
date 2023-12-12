@@ -39,15 +39,6 @@ func (s *ConditionalProcessor) Fail(fail ProcessorBucket) *ConditionalProcessor 
 	return s
 }
 
-func (s *ConditionalProcessor) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "Conditional Processor",
-		Description: "Description",
-		Input:       "",
-		Output:      "",
-	}
-}
-
 type FinalProcessor struct {
 	main  Processor
 	final Processor
@@ -72,13 +63,4 @@ func (s *FinalProcessor) Process(processable Processable) (Processable, bool) {
 func (s *FinalProcessor) Final(final Processor) *FinalProcessor {
 	s.final = final
 	return s
-}
-
-func (s *FinalProcessor) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "Final Processor",
-		Description: "Description",
-		Input:       "",
-		Output:      "",
-	}
 }

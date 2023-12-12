@@ -151,30 +151,12 @@ func (p LockChannels) Process(processable Processable) (Processable, bool) {
 	return processable, true
 }
 
-func (p LockChannels) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "LOCK_CHANNELS",
-		Description: "",
-		Input:       "",
-		Output:      "",
-	}
-}
-
 type UnLockChannels struct {
 }
 
 func (p UnLockChannels) Process(processable Processable) (Processable, bool) {
 	ChannelsMutex.Unlock()
 	return processable, true
-}
-
-func (p UnLockChannels) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "UNLOCK_CHANNELS",
-		Description: "",
-		Input:       "",
-		Output:      "",
-	}
 }
 
 func getChannel(id uuid.UUID) (Channel, bool) {

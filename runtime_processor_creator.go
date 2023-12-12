@@ -48,12 +48,3 @@ func (p RuntimeProcessorCreator) Process(processable Processable) (Processable, 
 
 	return processable, true
 }
-
-func (p RuntimeProcessorCreator) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "",
-		Description: "",
-		Input:       "",
-		Output:      "",
-	}
-}

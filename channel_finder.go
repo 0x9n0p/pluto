@@ -35,10 +35,6 @@ func (p ChannelFinder) Process(processable Processable) (Processable, bool) {
 	return processable, false
 }
 
-func (p ChannelFinder) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{}
-}
-
 //func findChannel(name string) (Channel, bool) {
 //	for _, channel := range Channels {
 //		if channel.Name == name {

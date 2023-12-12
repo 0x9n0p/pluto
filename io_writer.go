@@ -36,12 +36,3 @@ func (p IOWriter) Process(processable Processable) (Processable, bool) {
 
 	return processable, true
 }
-
-func (p IOWriter) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        ProcessorName_IOWriter,
-		Description: "",
-		Input:       "",
-		Output:      "",
-	}
-}

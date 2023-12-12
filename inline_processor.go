@@ -13,12 +13,3 @@ func NewInlineProcessor(f func(processable Processable) (Processable, bool)) *In
 func (s *InlineProcessor) Process(processable Processable) (Processable, bool) {
 	return s.f(processable)
 }
-
-func (s *InlineProcessor) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "Inline Processor",
-		Description: "Description",
-		Input:       "",
-		Output:      "",
-	}
-}

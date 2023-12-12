@@ -39,7 +39,3 @@ func (p ChannelCreator) Process(processable Processable) (Processable, bool) {
 	processable.SetBody(appendable)
 	return processable, true
 }
-
-func (p ChannelCreator) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{}
-}

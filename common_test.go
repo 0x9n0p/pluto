@@ -17,15 +17,6 @@ func (p PrintProcessor) Process(processable pluto.Processable) (pluto.Processabl
 	return processable, true
 }
 
-func (p PrintProcessor) GetDescriptor() pluto.ProcessorDescriptor {
-	return pluto.ProcessorDescriptor{
-		Name:        "Print Processor",
-		Description: "Description",
-		Input:       "",
-		Output:      "",
-	}
-}
-
 type TestIdentifier struct {
 	Name string
 	Kind string

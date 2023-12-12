@@ -45,12 +45,3 @@ func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) 
 		CreatedAt: time.Now(),
 	}, true
 }
-
-func (p ConnectionDecoder) GetDescriptor() ProcessorDescriptor {
-	return ProcessorDescriptor{
-		Name:        "CONNECTION_DECODER_PROCESSOR",
-		Description: "",
-		Input:       "",
-		Output:      "",
-	}
-}
