@@ -42,7 +42,7 @@ export default function CreatePipelinePage() {
 
   useEffect(() => {
     const results = processors.filter((listItem) =>
-      listItem.name.toLowerCase().includes(searchTerm.toLowerCase())
+      listItem.name.toLowerCase().includes(searchTerm.toLowerCase()),
     );
     setSearchResults(results);
   }, [searchTerm]);
@@ -54,7 +54,7 @@ export default function CreatePipelinePage() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       })
-      .then(function (response) {
+      .then(function(response) {
         if (response.status !== 200) {
           setErrorMessage('Unexpected response from server');
           return;
@@ -62,7 +62,7 @@ export default function CreatePipelinePage() {
         setProcessors(response.data);
         setSearchResults(response.data);
       })
-      .catch(function (error) {
+      .catch(function(error) {
         if (error.response) {
           if (error.response.status === 401) {
             window.location.href = '/auth';
@@ -111,11 +111,11 @@ export default function CreatePipelinePage() {
           arg.value = arg.default;
         }
       });
-      if (dragOverItem.current + 1 === listCopy.length) {
-        listCopy.push(draggingItemContent);
-      } else {
-        listCopy.splice(dragOverItem.current, 0, draggingItemContent);
-      }
+      // if (dragOverItem.current + 1 === listCopy.length) {
+      //   listCopy.push(draggingItemContent);
+      // } else {
+      listCopy.splice(dragOverItem.current + 1, 0, draggingItemContent);
+      // }
     } else {
       draggingItemContent = listCopy[draggingItem.current];
       listCopy.splice(draggingItem.current, 1);
@@ -146,7 +146,7 @@ export default function CreatePipelinePage() {
   return (
     <>
       <div>
-        <Theme theme="g100">
+        <Theme theme='g100'>
           <MainHeader />
         </Theme>
         <Content>
@@ -155,10 +155,10 @@ export default function CreatePipelinePage() {
               open
               preventCloseOnClickOutside={true}
               isFullWidth
-              modalHeading="Create a new pipeline"
-              modalLabel="Pipeline information"
-              primaryButtonText="Continue"
-              secondaryButtonText="Back to pipelines"
+              modalHeading='Create a new pipeline'
+              modalLabel='Pipeline information'
+              primaryButtonText='Continue'
+              secondaryButtonText='Back to pipelines'
               onRequestSubmit={(event) => {
                 if (pipelineName) {
                   setOpenPipeline(false);
@@ -176,9 +176,9 @@ export default function CreatePipelinePage() {
                 <TextInput
                   required={true}
                   data-modal-primary-focus
-                  id="text-input-1"
-                  labelText="Pipeline name"
-                  placeholder="e.g. LOGIN_USER__V1"
+                  id='text-input-1'
+                  labelText='Pipeline name'
+                  placeholder='e.g. LOGIN_USER__V1'
                   style={{
                     marginBottom: '1rem',
                   }}
@@ -188,25 +188,25 @@ export default function CreatePipelinePage() {
             </Modal>
           ) : null}
 
-          <Grid className="create-page" fullWidth>
+          <Grid className='create-page' fullWidth>
             <Column
               lg={16}
               md={8}
               sm={4}
-              className="create-page_header"
+              className='create-page_header'
               style={{ marginBottom: '48px' }}
             >
               <Breadcrumb>
                 <BreadcrumbItem>
-                  <a href="/">Home</a>
+                  <a href='/'>Home</a>
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                  <a href="/pipelines">Pipelines</a>
+                  <a href='/pipelines'>Pipelines</a>
                 </BreadcrumbItem>
               </Breadcrumb>
               <Grid fullWidth>
                 <Column md={4} lg={{ span: 7, offset: 0 }} sm={4}>
-                  <h1 className="create-page__heading">
+                  <h1 className='create-page__heading'>
                     Create a new pipeline
                   </h1>
                 </Column>
@@ -223,24 +223,24 @@ export default function CreatePipelinePage() {
                           {
                             headers: {
                               Authorization: `Bearer ${localStorage.getItem(
-                                'token'
+                                'token',
                               )}`,
                             },
-                          }
+                          },
                         )
-                        .then(function (response) {
+                        .then(function(response) {
                           if (response.status !== 201) {
                             setErrorMessageForSavePipeline(
-                              'Unexpected response from server'
+                              'Unexpected response from server',
                             );
                             return;
                           }
                           window.location.href = '/pipelines';
                         })
-                        .catch(function (error) {
+                        .catch(function(error) {
                           if (error.response) {
                             setErrorMessageForSavePipeline(
-                              error.response.data.message
+                              error.response.data.message,
                             );
                           } else {
                             setErrorMessageForSavePipeline('Unknown Error');
@@ -257,9 +257,9 @@ export default function CreatePipelinePage() {
             <Column md={4} lg={{ span: 7, offset: 1 }} sm={4}>
               {errorMessageForSavePipeline !== '' && (
                 <InlineNotification
-                  aria-label="closes notification"
-                  kind="error"
-                  statusIconDescription="notification"
+                  aria-label='closes notification'
+                  kind='error'
+                  statusIconDescription='notification'
                   subtitle={errorMessageForSavePipeline}
                   onClose={() => {
                     setErrorMessageForSavePipeline('');
@@ -316,7 +316,7 @@ export default function CreatePipelinePage() {
                             setUsedProcessors(
                               usedProcessors.filter((value, index1) => {
                                 return index1 !== index;
-                              })
+                              }),
                             );
                           }}
                         />
@@ -335,56 +335,56 @@ export default function CreatePipelinePage() {
                         >
                           {item.arguments
                             ? item.arguments.map((arg, argIndex) => (
-                                <div
-                                  key={arg.name}
-                                  style={{
-                                    marginBottom: '20px',
-                                    marginLeft: '20px',
-                                    marginRight: '20px',
-                                  }}
-                                >
-                                  {arg.type === 'Text' ? (
-                                    <TextInput
-                                      type="text"
-                                      onChange={(e) => {
-                                        arg.value = e.target.value;
-                                        item.arguments[argIndex] = arg;
-                                        usedProcessors[index] = item;
-                                        setUsedProcessors(
-                                          (prevState) => usedProcessors
-                                        );
-                                      }}
-                                      required={arg.required}
-                                      placeholder={arg.name}
-                                      defaultValue={arg.value}
-                                    />
-                                  ) : arg.type === 'Numeric' ? (
-                                    <TextInput
-                                      type="text"
-                                      onChange={(e) => {
-                                        arg.value = parseInt(e.target.value);
-                                        item.arguments[argIndex] = arg;
-                                        usedProcessors[index] = item;
-                                        setUsedProcessors(
-                                          (prevState) => usedProcessors
-                                        );
-                                      }}
-                                      required={arg.required}
-                                      defaultValue={arg.value}
-                                      placeholder={arg.name + ' (Number)'}
-                                    />
-                                  ) : (
-                                    <p>
-                                      No input found for argument {arg.name}
-                                    </p>
-                                  )}
+                              <div
+                                key={arg.name}
+                                style={{
+                                  marginBottom: '20px',
+                                  marginLeft: '20px',
+                                  marginRight: '20px',
+                                }}
+                              >
+                                {arg.type === 'Text' ? (
+                                  <TextInput
+                                    type='text'
+                                    onChange={(e) => {
+                                      arg.value = e.target.value;
+                                      item.arguments[argIndex] = arg;
+                                      usedProcessors[index] = item;
+                                      setUsedProcessors(
+                                        (prevState) => usedProcessors,
+                                      );
+                                    }}
+                                    required={arg.required}
+                                    placeholder={arg.name}
+                                    defaultValue={arg.value}
+                                  />
+                                ) : arg.type === 'Numeric' ? (
+                                  <TextInput
+                                    type='text'
+                                    onChange={(e) => {
+                                      arg.value = parseInt(e.target.value);
+                                      item.arguments[argIndex] = arg;
+                                      usedProcessors[index] = item;
+                                      setUsedProcessors(
+                                        (prevState) => usedProcessors,
+                                      );
+                                    }}
+                                    required={arg.required}
+                                    defaultValue={arg.value}
+                                    placeholder={arg.name + ' (Number)'}
+                                  />
+                                ) : (
+                                  <p>
+                                    No input found for argument {arg.name}
+                                  </p>
+                                )}
 
-                                  {/*{arg.required ? <p style={{ paddingTop: '3px', color: 'red' }}>*</p> : null}*/}
-                                  {/*<p style={{ fontWeight: 'bold', padding: '3px 10px 0 10px' }}>{arg.type}</p>*/}
-                                  {/*<p*/}
-                                  {/*  style={{ paddingTop: '3px' }}>{arg.name !== 'processable.body' ? arg.name : ''}</p>*/}
-                                </div>
-                              ))
+                                {/*{arg.required ? <p style={{ paddingTop: '3px', color: 'red' }}>*</p> : null}*/}
+                                {/*<p style={{ fontWeight: 'bold', padding: '3px 10px 0 10px' }}>{arg.type}</p>*/}
+                                {/*<p*/}
+                                {/*  style={{ paddingTop: '3px' }}>{arg.name !== 'processable.body' ? arg.name : ''}</p>*/}
+                              </div>
+                            ))
                             : null}
                         </div>
                       ) : (
@@ -420,12 +420,12 @@ export default function CreatePipelinePage() {
                 offsetTop={100}
                 offsetBottom={20}
               >
-                <ContainedList label="Processors" kind="on-page" action={''}>
+                <ContainedList label='Processors' kind='on-page' action={''}>
                   <Search
-                    placeholder="Filter"
-                    closeButtonLabelText="Clear search input"
-                    size="lg"
-                    labelText="Filter search"
+                    placeholder='Filter'
+                    closeButtonLabelText='Clear search input'
+                    size='lg'
+                    labelText='Filter search'
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -433,9 +433,9 @@ export default function CreatePipelinePage() {
                   />
                   {errorMessage !== '' && (
                     <InlineNotification
-                      aria-label="closes notification"
-                      kind="error"
-                      statusIconDescription="notification"
+                      aria-label='closes notification'
+                      kind='error'
+                      statusIconDescription='notification'
                       subtitle={errorMessage}
                       onClose={() => {
                         setErrorMessage('');
@@ -463,8 +463,8 @@ export default function CreatePipelinePage() {
                             marginTop: '10px',
                             marginBottom: '10px',
                           }}
-                          tileCollapsedIconText="Details"
-                          tileExpandedIconText="Details"
+                          tileCollapsedIconText='Details'
+                          tileExpandedIconText='Details'
                         >
                           <TileAboveTheFoldContent>
                             <div>
