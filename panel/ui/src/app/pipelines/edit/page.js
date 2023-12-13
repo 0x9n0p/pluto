@@ -110,24 +110,8 @@ export default function EditPipelinePage() {
 
     let draggingItemContent;
     if (draggingItem.source === 'processors') {
-      draggingItemContent = processors[draggingItem.current];
-      draggingItemContent.arguments.map((arg, index) => {
-        if (arg.type === 'Text') {
-          arg.value = '';
-        } else if (arg.type === 'Numeric') {
-          arg.value = 0;
-        } else {
-          console.log('handleDragEnd: Type not found.', arg.type);
-        }
-        if (arg.default) {
-          arg.value = arg.default;
-        }
-      });
-      // if (dragOverItem.current + 1 === listCopy.length) {
-      //   listCopy.push(draggingItemContent);
-      // } else {
+      draggingItemContent = JSON.parse(JSON.stringify(processors[draggingItem.current]));
       listCopy.splice(dragOverItem.current + 1, 0, draggingItemContent);
-      // }
     } else {
       draggingItemContent = listCopy[draggingItem.current];
       listCopy.splice(draggingItem.current, 1);
@@ -167,7 +151,7 @@ export default function EditPipelinePage() {
               open
               preventCloseOnClickOutside={true}
               isFullWidth
-              modalHeading='Create a new pipeline'
+              modalHeading='Edit/Duplicate pipeline'
               modalLabel='Pipeline information'
               primaryButtonText='Continue'
               secondaryButtonText='Back to pipelines'
@@ -220,7 +204,7 @@ export default function EditPipelinePage() {
               <Grid fullWidth>
                 <Column md={4} lg={{ span: 7, offset: 0 }} sm={4}>
                   <h1 className='create-page__heading'>
-                    Create a new pipeline
+                    Edit/Duplicate pipeline
                   </h1>
                 </Column>
                 <Column md={4} lg={{ span: 1, offset: 13 }} sm={4}>
@@ -388,7 +372,7 @@ export default function EditPipelinePage() {
                                   />
                                 ) : arg.type === 'Boolean' ? (
                                   <Toggle
-                                    id={arg.name}
+                                    id={arg.name + index}
                                     labelA='False' labelB='True'
                                     defaultToggled={arg.value}
                                     labelText={arg.name}

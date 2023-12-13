@@ -98,24 +98,8 @@ export default function CreatePipelinePage() {
 
     let draggingItemContent;
     if (draggingItem.source === 'processors') {
-      draggingItemContent = processors[draggingItem.current];
-      draggingItemContent.arguments.map((arg, index) => {
-        if (arg.type === 'Text') {
-          arg.value = '';
-        } else if (arg.type === 'Numeric') {
-          arg.value = 0;
-        } else {
-          console.log('handleDragEnd: Type not found.', arg.type);
-        }
-        if (arg.default) {
-          arg.value = arg.default;
-        }
-      });
-      // if (dragOverItem.current + 1 === listCopy.length) {
-      //   listCopy.push(draggingItemContent);
-      // } else {
+      draggingItemContent = JSON.parse(JSON.stringify(processors[draggingItem.current]));
       listCopy.splice(dragOverItem.current + 1, 0, draggingItemContent);
-      // }
     } else {
       draggingItemContent = listCopy[draggingItem.current];
       listCopy.splice(draggingItem.current, 1);
@@ -375,8 +359,8 @@ export default function CreatePipelinePage() {
                                   />
                                 ) : arg.type === 'Boolean' ? (
                                   <Toggle
-                                    id={arg.name}
-                                    labelA="False" labelB="True"
+                                    id={arg.name + index}
+                                    labelA='False' labelB='True'
                                     defaultToggled={arg.value}
                                     labelText={arg.name}
                                     onToggle={props => {
