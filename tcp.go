@@ -58,6 +58,7 @@ var processor = NewFinalProcessor(
 			connection := AuthenticatedConnections[context.GetBody().(map[string]any)["connection_id"].(uuid.UUID)]
 			new.Producer = connection.Producer.(ExternalIdentifier)
 			new.ProducerCredential = connection.ProducerCredential.(OutComingCredential)
+			new.Connection = connection.AcceptedConnection
 
 			return &new
 		},

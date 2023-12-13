@@ -124,6 +124,21 @@ var Processors = []Descriptor{
 		Category: Category_Flow,
 	},
 	{
+		Name:        pluto.ProcessorName_SendResponse,
+		Description: "Sends body to producer",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "pipeline_name",
+				Type:     pluto.TypeText,
+				Required: true,
+			},
+		},
+		Input:    []pluto.ValueDescriptor{},
+		Output:   []pluto.ValueDescriptor{},
+		Category: Category_Communication,
+	},
+	{
 		Name:        pluto.ProcessorName_ChannelCreator,
 		Description: "Creates a channel",
 		Icon:        "https://...",

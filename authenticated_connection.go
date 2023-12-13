@@ -59,12 +59,17 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 			}
 
 			if !validated {
-				// TODO: Write to the client that the credential is not valid
+				// TODO: Write to the client that the credential is not valid + Set write deadline
 				return processable, false
 			}
 
 			authenticatedConnection.Producer = p.Producer
 			authenticatedConnection.ProducerCredential = p.ProducerCredential
+		}
+
+		// Reset write deadline
+		if err := authenticatedConnection.Conn.SetWriteDeadline(time.Time{}); err != nil {
+			return processable, false
 		}
 
 		// Move the connection from the accepted connections to the authenticated connections
