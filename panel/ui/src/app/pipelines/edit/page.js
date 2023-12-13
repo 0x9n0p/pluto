@@ -16,7 +16,7 @@ import {
   TextInput,
   Theme,
   TileAboveTheFoldContent,
-  TileBelowTheFoldContent,
+  TileBelowTheFoldContent, Toggle,
 } from '@carbon/react';
 import MainHeader from '@/components/MainHeader/MainHeader';
 import React, { useEffect, useRef, useState } from 'react';
@@ -385,6 +385,21 @@ export default function EditPipelinePage() {
                                     required={arg.required}
                                     defaultValue={arg.value}
                                     placeholder={arg.name + ' (Number)'}
+                                  />
+                                ) : arg.type === 'Boolean' ? (
+                                  <Toggle
+                                    id={arg.name}
+                                    labelA='False' labelB='True'
+                                    defaultToggled={arg.value}
+                                    labelText={arg.name}
+                                    onToggle={props => {
+                                      arg.value = props;
+                                      item.arguments[argIndex] = arg;
+                                      usedProcessors[index] = item;
+                                      setUsedProcessors(
+                                        (prevState) => usedProcessors,
+                                      );
+                                    }}
                                   />
                                 ) : (
                                   <p>
