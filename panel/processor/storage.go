@@ -11,6 +11,7 @@ const (
 	Category_Flow          = "Flow"
 	Category_InputOutpt    = "InputOutput"
 	Category_Communication = "Communication"
+	Category_Validator     = "Validator"
 )
 
 var Processors = []Descriptor{
@@ -137,6 +138,31 @@ var Processors = []Descriptor{
 		Input:    []pluto.ValueDescriptor{},
 		Output:   []pluto.ValueDescriptor{},
 		Category: Category_Communication,
+	},
+	{
+		Name:        pluto.ProcessorName_NumberValidator,
+		Description: "Validates the input",
+		Icon:        "https://...",
+		Arguments: []pluto.ValueDescriptor{
+			{
+				Name:     "name",
+				Type:     pluto.TypeText,
+				Required: true,
+			},
+			{
+				Name:     "minimum",
+				Type:     pluto.TypeNumeric,
+				Required: true,
+			},
+			{
+				Name:     "maximum",
+				Type:     pluto.TypeNumeric,
+				Required: true,
+			},
+		},
+		Input:    []pluto.ValueDescriptor{},
+		Output:   []pluto.ValueDescriptor{},
+		Category: Category_Validator,
 	},
 	{
 		Name:        pluto.ProcessorName_ChannelCreator,

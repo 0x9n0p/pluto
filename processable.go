@@ -6,6 +6,12 @@ import (
 	"github.com/google/uuid"
 )
 
+type Number interface {
+	Int64() (int64, error)
+	Float64() (float64, error)
+	String() string
+}
+
 type Processable interface {
 	SetBody(any)
 	GetBody() any
