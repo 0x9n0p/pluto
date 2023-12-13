@@ -29,6 +29,9 @@ var (
 
 	//go:embed out/pipelines/create.html
 	PagePipelinesCreate embed.FS
+
+	//go:embed out/pipelines/edit.html
+	PagePipelinesEdit embed.FS
 )
 
 func init() {
@@ -40,4 +43,5 @@ func init() {
 	p.FileFS("/logsview", "logsview.html", echo.MustSubFS(PageLogsView, "out"))
 	p.FileFS("/pipelines", "pipelines.html", echo.MustSubFS(PagePipelines, "out"))
 	p.FileFS("/pipelines/create", "pipelines/create.html", echo.MustSubFS(PagePipelinesCreate, "out"))
+	p.FileFS("/pipelines/edit", "pipelines/edit.html", echo.MustSubFS(PagePipelinesEdit, "out"))
 }
