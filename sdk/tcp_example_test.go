@@ -16,12 +16,30 @@ func TestTCP(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	//for {
-	//	p, err := client.Receive()
-	//	if err != nil {
-	//		t.Fatal(err)
-	//	}
-	//
-	//	t.Log(p)
-	//}
+	go func() {
+		for i := 0; i < 200000; i++ {
+			go func(i int) {
+				err := client.Send(sdk.Processable{
+					Consumer: sdk.Identifier{
+						Name: "PING",
+						Kind: "Pipeline",
+					},
+					Body: i,
+				})
+				if err != nil {
+					t.Fatal(err)
+					return
+				}
+			}(i)
+		}
+	}()
+
+	for {
+		p, err := client.Receive()
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		t.Log(p)
+	}
 }

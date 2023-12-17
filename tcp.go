@@ -59,6 +59,7 @@ var processor = NewFinalProcessor(
 			new.Producer = connection.Producer.(ExternalIdentifier)
 			new.ProducerCredential = connection.ProducerCredential.(OutComingCredential)
 			new.Connection = connection.AcceptedConnection
+			new.Encoder = NewJsonStreamEncoder(connection.AcceptedConnection)
 
 			return &new
 		},

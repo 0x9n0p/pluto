@@ -20,6 +20,7 @@ type TCPClient struct {
 	ConnectionToken string
 
 	net.Conn
+	*json.Decoder
 }
 
 func (c *TCPClient) Connect() (err error) {
@@ -27,6 +28,8 @@ func (c *TCPClient) Connect() (err error) {
 	if err != nil {
 		return fmt.Errorf("connect to tcp server: %v", err)
 	}
+
+	c.Decoder = json.NewDecoder(c.Conn)
 
 	p, err := c.Receive()
 	if err != nil {
@@ -69,17 +72,9 @@ func (c *TCPClient) Send(processable Processable) error {
 	return nil
 }
 
-func (c *TCPClient) Receive() (Processable, error) {
-	var buff [1024]byte
-	n, err := c.Read(buff[:])
-	if err != nil {
-		return Processable{}, fmt.Errorf("read from connection: %v", err)
+func (c *TCPClient) Receive() (p Processable, err error) {
+	if err := c.Decode(&p); err != nil {
+		return Processable{}, fmt.Errorf("decoder: %v", err)
 	}
-
-	var p Processable
-	if err := json.Unmarshal(buff[:n], &p); err != nil {
-		return Processable{}, fmt.Errorf("unmarshal processable: %v", err)
-	}
-
-	return p, nil
+	return
 }

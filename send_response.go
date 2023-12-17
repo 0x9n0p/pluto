@@ -1,9 +1,5 @@
 package pluto
 
-import (
-	"encoding/json"
-)
-
 const ProcessorName_SendResponse = "SEND_RESPONSE"
 
 func init() {
@@ -40,22 +36,9 @@ func (p SendResponse) Process(processable Processable) (Processable, bool) {
 		return processable, false
 	}
 
-	b, err := json.Marshal(outGoing)
-	if err != nil {
+	if err := outComing.Encoder.Encode(outGoing); err != nil {
 		ApplicationLogger.Error(ApplicationLog{
-			Message: "Failed to encode processable",
-			Extra: map[string]any{
-				"issuer": ProcessorName_SendResponse,
-				"error":  err.Error(),
-			},
-		})
-		return processable, false
-	}
-
-	_, err = outComing.Connection.Conn.Write(b)
-	if err != nil {
-		ApplicationLogger.Debug(ApplicationLog{
-			Message: "Failed to write to connection",
+			Message: "Stream encoder failed",
 			Extra: map[string]any{
 				"issuer": ProcessorName_SendResponse,
 				"error":  err.Error(),
