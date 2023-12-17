@@ -21,6 +21,7 @@ type TCPClient struct {
 
 	net.Conn
 	*json.Decoder
+	*json.Encoder
 }
 
 func (c *TCPClient) Connect() (err error) {
@@ -30,6 +31,7 @@ func (c *TCPClient) Connect() (err error) {
 	}
 
 	c.Decoder = json.NewDecoder(c.Conn)
+	c.Encoder = json.NewEncoder(c.Conn)
 
 	p, err := c.Receive()
 	if err != nil {
@@ -60,15 +62,9 @@ func (c *TCPClient) Connect() (err error) {
 }
 
 func (c *TCPClient) Send(processable Processable) error {
-	b, err := json.Marshal(processable)
-	if err != nil {
-		return fmt.Errorf("marshal processable: %v", err)
+	if err := c.Encoder.Encode(processable); err != nil {
+		return fmt.Errorf("encoder: %v", err)
 	}
-
-	if _, err := c.Write(b); err != nil {
-		return fmt.Errorf("write to connection: %v", err)
-	}
-
 	return nil
 }
 
