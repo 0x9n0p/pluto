@@ -22,13 +22,15 @@ type AcceptedConnection struct {
 	ID       uuid.UUID `json:"connection_id"`
 	Token    string    `json:"connection_token"`
 	net.Conn `json:"-"`
+	Encoder  StreamEncoder `json:"-"`
 }
 
 var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bool) {
 	connection := AcceptedConnection{
-		ID:    uuid.New(),
-		Token: random.String(ConnectionTokenLength),
-		Conn:  processable.GetBody().(map[string]any)["connection"].(net.Conn),
+		ID:      uuid.New(),
+		Token:   random.String(ConnectionTokenLength),
+		Conn:    processable.GetBody().(map[string]any)["connection"].(net.Conn),
+		Encoder: NewJsonStreamEncoder(processable.GetBody().(map[string]any)["connection"].(net.Conn)),
 	}
 
 	b, err := json.Marshal(OutGoingProcessable{

@@ -36,6 +36,14 @@ func Process(processable RoutableProcessable) {
 
 	ExecutionCacheMutex.RUnlock()
 
+	ApplicationLogger.Debug(ApplicationLog{
+		Message: "Execute pipeline",
+		Extra: map[string]any{
+			"pipeline_name": processable.GetConsumer().UniqueProperty(),
+			"body":          processable.GetBody(),
+		},
+	})
+
 	p.Process(processable)
 }
 
