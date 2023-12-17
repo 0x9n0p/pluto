@@ -340,6 +340,7 @@ export default function CreatePipelinePage() {
                                     }}
                                     required={arg.required}
                                     placeholder={arg.name}
+                                    labelText={arg.name}
                                     defaultValue={arg.value}
                                   />
                                 ) : arg.type === 'Numeric' ? (
@@ -356,6 +357,7 @@ export default function CreatePipelinePage() {
                                     required={arg.required}
                                     defaultValue={arg.value}
                                     placeholder={arg.name + ' (Number)'}
+                                    labelText={arg.name}
                                   />
                                 ) : arg.type === 'Boolean' ? (
                                   <Toggle

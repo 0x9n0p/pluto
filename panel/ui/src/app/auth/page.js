@@ -86,7 +86,7 @@ export default function LoginPage() {
             <TextInput
               id={'email'}
               labelText={'Email'}
-              placeholder='admin'
+              placeholder='Please enter your email address'
               style={{ marginBottom: '16px' }}
               onChange={(event) => {
                 setEmail(event.target.value);
@@ -97,7 +97,7 @@ export default function LoginPage() {
               id={'password'}
               type={'password'}
               labelText={'Password'}
-              placeholder='admin'
+              placeholder='Please enter your password'
               style={{ marginBottom: '16px' }}
               onChange={(event) => {
                 setPassword(event.target.value);
