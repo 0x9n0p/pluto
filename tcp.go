@@ -8,9 +8,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Address
-// TODO: env
-const Address = "localhost:9631"
 const MAXRequestPerConnection = 1000
 
 var ConnectionHandler = Pipeline{
@@ -20,9 +17,9 @@ var ConnectionHandler = Pipeline{
 
 func init() {
 	go func() {
-		l, err := net.Listen("tcp4", Address)
+		l, err := net.Listen("tcp4", Env.TCPServerAddress)
 		if err != nil {
-			Log.Fatal("Create TCP listener", zap.String("address", Address))
+			Log.Fatal("Create TCP listener", zap.String("address", Env.TCPServerAddress))
 		}
 
 		for {

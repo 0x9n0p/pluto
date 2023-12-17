@@ -7,7 +7,7 @@ import (
 
 func TestTCP(t *testing.T) {
 	client := sdk.TCPClient{
-		ServerAddress:      "localhost:9631",
+		ServerAddress:      "localhost:9630",
 		Producer:           sdk.Identifier{},
 		ProducerCredential: sdk.Credential{},
 	}

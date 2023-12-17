@@ -13,6 +13,7 @@ var Env EnvSpec
 type EnvSpec struct {
 	Debug               bool
 	Host                []string `envconfig:"HOST" default:"localhost"`
+	TCPServerAddress    string   `envconfig:"TCP_SERVER" default:"0.0.0.0:9630"`
 	HTTPServerAddress   string   `envconfig:"HTTP_SERVER" default:"0.0.0.0:443"`
 	HTTPCertificatePath string   `envconfig:"HTTP_CERTIFICATE_PATH" default:"ssl/plutoengine.crt"`
 	HTTPKeyPath         string   `envconfig:"HTTP_KEY_PATH" default:"ssl/plutoengine.key"`
