@@ -10,13 +10,13 @@ import {
   ExpandableTile,
   Grid,
   InlineNotification,
-  Modal, RadioButton,
+  Modal,
   Search,
   Tag,
   TextInput,
   Theme,
   TileAboveTheFoldContent,
-  TileBelowTheFoldContent, Toggle,
+  TileBelowTheFoldContent,
 } from '@carbon/react';
 import MainHeader from '@/components/MainHeader/MainHeader';
 import React, { useEffect, useRef, useState } from 'react';
@@ -24,6 +24,23 @@ import StickyBox from 'react-sticky-box';
 import axios from 'axios';
 import { Address } from '@/settings';
 import { CloseLarge } from '@carbon/icons-react';
+import DraggableItems from '@/components/Piipeline/DraggableItems';
+import { v4 as uuidv4 } from 'uuid';
+import DraggedItems from '@/components/Piipeline/DraggedItems';
+
+// Category color
+export const categoryToColor = (category) => {
+  switch (category) {
+    case 'Communication':
+      return 'green';
+    case 'Flow':
+      return 'blue';
+    case 'InputOutput':
+      return 'red';
+    default:
+      return '';
+  }
+};
 
 export default function CreatePipelinePage() {
   const [errorMessage, setErrorMessage] = useState('');
@@ -41,10 +58,12 @@ export default function CreatePipelinePage() {
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
-    const results = processors.filter((listItem) =>
-      listItem.name.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-    setSearchResults(results);
+    if (Boolean(searchTerm) && Boolean(processors?.length)) {
+      const results = processors.filter((listItem) =>
+        listItem.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setSearchResults(results);
+    }
   }, [searchTerm]);
 
   useEffect(() => {
@@ -54,15 +73,18 @@ export default function CreatePipelinePage() {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       })
-      .then(function(response) {
+      .then(function (response) {
         if (response.status !== 200) {
           setErrorMessage('Unexpected response from server');
           return;
         }
-        setProcessors(response.data);
-        setSearchResults(response.data);
+        const newGenerationOfData = response.data.map((item) => {
+          return { ...item, id: uuidv4() };
+        });
+        setProcessors(newGenerationOfData);
+        setSearchResults(newGenerationOfData);
       })
-      .catch(function(error) {
+      .catch(function (error) {
         if (error.response) {
           if (error.response.status === 401) {
             window.location.href = '/auth';
@@ -84,12 +106,25 @@ export default function CreatePipelinePage() {
     draggingItem.source = source;
   };
 
+  //  ---------- new ------------
+  const onDragStart = ({ id, event, position, source }) => {
+    debugger;
+    draggingItem.current = position;
+    draggingItem.source = source;
+  };
+  const onDragEnter = ({ id, event, position, destination }) => {
+    dragOverItem.destination = destination;
+    dragOverItem.current = position;
+  };
+
+  // -------------------------
+
   const handleDragEnter = (e, position, destination) => {
     dragOverItem.destination = destination;
     dragOverItem.current = position;
   };
 
-  const handleDragEnd = (e) => {
+  const handleDragEnd = ({ event, id }) => {
     if (dragOverItem.destination === 'processors') {
       return;
     }
@@ -98,30 +133,38 @@ export default function CreatePipelinePage() {
 
     let draggingItemContent;
     if (draggingItem.source === 'processors') {
-      draggingItemContent = JSON.parse(JSON.stringify(processors[draggingItem.current]));
+      draggingItemContent = processors[draggingItem.current];
+
+      // Create a deep copy of draggingItemContent
+      draggingItemContent = JSON.parse(JSON.stringify(draggingItemContent));
+
+      draggingItemContent.arguments.forEach((arg) => {
+        if (arg.type === 'Text') {
+          arg.value = '';
+        } else if (arg.type === 'Numeric') {
+          arg.value = 0;
+        } else {
+          console.log('handleDragEnd: Type not found.', arg.type);
+        }
+        if (arg.default) {
+          arg.value = arg.default;
+        }
+      });
+
       listCopy.splice(dragOverItem.current + 1, 0, draggingItemContent);
     } else {
-      draggingItemContent = listCopy[draggingItem.current];
+      const draggedItem = listCopy[draggingItem.current];
+
+      // Remove the dragged item
       listCopy.splice(draggingItem.current, 1);
-      listCopy.splice(dragOverItem.current, 0, draggingItemContent);
+
+      // Insert the dragged item at the new position
+      listCopy.splice(dragOverItem.current, 0, draggedItem);
     }
 
     draggingItem.current = null;
     dragOverItem.current = null;
     setUsedProcessors(listCopy);
-  };
-
-  const categoryToColor = (category) => {
-    switch (category) {
-      case 'Communication':
-        return 'green';
-      case 'Flow':
-        return 'blue';
-      case 'InputOutput':
-        return 'red';
-      default:
-        return '';
-    }
   };
 
   if (typeof window !== 'undefined')
@@ -130,7 +173,7 @@ export default function CreatePipelinePage() {
   return (
     <>
       <div>
-        <Theme theme='g100'>
+        <Theme theme="g100">
           <MainHeader />
         </Theme>
         <Content>
@@ -139,10 +182,10 @@ export default function CreatePipelinePage() {
               open
               preventCloseOnClickOutside={true}
               isFullWidth
-              modalHeading='Create a new pipeline'
-              modalLabel='Pipeline information'
-              primaryButtonText='Continue'
-              secondaryButtonText='Back to pipelines'
+              modalHeading="Create a new pipeline"
+              modalLabel="Pipeline information"
+              primaryButtonText="Continue"
+              secondaryButtonText="Back to pipelines"
               onRequestSubmit={(event) => {
                 if (pipelineName) {
                   setOpenPipeline(false);
@@ -160,9 +203,9 @@ export default function CreatePipelinePage() {
                 <TextInput
                   required={true}
                   data-modal-primary-focus
-                  id='text-input-1'
-                  labelText='Pipeline name'
-                  placeholder='e.g. LOGIN_USER__V1'
+                  id="text-input-1"
+                  labelText="Pipeline name"
+                  placeholder="e.g. LOGIN_USER__V1"
                   style={{
                     marginBottom: '1rem',
                   }}
@@ -172,25 +215,25 @@ export default function CreatePipelinePage() {
             </Modal>
           ) : null}
 
-          <Grid className='create-page' fullWidth>
+          <Grid className="create-page" fullWidth>
             <Column
               lg={16}
               md={8}
               sm={4}
-              className='create-page_header'
+              className="create-page_header"
               style={{ marginBottom: '48px' }}
             >
               <Breadcrumb>
                 <BreadcrumbItem>
-                  <a href='/'>Home</a>
+                  <a href="/">Home</a>
                 </BreadcrumbItem>
                 <BreadcrumbItem>
-                  <a href='/pipelines'>Pipelines</a>
+                  <a href="/pipelines">Pipelines</a>
                 </BreadcrumbItem>
               </Breadcrumb>
               <Grid fullWidth>
                 <Column md={4} lg={{ span: 7, offset: 0 }} sm={4}>
-                  <h1 className='create-page__heading'>
+                  <h1 className="create-page__heading">
                     Create a new pipeline
                   </h1>
                 </Column>
@@ -207,24 +250,24 @@ export default function CreatePipelinePage() {
                           {
                             headers: {
                               Authorization: `Bearer ${localStorage.getItem(
-                                'token',
+                                'token'
                               )}`,
                             },
-                          },
+                          }
                         )
-                        .then(function(response) {
+                        .then(function (response) {
                           if (response.status !== 201) {
                             setErrorMessageForSavePipeline(
-                              'Unexpected response from server',
+                              'Unexpected response from server'
                             );
                             return;
                           }
                           window.location.href = '/pipelines';
                         })
-                        .catch(function(error) {
+                        .catch(function (error) {
                           if (error.response) {
                             setErrorMessageForSavePipeline(
-                              error.response.data.message,
+                              error.response.data.message
                             );
                           } else {
                             setErrorMessageForSavePipeline('Unknown Error');
@@ -241,9 +284,9 @@ export default function CreatePipelinePage() {
             <Column md={4} lg={{ span: 7, offset: 1 }} sm={4}>
               {errorMessageForSavePipeline !== '' && (
                 <InlineNotification
-                  aria-label='closes notification'
-                  kind='error'
-                  statusIconDescription='notification'
+                  aria-label="closes notification"
+                  kind="error"
+                  statusIconDescription="notification"
                   subtitle={errorMessageForSavePipeline}
                   onClose={() => {
                     setErrorMessageForSavePipeline('');
@@ -251,147 +294,22 @@ export default function CreatePipelinePage() {
                   style={{ marginBottom: '16px', maxWidth: '500px' }}
                 />
               )}
+              {/* Drop zone */}
               <div
                 style={{
                   paddingBottom: '30px',
                   paddingTop: '30px',
                 }}
               >
-                {usedProcessors.length ? (
-                  usedProcessors.map((item, index) => (
-                    <div
-                      onDragStart={(e) =>
-                        handleDragStart(e, index, 'used_processors')
-                      }
-                      onDragOver={(e) => e.preventDefault()}
-                      onDragEnter={(e) =>
-                        handleDragEnter(e, index, 'used_processors')
-                      }
-                      onDragEnd={handleDragEnd}
-                      key={index}
-                      draggable
-                    >
-                      <div
-                        style={{
-                          maxWidth: '400px',
-                          padding: '20px 20px 20px 20px',
-                          borderTopRightRadius: '10px',
-                          borderTopLeftRadius: '10px',
-                          background: '#000',
-                          display: 'flex',
-                          justifyItems: 'center',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <p
-                          style={{
-                            fontSize: '16px',
-                            fontWeight: 'bold',
-                            color: 'white',
-                          }}
-                        >
-                          {item.name}
-                        </p>
-                        <CloseLarge
-                          size={24}
-                          style={{ color: 'white', padding: '2px' }}
-                          onClick={(e) => {
-                            setUsedProcessors(
-                              usedProcessors.filter((value, index1) => {
-                                return index1 !== index;
-                              }),
-                            );
-                          }}
-                        />
-                      </div>
-                      {item.arguments.length ? (
-                        <div
-                          style={{
-                            maxWidth: '400px',
-                            borderBottomRightRadius: '10px',
-                            borderBottomLeftRadius: '10px',
-                            paddingTop: '20px',
-                            paddingBottom: '10px',
-                            background: '#f4f4f4',
-                            marginBottom: '30px',
-                          }}
-                        >
-                          {item.arguments
-                            ? item.arguments.map((arg, argIndex) => (
-                              <div
-                                key={arg.name}
-                                style={{
-                                  marginBottom: '20px',
-                                  marginLeft: '20px',
-                                  marginRight: '20px',
-                                }}
-                              >
-                                {arg.type === 'Text' ? (
-                                  <TextInput
-                                    type='text'
-                                    onChange={(e) => {
-                                      arg.value = e.target.value;
-                                      item.arguments[argIndex] = arg;
-                                      usedProcessors[index] = item;
-                                      setUsedProcessors(
-                                        (prevState) => usedProcessors,
-                                      );
-                                    }}
-                                    required={arg.required}
-                                    placeholder={arg.name}
-                                    defaultValue={arg.value}
-                                  />
-                                ) : arg.type === 'Numeric' ? (
-                                  <TextInput
-                                    type='text'
-                                    onChange={(e) => {
-                                      arg.value = parseInt(e.target.value);
-                                      item.arguments[argIndex] = arg;
-                                      usedProcessors[index] = item;
-                                      setUsedProcessors(
-                                        (prevState) => usedProcessors,
-                                      );
-                                    }}
-                                    required={arg.required}
-                                    defaultValue={arg.value}
-                                    placeholder={arg.name + ' (Number)'}
-                                  />
-                                ) : arg.type === 'Boolean' ? (
-                                  <Toggle
-                                    id={arg.name + index}
-                                    labelA='False' labelB='True'
-                                    defaultToggled={arg.value}
-                                    labelText={arg.name}
-                                    onToggle={props => {
-                                      arg.value = props;
-                                      item.arguments[argIndex] = arg;
-                                      usedProcessors[index] = item;
-                                      setUsedProcessors(
-                                        (prevState) => usedProcessors,
-                                      );
-                                    }}
-                                  />
-                                ) : (
-                                  <p>
-                                    No input found for argument {arg.name}
-                                  </p>
-                                )}
+                <DraggedItems
+                  usedProcessors={usedProcessors}
+                  onDragStart={onDragStart}
+                  onDragEnter={onDragEnter}
+                  onDragEnd={handleDragEnd}
+                  setUsedProcessors={setUsedProcessors}
+                />
 
-                                {/*{arg.required ? <p style={{ paddingTop: '3px', color: 'red' }}>*</p> : null}*/}
-                                {/*<p style={{ fontWeight: 'bold', padding: '3px 10px 0 10px' }}>{arg.type}</p>*/}
-                                {/*<p*/}
-                                {/*  style={{ paddingTop: '3px' }}>{arg.name !== 'processable.body' ? arg.name : ''}</p>*/}
-                              </div>
-                            ))
-                            : null}
-                        </div>
-                      ) : (
-                        <p>No arguments</p>
-                      )}
-                    </div>
-                  ))
-                ) : (
+                {!Boolean(usedProcessors?.length) && (
                   <div
                     onDragOver={() => {
                       dragOverItem.destination = 'used_processors';
@@ -413,212 +331,209 @@ export default function CreatePipelinePage() {
               </div>
             </Column>
 
+            {/* Draggable Iitems */}
             <Column md={4} lg={{ span: 6, offset: 8 }} sm={4}>
               <StickyBox
                 style={{ height: '20px' }}
                 offsetTop={100}
                 offsetBottom={20}
               >
-                <ContainedList label='Processors' kind='on-page' action={''}>
+                <ContainedList label="Processors" kind="on-page" action={''}>
                   <Search
-                    placeholder='Filter'
-                    closeButtonLabelText='Clear search input'
-                    size='lg'
-                    labelText='Filter search'
+                    placeholder="Filter"
+                    closeButtonLabelText="Clear search input"
+                    size="lg"
+                    labelText="Filter search"
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
                     }}
                   />
-                  {errorMessage !== '' && (
+                  {/* {errorMessage !== '' && (
                     <InlineNotification
-                      aria-label='closes notification'
-                      kind='error'
-                      statusIconDescription='notification'
+                      aria-label="closes notification"
+                      kind="error"
+                      statusIconDescription="notification"
                       subtitle={errorMessage}
                       onClose={() => {
                         setErrorMessage('');
                       }}
                       style={{ marginBottom: '16px' }}
                     />
-                  )}
-                  {searchResults &&
-                    searchResults.map((item, index) => (
-                      <div
-                        onDragStart={(e) => {
-                          handleDragStart(e, index, 'processors');
-                        }}
-                        onDragOver={(e) => e.preventDefault()}
-                        onDragEnter={(e) =>
-                          handleDragEnter(e, index, 'processors')
-                        }
-                        onDragEnd={handleDragEnd}
-                        key={index}
-                        draggable
-                      >
-                        <ExpandableTile
-                          style={{
-                            paddingLeft: '20px',
-                            marginTop: '10px',
-                            marginBottom: '10px',
+                  )} */}
+                  <div
+                    style={{
+                      height: '80vh',
+                      overflowY: 'scroll',
+                    }}
+                  >
+                    <DraggableItems
+                      searchResults={searchResults}
+                      onDragStart={onDragStart}
+                      onDragEnter={onDragEnter}
+                      handleDragEnd={handleDragEnd}
+                    />
+                    {/* <div
+                          onDragStart={(e) => {
+                            handleDragStart(e, index, 'processors');
                           }}
-                          tileCollapsedIconText='Details'
-                          tileExpandedIconText='Details'
-                        >
-                          <TileAboveTheFoldContent>
-                            <div>
-                              <h5>{item.name}</h5>
-                              <p
-                                style={{
-                                  fontSize: '14px',
-                                }}
-                              >
-                                {item.description}
-                              </p>
-                              <Tag type={categoryToColor(item.category)}>
-                                {item.category}
-                              </Tag>
-                            </div>
-                          </TileAboveTheFoldContent>
-                          <TileBelowTheFoldContent>
-                            <div style={{ marginTop: '10px' }}>
-                              <p
-                                style={{
-                                  fontWeight: 'bold',
-                                  fontSize: '18px',
-                                }}
-                              >
-                                Arguments
-                              </p>
-                              {item.arguments ? (
-                                item.arguments.map((arg, index) => (
-                                  <div
-                                    key={arg.name}
-                                    style={{ display: 'flex' }}
-                                  >
-                                    {arg.required ? (
+                          onDragOver={(e) => e.preventDefault()}
+                          onDragEnter={(e) =>
+                            handleDragEnter(e, index, 'processors')
+                          }
+                          onDragEnd={handleDragEnd}
+                          key={index}
+                          draggable>
+                          <ExpandableTile
+                            style={{
+                              paddingLeft: '20px',
+                              marginTop: '10px',
+                              marginBottom: '10px',
+                            }}
+                            tileCollapsedIconText="Details"
+                            tileExpandedIconText="Details">
+                            <TileAboveTheFoldContent>
+                              <div>
+                                <h5>{item.name}</h5>
+                                <p
+                                  style={{
+                                    fontSize: '14px',
+                                  }}>
+                                  {item.description}
+                                </p>
+                                <Tag type={categoryToColor(item.category)}>
+                                  {item.category}
+                                </Tag>
+                              </div>
+                            </TileAboveTheFoldContent>
+                            <TileBelowTheFoldContent>
+                              <div style={{ marginTop: '10px' }}>
+                                <p
+                                  style={{
+                                    fontWeight: 'bold',
+                                    fontSize: '18px',
+                                  }}>
+                                  Arguments
+                                </p>
+                                {item.arguments ? (
+                                  item.arguments.map((arg, index) => (
+                                    <div
+                                      key={arg.name}
+                                      style={{ display: 'flex' }}>
+                                      {arg.required ? (
+                                        <p
+                                          style={{
+                                            paddingTop: '3px',
+                                            color: 'red',
+                                          }}>
+                                          *
+                                        </p>
+                                      ) : null}
                                       <p
                                         style={{
-                                          paddingTop: '3px',
-                                          color: 'red',
-                                        }}
-                                      >
-                                        *
+                                          fontWeight: 'bold',
+                                          padding: '3px 10px 0 10px',
+                                        }}>
+                                        {arg.type}
                                       </p>
-                                    ) : null}
-                                    <p
-                                      style={{
-                                        fontWeight: 'bold',
-                                        padding: '3px 10px 0 10px',
-                                      }}
-                                    >
-                                      {arg.type}
-                                    </p>
-                                    <p style={{ paddingTop: '3px' }}>
-                                      {arg.name !== 'processable.body'
-                                        ? arg.name
-                                        : ''}
-                                    </p>
-                                  </div>
-                                ))
-                              ) : (
-                                <p>No arguments</p>
-                              )}
-                            </div>
+                                      <p style={{ paddingTop: '3px' }}>
+                                        {arg.name !== 'processable.body'
+                                          ? arg.name
+                                          : ''}
+                                      </p>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p>No arguments</p>
+                                )}
+                              </div>
 
-                            <div style={{ marginTop: '10px' }}>
-                              <p
-                                style={{
-                                  fontWeight: 'bold',
-                                  fontSize: '18px',
-                                }}
-                              >
-                                Input
-                              </p>
-                              {item.input ? (
-                                item.input.map((arg, index) => (
-                                  <div
-                                    key={arg.name}
-                                    style={{ display: 'flex' }}
-                                  >
-                                    {arg.required ? (
+                              <div style={{ marginTop: '10px' }}>
+                                <p
+                                  style={{
+                                    fontWeight: 'bold',
+                                    fontSize: '18px',
+                                  }}>
+                                  Input
+                                </p>
+                                {item.input ? (
+                                  item.input.map((arg, index) => (
+                                    <div
+                                      key={arg.name}
+                                      style={{ display: 'flex' }}>
+                                      {arg.required ? (
+                                        <p
+                                          style={{
+                                            paddingTop: '3px',
+                                            color: 'red',
+                                          }}>
+                                          *
+                                        </p>
+                                      ) : null}
                                       <p
                                         style={{
-                                          paddingTop: '3px',
-                                          color: 'red',
-                                        }}
-                                      >
-                                        *
+                                          fontWeight: 'bold',
+                                          padding: '3px 10px 0 10px',
+                                        }}>
+                                        {arg.type}
                                       </p>
-                                    ) : null}
-                                    <p
-                                      style={{
-                                        fontWeight: 'bold',
-                                        padding: '3px 10px 0 10px',
-                                      }}
-                                    >
-                                      {arg.type}
-                                    </p>
-                                    <p style={{ paddingTop: '3px' }}>
-                                      {arg.name !== 'processable.body'
-                                        ? arg.name
-                                        : ''}
-                                    </p>
-                                  </div>
-                                ))
-                              ) : (
-                                <p>No input</p>
-                              )}
-                            </div>
+                                      <p style={{ paddingTop: '3px' }}>
+                                        {arg.name !== 'processable.body'
+                                          ? arg.name
+                                          : ''}
+                                      </p>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p>No input</p>
+                                )}
+                              </div>
 
-                            <div style={{ marginTop: '10px' }}>
-                              <p
-                                style={{
-                                  fontWeight: 'bold',
-                                  fontSize: '18px',
-                                }}
-                              >
-                                Output
-                              </p>
-                              {item.output ? (
-                                item.output.map((arg, index) => (
-                                  <div
-                                    key={arg.name}
-                                    style={{ display: 'flex' }}
-                                  >
-                                    {arg.required ? (
+                              <div style={{ marginTop: '10px' }}>
+                                <p
+                                  style={{
+                                    fontWeight: 'bold',
+                                    fontSize: '18px',
+                                  }}>
+                                  Output
+                                </p>
+                                {item.output ? (
+                                  item.output.map((arg, index) => (
+                                    <div
+                                      key={arg.name}
+                                      style={{ display: 'flex' }}>
+                                      {arg.required ? (
+                                        <p
+                                          style={{
+                                            paddingTop: '3px',
+                                            color: 'red',
+                                          }}>
+                                          *
+                                        </p>
+                                      ) : null}
                                       <p
                                         style={{
-                                          paddingTop: '3px',
-                                          color: 'red',
-                                        }}
-                                      >
-                                        *
+                                          fontWeight: 'bold',
+                                          padding: '3px 10px 0 10px',
+                                        }}>
+                                        {arg.type}
                                       </p>
-                                    ) : null}
-                                    <p
-                                      style={{
-                                        fontWeight: 'bold',
-                                        padding: '3px 10px 0 10px',
-                                      }}
-                                    >
-                                      {arg.type}
-                                    </p>
-                                    <p style={{ paddingTop: '3px' }}>
-                                      {arg.name !== 'processable.body'
-                                        ? arg.name
-                                        : ''}
-                                    </p>
-                                  </div>
-                                ))
-                              ) : (
-                                <p>No output</p>
-                              )}
-                            </div>
-                          </TileBelowTheFoldContent>
-                        </ExpandableTile>
-                      </div>
-                    ))}
+                                      <p style={{ paddingTop: '3px' }}>
+                                        {arg.name !== 'processable.body'
+                                          ? arg.name
+                                          : ''}
+                                      </p>
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p>No output</p>
+                                )}
+                              </div>
+                            </TileBelowTheFoldContent>
+                          </ExpandableTile>
+                        </div>
+                      ))} */}
+                  </div>
                 </ContainedList>
               </StickyBox>
             </Column>
