@@ -74,8 +74,7 @@ export default function LandingPage() {
               md={8}
               sm={4}
               className="create-page_header"
-              style={{ marginBottom: '48px' }}
-            >
+              style={{ marginBottom: '48px' }}>
               <Breadcrumb>
                 <BreadcrumbItem>
                   <a href="/">Home</a>
@@ -89,8 +88,7 @@ export default function LandingPage() {
                   <Button
                     onClick={(e) => {
                       window.location.href = '/pipelines/create';
-                    }}
-                  >
+                    }}>
                     New pipeline
                   </Button>
                 </Column>
@@ -129,8 +127,7 @@ export default function LandingPage() {
                           key={item.name}
                           onClick={(e) => {
                             console.log('cliecked');
-                          }}
-                        >
+                          }}>
                           <StructuredListCell noWrap>
                             {item?.name}
                           </StructuredListCell>
@@ -146,13 +143,11 @@ export default function LandingPage() {
                               style={{
                                 display: 'flex',
                                 justifyContent: 'end',
-                              }}
-                            >
+                              }}>
                               <OverflowMenu
                                 flipped={document?.dir === 'rtl'}
                                 menuOffset={{ left: -60 }}
-                                aria-label="overflow-menu"
-                              >
+                                aria-label="overflow-menu">
                                 <OverflowMenuItem itemText="Remake" disabled />
                                 <OverflowMenuItem itemText="Rename" disabled />
                                 <OverflowMenuItem
