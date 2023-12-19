@@ -110,6 +110,8 @@ export default function LandingPage() {
                 />
               )}
 
+              {/*// TODO:*/}
+              {/*//  Action: Rename, Edit, Delete*/}
               {pipelines.length ? (
                 <StructuredListWrapper selection={true}>
                   <StructuredListHead>
@@ -151,6 +153,8 @@ export default function LandingPage() {
                                 menuOffset={{ left: -60 }}
                                 aria-label="overflow-menu"
                               >
+                                <OverflowMenuItem itemText="Remake" disabled />
+                                <OverflowMenuItem itemText="Rename" disabled />
                                 <OverflowMenuItem
                                   itemText="Deactive"
                                   disabled
