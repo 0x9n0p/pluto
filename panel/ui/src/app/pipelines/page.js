@@ -74,8 +74,7 @@ export default function LandingPage() {
               md={8}
               sm={4}
               className="create-page_header"
-              style={{ marginBottom: '48px' }}
-            >
+              style={{ marginBottom: '48px' }}>
               <Breadcrumb>
                 <BreadcrumbItem>
                   <a href="/">Home</a>
@@ -89,8 +88,7 @@ export default function LandingPage() {
                   <Button
                     onClick={(e) => {
                       window.location.href = '/pipelines/create';
-                    }}
-                  >
+                    }}>
                     New pipeline
                   </Button>
                 </Column>
@@ -129,36 +127,43 @@ export default function LandingPage() {
                           key={item.name}
                           onClick={(e) => {
                             console.log('cliecked');
-                          }}
-                        >
+                          }}>
                           <StructuredListCell noWrap>
-                            {item.name}
+                            {item?.name}
                           </StructuredListCell>
                           <StructuredListCell>
-                            {item.processors.length}
+                            {item.processors?.length}
                           </StructuredListCell>
                           <StructuredListCell>Active</StructuredListCell>
                           <StructuredListCell>
-                            {new Date(item.saved_at).toLocaleString()}
+                            {new Date(item?.saved_at).toLocaleString()}
                           </StructuredListCell>
                           <StructuredListCell>
                             <div
                               style={{
                                 display: 'flex',
                                 justifyContent: 'end',
-                              }}
-                            >
+                              }}>
                               <OverflowMenu
                                 flipped={document?.dir === 'rtl'}
                                 menuOffset={{ left: -60 }}
-                                aria-label="overflow-menu"
-                              >
+                                aria-label="overflow-menu">
                                 <OverflowMenuItem itemText="Remake" disabled />
                                 <OverflowMenuItem itemText="Rename" disabled />
                                 <OverflowMenuItem
                                   itemText="Deactive"
                                   disabled
                                   requireTitle
+                                />
+                                <OverflowMenuItem
+                                  itemText="Duplicate/Edit"
+                                  onClick={(e) => {
+                                    localStorage.setItem(
+                                      'selected_pipeline',
+                                      JSON.stringify(item)
+                                    );
+                                    window.location.href = '/pipelines/edit';
+                                  }}
                                 />
                                 <OverflowMenuItem
                                   hasDivider
