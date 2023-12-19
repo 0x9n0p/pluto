@@ -33,6 +33,11 @@ func init() {
 				continue
 			}
 
+			ApplicationLogger.Debug(ApplicationLog{
+				Message: "New TCP connection accepted",
+				Extra:   map[string]any{"remote_address": conn.RemoteAddr().String()},
+			})
+
 			go ConnectionHandler.Process(&InternalProcessable{
 				ID:        uuid.New(),
 				Body:      map[string]any{"connection": conn},
@@ -70,7 +75,11 @@ var processor = NewFinalProcessor(
 		AuthenticatedConnectionsMutex.Lock()
 		defer AuthenticatedConnectionsMutex.Unlock()
 		defer func() { recover() }()
-		delete(AuthenticatedConnections, processable.GetBody().(map[string]any)["connection_id"].(uuid.UUID))
+
+		authenticatedConnection := AuthenticatedConnections[processable.GetBody().(map[string]any)["connection_id"].(uuid.UUID)]
+		_ = authenticatedConnection.Encoder.Close()
+		delete(AuthenticatedConnections, authenticatedConnection.ID)
+
 		return processable, true
 	}),
 )

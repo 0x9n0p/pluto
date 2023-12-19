@@ -26,10 +26,6 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 	Processor: NewInlineProcessor(func(processable Processable) (result Processable, succeed bool) {
 		defer func() { succeed = recover() == nil }()
 
-		ApplicationLogger.Debug(ApplicationLog{
-			Message: "Authentication request",
-		})
-
 		var authenticatedConnection AuthenticatedConnection
 
 		// Authenticate Connection
@@ -84,6 +80,14 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 			AcceptedConnectionsMutex.Unlock()
 		}
 
+		ApplicationLogger.Debug(ApplicationLog{
+			Message: "New connection successfully authenticated",
+			Extra: map[string]any{
+				"connection_id":  authenticatedConnection.ID,
+				"remote_address": authenticatedConnection.RemoteAddr().String(),
+			},
+		})
+
 		return processable, true
 	}),
 }).Fail(ProcessorBucket{Processors: []Processor{
@@ -102,6 +106,7 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 		AcceptedConnectionsMutex.RUnlock()
 
 		_ = acceptedConnection.Close()
+		_ = acceptedConnection.Encoder.Close()
 
 		AcceptedConnectionsMutex.Lock()
 		delete(AcceptedConnections, acceptedConnection.ID)

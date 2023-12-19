@@ -30,7 +30,7 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 		ID:      uuid.New(),
 		Token:   random.String(ConnectionTokenLength),
 		Conn:    processable.GetBody().(map[string]any)["connection"].(net.Conn),
-		Encoder: NewJsonStreamEncoder(processable.GetBody().(map[string]any)["connection"].(net.Conn)),
+		Encoder: NewChannelBasedStreamEncoder(NewJsonStreamEncoder(processable.GetBody().(map[string]any)["connection"].(net.Conn))),
 	}
 
 	b, err := json.Marshal(OutGoingProcessable{
@@ -54,12 +54,6 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 		Log.Debug("Write bytes to connection", zap.Error(err))
 		return processable, false
 	}
-
-	Log.Debug("New connection accepted", zap.String("remote_address", connection.RemoteAddr().String()))
-	ApplicationLogger.Debug(ApplicationLog{
-		Message: "New connection accepted",
-		Extra:   map[string]any{"remote_address": connection.RemoteAddr().String()},
-	})
 
 	AcceptedConnectionsMutex.Lock()
 	AcceptedConnections[connection.ID] = connection
