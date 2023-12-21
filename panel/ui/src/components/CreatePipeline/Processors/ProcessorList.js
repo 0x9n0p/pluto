@@ -40,10 +40,6 @@ const ProcessorList = forwardRef(
     );
 
     useEffect(() => {
-      // const data = _mock;
-      // debugger;
-      // setProcessors(data);
-      // setSearchResults(data);
       axios
         .get(Address() + '/api/v1/processors', {
           headers: {
