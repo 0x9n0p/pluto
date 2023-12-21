@@ -19,11 +19,7 @@ const UsedProcessorList = forwardRef((_, ref) => {
       {' '}
       {usedProcessors.length ? (
         usedProcessors.map((item, index) => (
-          <Draggable
-            key={uuidv4()}
-            draggableId={JSON.stringify(item)}
-            index={index}
-          >
+          <Draggable key={item?.id} draggableId={item?.id} index={index}>
             {(provided) => (
               <div
                 ref={provided.innerRef}
@@ -82,6 +78,7 @@ const UsedProcessorList = forwardRef((_, ref) => {
                     {item.arguments
                       ? item.arguments.map((arg, argIndex) => (
                           <div
+                            key={arg?.id}
                             style={{
                               marginBottom: '20px',
                               marginLeft: '20px',
@@ -93,10 +90,14 @@ const UsedProcessorList = forwardRef((_, ref) => {
                                 type="text"
                                 onChange={(e) => {
                                   setUsedProcessors((perv) => {
+                                    debugger;
                                     perv.forEach((x) => {
-                                      if (x?.id === item?.id) {
-                                        x.arguments[argIndex]['value'] =
-                                          e.target.value;
+                                      if (x.id === item.id) {
+                                        x.arguments.forEach((y) => {
+                                          if (y.id === arg.id) {
+                                            y['value'] = e.target.value;
+                                          }
+                                        });
                                       }
                                     });
 

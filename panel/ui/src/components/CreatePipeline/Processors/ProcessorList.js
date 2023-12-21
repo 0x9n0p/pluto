@@ -10,6 +10,7 @@ import {
   TileBelowTheFoldContent,
 } from '@carbon/react';
 import uuidv4 from '../../../utils/uuidv4';
+import _mock from '../../../_mock/proccessors.json';
 
 // ---------------------
 const categoryToColor = (category) => {
@@ -39,52 +40,62 @@ const ProcessorList = forwardRef(
     );
 
     useEffect(() => {
-      axios
-        .get(Address() + '/api/v1/processors', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        })
-        .then(function (response) {
-          if (response.status !== 200) {
-            setErrorMessage('Unexpected response from server');
-            return;
-          }
-          const newData = response.data.map((item) => {
-            return { ...item, id: uuidv4() };
-          });
-          setProcessors(newData);
-          setSearchResults(newData);
-        })
-        .catch(function (error) {
-          if (error.response) {
-            if (error.response.status === 401) {
-              window.location.href = '/auth';
-              return;
-            }
-            setErrorMessage(error.response.data.message);
-          } else {
-            setErrorMessage('Unknown Error');
-            console.error(error);
-          }
-        });
+      const data = _mock;
+      debugger;
+      setProcessors(data);
+      setSearchResults(data);
+      // axios
+      //   .get(Address() + '/api/v1/processors', {
+      //     headers: {
+      //       Authorization: `Bearer ${localStorage.getItem('token')}`,
+      //     },
+      //   })
+      //   .then(function (response) {
+      //     if (response.status !== 200) {
+      //       setErrorMessage('Unexpected response from server');
+      //       return;
+      //     }
+      //     const newData = response.data.map((item) => {
+      //       return { ...item, id: uuidv4() };
+      //     });
+      //     debugger;
+      //     setProcessors(newData);
+      //     setSearchResults(newData);
+      //   })
+      //   .catch(function (error) {
+      //     if (error.response) {
+      //       if (error.response.status === 401) {
+      //         window.location.href = '/auth';
+      //         return;
+      //       }
+      //       setErrorMessage(error.response.data.message);
+      //     } else {
+      //       setErrorMessage('Unknown Error');
+      //       console.error(error);
+      //     }
+      //   });
     }, []);
 
-    useEffect(() => {
-      const results = processors.filter((listItem) =>
-        listItem.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchResults(results);
-    }, [searchTerm]);
+    // useEffect(() => {
+    //   const results = processors.filter((listItem) =>
+    //     listItem.name.toLowerCase().includes(searchTerm.toLowerCase())
+    //   );
+    //   setSearchResults(results);
+    // }, [searchTerm]);
 
     return (
       <>
         {' '}
         {searchResults &&
           searchResults.map((item, index) => (
-            <Draggable draggableId={JSON.stringify(item)} index={index}>
+            <Draggable
+              key={item?.id}
+              draggableId={JSON.stringify(item)}
+              index={index}
+            >
               {(provided) => (
                 <div
+                  key={item?.id}
                   style={{
                     paddingLeft: '20px',
                     marginTop: '10px',
