@@ -1,0 +1,227 @@
+[
+	{
+	  "id": "f65603d7-f2fe-4d6a-aa2d-4cecd8b15368",
+		"name": "CHANNEL_CREATOR",
+		"description": "Creates a channel",
+		"icon": "https://...",
+		"arguments": [
+			{
+			  "id":"7c3f9cd2-9854-408e-9b55-78873b729e59",
+				"name": "name",
+				"type": "Text",
+				"required": true
+			},
+			{
+			  "id":"7f292cfc-49bc-443e-a75e-196127256119",
+				"name": "length",
+				"type": "Numeric",
+				"required": false,
+				"default": 10
+			}
+		],
+		"input": [],
+		"output": [
+			{
+                "id":"948da961-df32-4ce7-a91b-1638247c2147",
+				"name": "channel",
+				"type": "Channel",
+				"required": true
+			}
+		],
+		"category": "Communication"
+	},
+	{
+        "id":"252767a0-903a-4131-8a78-ae14deff2239",
+		"name": "CHANNEL_FINDER",
+		"description": "Finds channel by the given name",
+		"icon": "https://...",
+		"arguments": [
+            {
+                "id":"7dc182e1-1877-4a60-8dac-cb4243518cd0",
+				"name": "name",
+				"type": "Text",
+				"required": true
+			}
+		],
+		"input": [],
+		"output": [
+            {
+                "id":"643a19e9-a33f-49ae-8cef-69af9d4a85cf",
+				"name": "channel",
+				"type": "Channel",
+				"required": true
+			}
+		],
+		"category": "Communication"
+	},
+	{
+        "id":"799694a7-330c-4782-a5f3-cfdb07f83ce5",
+		"name": "EXECUTE",
+		"description": "Executes the pipeline",
+		"icon": "https://...",
+		"arguments": [
+			{
+                "id":"68dfdae6-7c50-45af-bff9-6de8a2c24627",
+				"name": "name",
+				"type": "Text",
+				"required": true
+			},
+			{
+                "id":"7bcd09d9-38c0-41a7-908b-db601fad7529",
+				"name": "append_result",
+				"type": "Boolean",
+				"required": false,
+				"default": false
+			}
+		],
+		"input": [],
+		"output": [],
+		"category": "Flow"
+	},
+	{
+        "id":"036981dc-6b22-4350-b080-47809b5d496d",
+		"name": "FORK",
+		"description": "Executes the pipeline in background",
+		"icon": "https://...",
+		"arguments": [
+			{
+                "id":"7d9fe836-410b-4425-8c23-d673a11530ad",
+				"name": "name",
+				"type": "Text",
+				"required": true
+			}
+		],
+		"input": [],
+		"output": [],
+		"category": "Flow"
+	},
+	{
+        "id":"9cc764b0-24fc-47ff-b90f-5546e02f0dbe",
+		"name": "IO_WRITER",
+		"description": "Write to Input/Output interfaces directly",
+		"icon": "https://...",
+		"arguments": [
+			{
+                "id":"a0915173-88b9-4049-a06c-4e67dc8f2292",
+				"name": "io_interface",
+				"type": "InternalInterface",
+				"required": true
+			}
+		],
+		"input": [
+			{
+                "id":"ce0c6e99-36cb-48f1-9848-560b3fc89aed",
+				"name": "processable.body",
+				"type": "Bytes",
+				"required": true
+			}
+		],
+		"output": [],
+		"category": "InputOutput"
+	},
+	{
+        "id":"f98c612d-e0a6-4f6b-bba9-b16eda6adc0e",
+		"name": "JOIN_CHANNEL",
+		"description": "When a processable is published by the channel, the processor is executed.",
+		"icon": "https://...",
+		"arguments": [],
+		"input": [
+			{
+                "id":"71b51261-de94-43ee-8d07-b5c4eebabc11",
+				"name": "channel",
+				"type": "Channel",
+				"required": true
+			},
+			{
+                "id":"0ae18616-352c-4117-94e8-9cd82c430949",
+				"name": "identifier",
+				"type": "Identifier",
+				"required": true
+			},
+			{
+                "id":"1a751154-521a-4c86-8734-34bfd0b2f3d1",
+				"name": "processor",
+				"type": "Processor",
+				"required": true
+			}
+		],
+		"output": [],
+		"category": "Communication"
+	},
+	{
+        "id":"f56e644e-bddf-4ab9-8c6b-e2db78ef5fdd",
+		"name": "NUMBER_VALIDATOR",
+		"description": "Validates the input",
+		"icon": "https://...",
+		"arguments": [
+			{
+                "id":"227a3f47-692d-4f77-b654-5eae6d80b8ba",
+				"name": "name",
+				"type": "Text",
+				"required": true
+			},
+			{
+                "id":"c169d163-0dbf-41cc-be7e-8c3ddbd01750",
+				"name": "minimum",
+				"type": "Numeric",
+				"required": true
+			},
+			{
+                "id":"7742b763-e214-4f8c-868f-18f383e69ad1",
+				"name": "maximum",
+				"type": "Numeric",
+				"required": true
+			}
+		],
+		"input": [],
+		"output": [],
+		"category": "Validator"
+	},
+	{
+        "id":"a9b69f3a-6b54-44d5-9bb3-35af736fd238",
+		"name": "RUNTIME_PROCESSOR_CREATOR",
+		"description": "Creates the processor and adds it to the body",
+		"icon": "https://...",
+		"arguments": [
+			{
+                "id":"75a426b0-d5f4-4931-af2c-555bef0393da",
+				"name": "processor_name",
+				"type": "Text",
+				"required": true
+			},
+			{
+                "id":"e819fadd-1377-4912-b611-3d93ae17f0b3",
+				"name": "append_name",
+				"type": "Text",
+				"required": true
+			}
+		],
+		"input": [],
+		"output": [
+			{
+                "id":"bda1a159-dfa1-47d3-a34f-d524e15eeedc",
+				"name": "$append_name",
+				"type": "Processor",
+				"required": true
+			}
+		],
+		"category": "Flow"
+	},
+	{
+        "id":"a11c7dd9-3126-41a5-b4bc-7d1793f16ba4",
+		"name": "SEND_RESPONSE",
+		"description": "Sends body to producer",
+		"icon": "https://...",
+		"arguments": [
+			{
+                "id":"adf292a0-a03a-44fb-ba0e-8f25eaafea0e",
+				"name": "pipeline_name",
+				"type": "Text",
+				"required": true
+			}
+		],
+		"input": [],
+		"output": [],
+		"category": "Communication"
+	}
+]

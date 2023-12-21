@@ -10,6 +10,7 @@ import {
   TileBelowTheFoldContent,
 } from '@carbon/react';
 import uuidv4 from '../../../utils/uuidv4';
+import _mock from '../../../_mock/proccessors.json';
 
 // ---------------------
 const categoryToColor = (category) => {
@@ -51,7 +52,26 @@ const ProcessorList = forwardRef(
             return;
           }
           const newData = response.data.map((item) => {
-            return { ...item, id: uuidv4() };
+            debugger;
+            return {
+              ...item,
+              id: uuidv4(),
+              ...(item?.arguments?.length && {
+                arguments: item.arguments.map((x) => {
+                  return { ...x, id: uuidv4() };
+                }),
+              }),
+              ...(item?.output?.length && {
+                output: item.output.map((x) => {
+                  return { ...x, id: uuidv4() };
+                }),
+              }),
+              ...(item?.input?.length && {
+                input: item.input.map((x) => {
+                  return { ...x, id: uuidv4() };
+                }),
+              }),
+            };
           });
           setProcessors(newData);
           setSearchResults(newData);
@@ -70,32 +90,34 @@ const ProcessorList = forwardRef(
         });
     }, []);
 
-    useEffect(() => {
-      const results = processors.filter((listItem) =>
-        listItem.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      setSearchResults(results);
-    }, [searchTerm]);
+    // useEffect(() => {
+    //   const results = processors.filter((listItem) =>
+    //     listItem.name.toLowerCase().includes(searchTerm.toLowerCase())
+    //   );
+    //   setSearchResults(results);
+    // }, [searchTerm]);
 
     return (
       <>
         {' '}
         {searchResults &&
           searchResults.map((item, index) => (
-            <Draggable draggableId={JSON.stringify(item)} index={index}>
+            <Draggable
+              key={item?.id}
+              draggableId={JSON.stringify(item)}
+              index={index}>
               {(provided) => (
                 <div
+                  key={item?.id}
                   style={{
                     paddingLeft: '20px',
                     marginTop: '10px',
                     marginBottom: '10px',
-                  }}
-                >
+                  }}>
                   <Tile
                     {...provided.draggableProps}
                     ref={provided.innerRef}
-                    {...provided.dragHandleProps}
-                  >
+                    {...provided.dragHandleProps}>
                     <ExpandableTile
                       style={{
                         paddingLeft: '20px',
@@ -103,16 +125,14 @@ const ProcessorList = forwardRef(
                         marginBottom: '10px',
                       }}
                       tileCollapsedIconText="Details"
-                      tileExpandedIconText="Details"
-                    >
+                      tileExpandedIconText="Details">
                       <TileAboveTheFoldContent>
                         <div>
                           <h5>{item.name}</h5>
                           <p
                             style={{
                               fontSize: '14px',
-                            }}
-                          >
+                            }}>
                             {item.description}
                           </p>
                           <Tag type={categoryToColor(item.category)}>
@@ -126,8 +146,7 @@ const ProcessorList = forwardRef(
                             style={{
                               fontWeight: 'bold',
                               fontSize: '18px',
-                            }}
-                          >
+                            }}>
                             Arguments
                           </p>
                           {item.arguments ? (
@@ -136,15 +155,13 @@ const ProcessorList = forwardRef(
                                 key={arg.name}
                                 style={{
                                   display: 'flex',
-                                }}
-                              >
+                                }}>
                                 {arg.required ? (
                                   <p
                                     style={{
                                       paddingTop: '3px',
                                       color: 'red',
-                                    }}
-                                  >
+                                    }}>
                                     *
                                   </p>
                                 ) : null}
@@ -152,15 +169,13 @@ const ProcessorList = forwardRef(
                                   style={{
                                     fontWeight: 'bold',
                                     padding: '3px 10px 0 10px',
-                                  }}
-                                >
+                                  }}>
                                   {arg.type}
                                 </p>
                                 <p
                                   style={{
                                     paddingTop: '3px',
-                                  }}
-                                >
+                                  }}>
                                   {arg.name !== 'processable.body'
                                     ? arg.name
                                     : ''}
@@ -177,8 +192,7 @@ const ProcessorList = forwardRef(
                             style={{
                               fontWeight: 'bold',
                               fontSize: '18px',
-                            }}
-                          >
+                            }}>
                             Input
                           </p>
                           {item.input ? (
@@ -187,15 +201,13 @@ const ProcessorList = forwardRef(
                                 key={arg.name}
                                 style={{
                                   display: 'flex',
-                                }}
-                              >
+                                }}>
                                 {arg.required ? (
                                   <p
                                     style={{
                                       paddingTop: '3px',
                                       color: 'red',
-                                    }}
-                                  >
+                                    }}>
                                     *
                                   </p>
                                 ) : null}
@@ -203,15 +215,13 @@ const ProcessorList = forwardRef(
                                   style={{
                                     fontWeight: 'bold',
                                     padding: '3px 10px 0 10px',
-                                  }}
-                                >
+                                  }}>
                                   {arg.type}
                                 </p>
                                 <p
                                   style={{
                                     paddingTop: '3px',
-                                  }}
-                                >
+                                  }}>
                                   {arg.name !== 'processable.body'
                                     ? arg.name
                                     : ''}
@@ -228,8 +238,7 @@ const ProcessorList = forwardRef(
                             style={{
                               fontWeight: 'bold',
                               fontSize: '18px',
-                            }}
-                          >
+                            }}>
                             Output
                           </p>
                           {item.output ? (
@@ -238,15 +247,13 @@ const ProcessorList = forwardRef(
                                 key={arg.name}
                                 style={{
                                   display: 'flex',
-                                }}
-                              >
+                                }}>
                                 {arg.required ? (
                                   <p
                                     style={{
                                       paddingTop: '3px',
                                       color: 'red',
-                                    }}
-                                  >
+                                    }}>
                                     *
                                   </p>
                                 ) : null}
@@ -254,15 +261,13 @@ const ProcessorList = forwardRef(
                                   style={{
                                     fontWeight: 'bold',
                                     padding: '3px 10px 0 10px',
-                                  }}
-                                >
+                                  }}>
                                   {arg.type}
                                 </p>
                                 <p
                                   style={{
                                     paddingTop: '3px',
-                                  }}
-                                >
+                                  }}>
                                   {arg.name !== 'processable.body'
                                     ? arg.name
                                     : ''}

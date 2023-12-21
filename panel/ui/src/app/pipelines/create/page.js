@@ -29,9 +29,9 @@ export default function CreatePipelinePage() {
     const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
-
+    debugger;
     if (source?.droppableId === 'used_processors') {
-      const newAdded = JSON.parse(result.draggableId);
+      const newAdded = usedProcessors.find((item) => item?.id === draggableId);
       const newItems = new Array(...usedProcessors);
       newItems.splice(source.index, 1);
       newItems.splice(destination.index, 0, newAdded);
@@ -41,8 +41,24 @@ export default function CreatePipelinePage() {
 
     if (destination?.droppableId === 'used_processors') {
       const newAdded = JSON.parse(result.draggableId);
+      newAdded['id'] = uuidv4();
+      if (newAdded?.arguments?.length) {
+        newAdded.arguments.forEach((item) => {
+          item['id'] = uuidv4();
+        });
+      }
+      if (newAdded?.output?.length) {
+        newAdded.output.forEach((item) => {
+          item['id'] = uuidv4();
+        });
+      }
+      if (newAdded?.input?.length) {
+        newAdded.input.forEach((item) => {
+          item['id'] = uuidv4();
+        });
+      }
       const newItems = new Array(...usedProcessors);
-      newItems.splice(destination.index, 0, { ...newAdded, id: uuidv4() });
+      newItems.splice(destination.index, 0, { ...newAdded });
       setUsedProcessors(newItems);
       return;
     }
