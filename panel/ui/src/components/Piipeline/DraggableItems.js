@@ -16,8 +16,6 @@ const DraggableItems = ({
     <>
       {Boolean(searchResults?.length) &&
         searchResults.map((item, index) => {
-          debugger;
-
           return (
             <div
               key={item?.id}
