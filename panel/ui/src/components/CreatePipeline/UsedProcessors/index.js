@@ -10,10 +10,12 @@ const UsedProcessors = forwardRef(
       <Droppable
         droppableId={'used_processors'}
         direction="vertical"
-        mode="standard"
-      >
+        mode="standard">
         {(provided) => (
-          <Column md={4} lg={{ span: 7, offset: 1 }} sm={4}>
+          <Column
+            md={{ span: 6, offset: 1 }}
+            lg={{ span: 6, offset: 1 }}
+            sm={{ span: 6 }}>
             {errorMessageForSavePipeline !== '' && (
               <InlineNotification
                 aria-label="closes notification"
@@ -36,8 +38,7 @@ const UsedProcessors = forwardRef(
               style={{
                 paddingBottom: '30px',
                 paddingTop: '30px',
-              }}
-            >
+              }}>
               <UsedProcessorList
                 ref={ref}
                 setErrorMessageForSavePipeline={setErrorMessageForSavePipeline}
