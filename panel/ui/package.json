@@ -34,7 +34,8 @@
     "react-use-websocket": "^4.5.0",
     "sass": "^1.66.1",
     "uuid": "^9.0.1",
-    "ws": "^8.14.2"
+    "ws": "^8.14.2",
+    "yarn": "^1.22.21"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",

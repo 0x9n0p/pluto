@@ -273,8 +273,11 @@ const ProcessorList = forwardRef(
     }, [searchTerm]);
 
     return (
-      <>
-        {' '}
+      <div
+        style={{
+          height: '80vh',
+          overflowY: 'auto',
+        }}>
         {searchResults &&
           searchResults.map((item, index) => (
             <Draggable
@@ -307,7 +310,7 @@ const ProcessorList = forwardRef(
               )}
             </Draggable>
           ))}
-      </>
+      </div>
     );
   }
 );
