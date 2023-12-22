@@ -28,19 +28,18 @@ const PipelinePopup = forwardRef(({ pipelineName, setPipelineName }, ref) => {
       }}
       onRequestClose={(e) => {
         window.location.href = '/pipelines';
-      }}
-    >
+      }}>
       <div
         style={{
           padding: '20px',
-        }}
-      >
+        }}>
         <TextInput
           required={true}
           data-modal-primary-focus
           id="text-input-1"
           labelText="Pipeline name"
           placeholder="e.g. LOGIN_USER__V1"
+          value={pipelineName}
           style={{
             marginBottom: '1rem',
           }}

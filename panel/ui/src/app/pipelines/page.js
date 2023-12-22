@@ -26,7 +26,7 @@ import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
   const [errorMessage, setErrorMessage] = useState('');
-  const [pipelines, setPipelines] = useLocalStorage('Pipelines', []);
+  const [pipelines, setPipelines] = useState([]);
   const router = useRouter();
 
   const syncPipelines = () => {
@@ -77,8 +77,7 @@ export default function LandingPage() {
               md={8}
               sm={4}
               className="create-page_header"
-              style={{ marginBottom: '48px' }}
-            >
+              style={{ marginBottom: '48px' }}>
               <Breadcrumb>
                 <BreadcrumbItem>
                   <a href="/">Home</a>
@@ -92,8 +91,7 @@ export default function LandingPage() {
                   <Button
                     onClick={(e) => {
                       window.location.href = '/pipelines/create';
-                    }}
-                  >
+                    }}>
                     New pipeline
                   </Button>
                 </Column>
@@ -132,8 +130,7 @@ export default function LandingPage() {
                           key={item.name}
                           onClick={(e) => {
                             console.log('cliecked');
-                          }}
-                        >
+                          }}>
                           <StructuredListCell noWrap>
                             {item?.name}
                           </StructuredListCell>
@@ -149,13 +146,11 @@ export default function LandingPage() {
                               style={{
                                 display: 'flex',
                                 justifyContent: 'end',
-                              }}
-                            >
+                              }}>
                               <OverflowMenu
                                 flipped={document?.dir === 'rtl'}
                                 menuOffset={{ left: -60 }}
-                                aria-label="overflow-menu"
-                              >
+                                aria-label="overflow-menu">
                                 <OverflowMenuItem itemText="Remake" disabled />
                                 <OverflowMenuItem itemText="Rename" disabled />
                                 <OverflowMenuItem
@@ -166,8 +161,11 @@ export default function LandingPage() {
                                 <OverflowMenuItem
                                   itemText="Duplicate/Edit"
                                   onClick={(e) => {
-                                    debugger;
-                                    router.push(`/pipelines/${item?.name}`);
+                                    localStorage.setItem(
+                                      'selected_pipeline',
+                                      JSON.stringify(item)
+                                    );
+                                    router.push('/pipelines/edit');
                                   }}
                                 />
                                 <OverflowMenuItem
