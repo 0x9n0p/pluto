@@ -27,8 +27,7 @@ const UsedProcessorList = forwardRef((_, ref) => {
                 <div
                   ref={provided.innerRef}
                   {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                >
+                  {...provided.dragHandleProps}>
                   <motion.div
                     initial={{
                       opacity: 0,
@@ -42,6 +41,13 @@ const UsedProcessorList = forwardRef((_, ref) => {
                       filter: 'blur(0px)',
                       y: 0,
                     }}
+                    exit={{
+                      y: -50,
+                      opacity: 0,
+                      scale: 0.8,
+                      duration: 1,
+                      filter: 'blur(20px)',
+                    }}
                     transition={{
                       duration: 0.5,
                       scale: {
@@ -49,11 +55,10 @@ const UsedProcessorList = forwardRef((_, ref) => {
                         stiffness: 500,
                         restDelta: 0.008,
                       },
-                    }}
-                  >
+                    }}>
                     <div
                       style={{
-                        maxWidth: '400px',
+                        width: '100%',
                         padding: '20px 20px 20px 20px',
                         borderTopRightRadius: '10px',
                         borderTopLeftRadius: '10px',
@@ -62,15 +67,13 @@ const UsedProcessorList = forwardRef((_, ref) => {
                         justifyItems: 'center',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                      }}
-                    >
+                      }}>
                       <p
                         style={{
                           fontSize: '16px',
                           fontWeight: 'bold',
                           color: 'white',
-                        }}
-                      >
+                        }}>
                         {item.name.split('').map((el, i) => (
                           <motion.span
                             initial={{ opacity: 0 }}
@@ -79,8 +82,7 @@ const UsedProcessorList = forwardRef((_, ref) => {
                               duration: 0.3,
                               delay: i / 5,
                             }}
-                            key={i}
-                          >
+                            key={i}>
                             {el}{' '}
                           </motion.span>
                         ))}
@@ -104,15 +106,13 @@ const UsedProcessorList = forwardRef((_, ref) => {
                     {item?.arguments?.length ? (
                       <div
                         style={{
-                          maxWidth: '400px',
                           borderBottomRightRadius: '10px',
                           borderBottomLeftRadius: '10px',
                           paddingTop: '20px',
                           paddingBottom: '10px',
                           background: '#f4f4f4',
                           marginBottom: '30px',
-                        }}
-                      >
+                        }}>
                         {item.arguments
                           ? item.arguments.map((arg, argIndex) => (
                               <div
@@ -121,8 +121,7 @@ const UsedProcessorList = forwardRef((_, ref) => {
                                   marginBottom: '20px',
                                   marginLeft: '20px',
                                   marginRight: '20px',
-                                }}
-                              >
+                                }}>
                                 {arg.type === 'Text' ? (
                                   <TextInput
                                     type="text"
@@ -206,7 +205,7 @@ const UsedProcessorList = forwardRef((_, ref) => {
           <>
             <div
               style={{
-                maxWidth: '400px',
+                width: '100%',
                 height: '100px',
                 border: '2px dashed gray',
                 borderColor: '#d2d2d2',
@@ -214,8 +213,7 @@ const UsedProcessorList = forwardRef((_, ref) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-            >
+              }}>
               <p>Drop a processor here</p>
             </div>
           </>
