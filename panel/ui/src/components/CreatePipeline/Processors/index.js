@@ -14,7 +14,7 @@ const Processors = forwardRef((_, ref) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   return (
-    <Droppable droppableId={'processors'} direction="vertical">
+    <Droppable droppableId={'processors'} direction="vertical" isDropDisabled>
       {(provided) => (
         <Column md={4} lg={{ span: 6, offset: 8 }} sm={4}>
           <StickyBox

@@ -3,3 +3,6 @@
 .create-page_main {
   margin-top: layout.$spacing-09;
 }
+.dnd-copy ~ div {
+  transform: none !important;
+}

@@ -11,9 +11,10 @@ import PiplineNavbar from '../../../components/CreatePipeline/Navbar';
 import Processors from '../../../components/CreatePipeline/Processors';
 import UsedProcessors from '../../../components/CreatePipeline/UsedProcessors';
 import uuidv4 from '../../../utils/uuidv4';
-import { useParams } from 'next/navigation';
 
-export default function CreatePipelinePage() {
+export default async function Page({ params }) {
+  debugger;
+  //   const params = useParams();
   const ProcessorsRef = useRef();
   const UsedProcessorsRef = useRef();
   const [pipelineName, setPipelineName] = useState('');
