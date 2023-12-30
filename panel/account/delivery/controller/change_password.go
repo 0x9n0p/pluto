@@ -1,17 +1,18 @@
-package delivery
+package controller
 
 import (
 	"net/http"
 	"pluto/panel/account"
+	"pluto/panel/account/delivery"
 	"pluto/panel/pkg/wrapper"
 )
 
-type ChangePasswordController struct {
+type ChangePassword struct {
 	OldPassword string `json:"old_password" validate:"required"`
 	NewPassword string `json:"new_password" validate:"required"`
 }
 
-func (c *ChangePasswordController) Exec(w wrapper.ResponseWriter) (err error) {
+func (c *ChangePassword) Exec(w wrapper.ResponseWriter) (err error) {
 	claims, err := wrapper.GetJWTClaims(w)
 	if err != nil {
 		return err
@@ -19,11 +20,11 @@ func (c *ChangePasswordController) Exec(w wrapper.ResponseWriter) (err error) {
 
 	a, err := account.Find(claims["email"].(string))
 	if err != nil {
-		return WriteError(err, w)
+		return delivery.WriteError(err, w)
 	}
 
 	if err := a.ChangePassword([]byte(c.OldPassword), []byte(c.NewPassword)); err != nil {
-		return WriteError(err, w)
+		return delivery.WriteError(err, w)
 	}
 
 	return w.NoContent(http.StatusOK)

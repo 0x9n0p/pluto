@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"pluto"
 	"pluto/panel/account"
+	"pluto/panel/account/delivery/controller"
 	"pluto/panel/delivery"
 	"pluto/panel/pkg/wrapper"
 	"time"
@@ -89,7 +90,7 @@ func init() {
 	)
 
 	authenticated.PATCH("/password",
-		wrapper.New[ChangePasswordController](func(c ChangePasswordController, w wrapper.ResponseWriter) error {
+		wrapper.New[controller.ChangePassword](func(c controller.ChangePassword, w wrapper.ResponseWriter) error {
 			return c.Exec(w)
 		}).Handle(),
 	)
