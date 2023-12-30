@@ -127,7 +127,7 @@ export default function LoginPage() {
                 onClick={async (event) => {
                   axios
                     .post(
-                      Address() + '/api/v1/auth',
+                      Address() + '/api/v1/account/login',
                       {
                         email: email,
                         password: password,
