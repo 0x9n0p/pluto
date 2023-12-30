@@ -3,7 +3,7 @@ package delivery
 import (
 	"net/http"
 	"pluto"
-	"pluto/panel/auth"
+	"pluto/panel/account"
 	"pluto/panel/logview"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -35,7 +35,7 @@ func init() {
 		return nil
 	},
 		echojwt.WithConfig(echojwt.Config{
-			SigningKey:  auth.JWTSecretKey,
+			SigningKey:  account.JWTSecretKey,
 			TokenLookup: "param:token",
 		}),
 	)
