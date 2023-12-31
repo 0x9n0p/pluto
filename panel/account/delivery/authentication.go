@@ -9,19 +9,19 @@ import (
 )
 
 const (
-	PasswordAuthenticationMethod = iota
-	PublicKeyAuthenticationMethod
+	AuthenticationMethod_Password = iota
+	AuthenticationMethod_PublicKey
 )
 
 func FactoryAuthenticator(c *controller.Authenticator) (err error) {
 	switch c.AuthenticationMethod {
-	case PasswordAuthenticationMethod:
+	case AuthenticationMethod_Password:
 		c.Authenticator = &account.PasswordAuthenticator{
 			Email:    c.Email,
 			Password: account.MustNewPassword([]byte(c.Password)),
 		}
 		break
-	case PublicKeyAuthenticationMethod:
+	case AuthenticationMethod_PublicKey:
 		c.Authenticator = &account.PublicKeyAuthenticator{
 			SignedMessage: c.SignedMessage,
 		}

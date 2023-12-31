@@ -9,7 +9,7 @@ import (
 )
 
 type Authenticator struct {
-	AuthenticationMethod int `json:"authenticator_method"`
+	AuthenticationMethod int `json:"authentication_method"`
 
 	Email    string `json:"email"`
 	Password string `json:"password"`
