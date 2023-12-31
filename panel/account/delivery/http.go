@@ -18,38 +18,15 @@ func init() {
 	authenticated := v1.Group("", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.POST("/login",
-		wrapper.New[account.PasswordAuthenticator](func(p account.PasswordAuthenticator, writer wrapper.ResponseWriter) error {
-			if err := p.Authenticate(); err != nil {
-				return WriteError(err, writer)
-			}
+		wrapper.New[controller.Authenticator](
+			func(c controller.Authenticator, w wrapper.ResponseWriter) error {
+				if err := FactoryAuthenticator(&c); err != nil {
+					return WriteError(err, w)
+				}
 
-			jwt := account.NewJsonWebToken(p.Email)
-			if err := jwt.Create(); err != nil {
-				return WriteError(err, writer)
-			}
-
-			{
-				expires := time.Now().UTC().Add(account.JWTExpiration)
-
-				writer.SetCookie(&http.Cookie{
-					Name:     "token",
-					Value:    jwt.Token,
-					Expires:  expires,
-					Secure:   true,
-					HttpOnly: true,
-				})
-
-				writer.SetCookie(&http.Cookie{
-					Name:     "email",
-					Value:    jwt.Email,
-					Expires:  expires,
-					Secure:   true,
-					HttpOnly: true,
-				})
-			}
-
-			return writer.JSON(http.StatusOK, jwt)
-		}).Handle(),
+				return c.Exec(w)
+			},
+		).Handle(),
 	)
 
 	/*

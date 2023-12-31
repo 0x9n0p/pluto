@@ -6,16 +6,25 @@ import (
 )
 
 type PasswordAuthenticator struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string
+	Password Password
 }
 
 func (p *PasswordAuthenticator) Authenticate() error {
-	if p.Email != "admin" || p.Password != "admin" {
+	a, err := Find(p.Email)
+	if err != nil {
 		return &pluto.Error{
 			HTTPCode: http.StatusUnauthorized,
 			Message:  "The email or password is incorrect",
 		}
 	}
+
+	if !a.Password.Compare(p.Password) {
+		return &pluto.Error{
+			HTTPCode: http.StatusUnauthorized,
+			Message:  "The email or password is incorrect",
+		}
+	}
+
 	return nil
 }

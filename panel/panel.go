@@ -2,7 +2,6 @@ package panel
 
 import (
 	"pluto"
-	_ "pluto/panel/auth/delivery"
 	_ "pluto/panel/logview/delivery"
 	"pluto/panel/pipeline"
 	_ "pluto/panel/pipeline/delivery"
