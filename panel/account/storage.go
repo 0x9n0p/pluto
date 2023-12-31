@@ -16,12 +16,12 @@ func GetStorage() *Storage {
 }
 
 func init() {
-	if err := os.MkdirAll(Env.StoragePath, 0644); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Create storage directory: %s\n", Env.StoragePath)
+	if err := os.MkdirAll(Env.AccountsPath, 0644); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Create storage directory: %s\n", Env.AccountsPath)
 		os.Exit(1)
 	}
 
-	storage = &Storage{Env.StoragePath}
+	storage = &Storage{Env.AccountsPath}
 }
 
 type Storage struct {
@@ -29,9 +29,9 @@ type Storage struct {
 }
 
 func (s *Storage) All() ([]Account, error) {
-	files, err := os.ReadDir(Env.StoragePath)
+	files, err := os.ReadDir(Env.AccountsPath)
 	if err != nil {
-		pluto.Log.Debug("Failed to get accounts", zap.String("path", Env.StoragePath), zap.Error(err))
+		pluto.Log.Debug("Failed to get accounts", zap.String("path", Env.AccountsPath), zap.Error(err))
 		return nil, &pluto.Error{
 			HTTPCode: http.StatusInternalServerError,
 			Message:  "Failed to get accounts",

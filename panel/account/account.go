@@ -130,5 +130,5 @@ func (a *Account) Save() error {
 }
 
 func StorageABSPath(email string) string {
-	return filepath.Join(Env.StoragePath, email)
+	return filepath.Join(Env.AccountsPath, email)
 }

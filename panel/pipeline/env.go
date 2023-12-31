@@ -12,7 +12,7 @@ import (
 var Env EnvSpec
 
 type EnvSpec struct {
-	StoragePath string `envconfig:"PANEL_STORAGE" default:"/var/plutoengine/panel/"`
+	PipelinesPath string `envconfig:"PANEL_PIPELINES" default:"./var/pipelines/"`
 }
 
 func init() {
