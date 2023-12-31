@@ -17,3 +17,11 @@ func (e *Error) Error() string {
 func (e *Error) String() string {
 	return fmt.Sprintf("http_code: %d, message: %s", e.HTTPCode, e.Message)
 }
+
+func (e *Error) GetHTTPCode() int {
+	return e.HTTPCode
+}
+
+func (e *Error) GetMessage() string {
+	return e.Message
+}

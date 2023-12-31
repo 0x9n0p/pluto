@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 	"pluto/panel/account"
-	"pluto/panel/account/delivery"
 	"pluto/panel/pkg/wrapper"
 	"time"
 )
@@ -21,12 +20,12 @@ type Authenticator struct {
 
 func (c *Authenticator) Exec(w wrapper.ResponseWriter) (err error) {
 	if err := c.Authenticator.Authenticate(); err != nil {
-		return delivery.WriteError(err, w)
+		return wrapper.WriteError(err, w)
 	}
 
 	jwt := account.NewJsonWebToken(c.Email)
 	if err := jwt.Create(); err != nil {
-		return delivery.WriteError(err, w)
+		return wrapper.WriteError(err, w)
 	}
 
 	{

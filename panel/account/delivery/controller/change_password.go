@@ -3,7 +3,6 @@ package controller
 import (
 	"net/http"
 	"pluto/panel/account"
-	"pluto/panel/account/delivery"
 	"pluto/panel/pkg/wrapper"
 )
 
@@ -20,11 +19,11 @@ func (c *ChangePassword) Exec(w wrapper.ResponseWriter) (err error) {
 
 	a, err := account.Find(claims["email"].(string))
 	if err != nil {
-		return delivery.WriteError(err, w)
+		return wrapper.WriteError(err, w)
 	}
 
 	if err := a.ChangePassword([]byte(c.OldPassword), []byte(c.NewPassword)); err != nil {
-		return delivery.WriteError(err, w)
+		return wrapper.WriteError(err, w)
 	}
 
 	return w.NoContent(http.StatusOK)

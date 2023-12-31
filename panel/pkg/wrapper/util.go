@@ -1,6 +1,7 @@
 package wrapper
 
 import (
+	"errors"
 	"net/http"
 	"pluto"
 
@@ -19,4 +20,12 @@ func GetJWTClaims(w ResponseWriter) (val map[string]any, err error) {
 	}()
 
 	return w.(echo.Context).Get("user").(*jwt.Token).Claims.(jwt.MapClaims), nil
+}
+
+func WriteError(err error, writer ResponseWriter) error {
+	var perr *pluto.Error
+	if errors.As(err, &perr) {
+		return writer.JSON(perr.HTTPCode, perr)
+	}
+	return writer.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
 }

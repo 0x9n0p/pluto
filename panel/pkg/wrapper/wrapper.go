@@ -25,6 +25,6 @@ func (s *Wrapper[T]) Handle() func(echo.Context) error {
 			return err
 		}
 
-		return s.Exec(t, c)
+		return s.Exec(t, &Context{c})
 	}
 }

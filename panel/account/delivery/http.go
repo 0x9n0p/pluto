@@ -1,7 +1,6 @@
 package delivery
 
 import (
-	"errors"
 	"net/http"
 	"pluto"
 	"pluto/panel/account"
@@ -21,7 +20,7 @@ func init() {
 		wrapper.New[controller.Authenticator](
 			func(c controller.Authenticator, w wrapper.ResponseWriter) error {
 				if err := FactoryAuthenticator(&c); err != nil {
-					return WriteError(err, w)
+					return w.Error(err.(wrapper.HTTPResponseError))
 				}
 
 				return c.Exec(w)
@@ -34,7 +33,7 @@ func init() {
 			Use access token and refresh token to improve logout with short token expiration.
 	*/
 
-	authenticated.Group("", echojwt.WithConfig(delivery.DefaultJWTConfig)).POST("/logout",
+	authenticated.POST("/logout",
 		wrapper.New[wrapper.EmptyRequest](func(_ wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {
 			writer.SetCookie(&http.Cookie{
 				Name:    "token",
@@ -59,7 +58,7 @@ func init() {
 
 			a, err := account.Find(claims["email"].(string))
 			if err != nil {
-				return WriteError(err, w)
+				return wrapper.WriteError(err, w)
 			}
 
 			return w.JSON(http.StatusOK, a)
@@ -71,12 +70,4 @@ func init() {
 			return c.Exec(w)
 		}).Handle(),
 	)
-}
-
-func WriteError(err error, writer wrapper.ResponseWriter) error {
-	var perr *pluto.Error
-	if errors.As(err, &perr) {
-		return writer.JSON(perr.HTTPCode, perr)
-	}
-	return writer.JSON(http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
 }
