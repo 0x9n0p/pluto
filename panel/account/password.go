@@ -22,12 +22,12 @@ func MustNewPassword(plain []byte) Password {
 		)
 		return Password{}
 	}
-	
+
 	return pass
 }
 
-func (p *Password) Compare(hash []byte) bool {
-	return bcrypt.CompareHashAndPassword(hash, *p) == nil
+func (p *Password) Compare(plain []byte) bool {
+	return bcrypt.CompareHashAndPassword(*p, plain) == nil
 }
 
 func (p *Password) String() string {

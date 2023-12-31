@@ -19,7 +19,7 @@ func init() {
 	go func() {
 		l, err := net.Listen("tcp4", Env.TCPServerAddress)
 		if err != nil {
-			Log.Fatal("Create TCP listener", zap.String("address", Env.TCPServerAddress))
+			Log.Fatal("Create TCP listener", zap.String("address", Env.TCPServerAddress), zap.Error(err))
 		}
 
 		for {

@@ -6,7 +6,6 @@ import (
 	"pluto"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/labstack/echo/v4"
 )
 
 func GetJWTClaims(w ResponseWriter) (val map[string]any, err error) {
@@ -19,7 +18,9 @@ func GetJWTClaims(w ResponseWriter) (val map[string]any, err error) {
 		}
 	}()
 
-	return w.(echo.Context).Get("user").(*jwt.Token).Claims.(jwt.MapClaims), nil
+	return w.(interface {
+		Get(key string) interface{}
+	}).Get("user").(*jwt.Token).Claims.(jwt.MapClaims), nil
 }
 
 func WriteError(err error, writer ResponseWriter) error {

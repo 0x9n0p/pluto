@@ -7,7 +7,7 @@ import (
 
 type PasswordAuthenticator struct {
 	Email    string
-	Password Password
+	Password string
 }
 
 func (p *PasswordAuthenticator) Authenticate() error {
@@ -19,7 +19,7 @@ func (p *PasswordAuthenticator) Authenticate() error {
 		}
 	}
 
-	if !a.Password.Compare(p.Password) {
+	if !a.Password.Compare([]byte(p.Password)) {
 		return &pluto.Error{
 			HTTPCode: http.StatusUnauthorized,
 			Message:  "The email or password is incorrect",

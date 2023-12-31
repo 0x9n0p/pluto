@@ -18,7 +18,7 @@ func FactoryAuthenticator(c *controller.Authenticator) (err error) {
 	case AuthenticationMethod_Password:
 		c.Authenticator = &account.PasswordAuthenticator{
 			Email:    c.Email,
-			Password: account.MustNewPassword([]byte(c.Password)),
+			Password: c.Password,
 		}
 		break
 	case AuthenticationMethod_PublicKey:

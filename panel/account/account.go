@@ -14,7 +14,7 @@ import (
 
 type Account struct {
 	Email    string    `json:"email"`
-	Password Password  `json:"-"`
+	Password Password  `json:"password"`
 	SavedAt  time.Time `json:"saved_at"`
 }
 
@@ -57,16 +57,15 @@ func (a *Account) ChangeEmail(new string) error {
 	}
 }
 
-func (a *Account) ChangePassword(old, new []byte) error {
-	oldPass, err := NewPassword(old)
-	if err != nil {
+func (a *Account) ChangePassword(old, new []byte) (err error) {
+	if !a.Password.Compare(old) {
 		return &pluto.Error{
-			HTTPCode: http.StatusBadRequest,
-			Message:  "Make sure you have entered the old password in the correct format",
+			HTTPCode: http.StatusUnauthorized,
+			Message:  "The entered old password is incorrect",
 		}
 	}
 
-	newPass, err := NewPassword(new)
+	a.Password, err = NewPassword(new)
 	if err != nil {
 		return &pluto.Error{
 			HTTPCode: http.StatusBadRequest,
@@ -74,14 +73,6 @@ func (a *Account) ChangePassword(old, new []byte) error {
 		}
 	}
 
-	if !a.Password.Compare(oldPass) {
-		return &pluto.Error{
-			HTTPCode: http.StatusUnauthorized,
-			Message:  "The entered old password is incorrect",
-		}
-	}
-
-	a.Password = newPass
 	return a.Save()
 }
 
