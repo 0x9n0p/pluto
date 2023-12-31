@@ -13,10 +13,9 @@ import (
 )
 
 type Account struct {
-	Email     string    `json:"email"`
-	Password  Password  `json:"-"`
-	CreatedAt time.Time `json:"created_at"`
-	SavedAt   time.Time `json:"saved_at"`
+	Email    string    `json:"email"`
+	Password Password  `json:"-"`
+	SavedAt  time.Time `json:"saved_at"`
 }
 
 func Find(email string) (a Account, err error) {
@@ -83,10 +82,10 @@ func (a *Account) ChangePassword(old, new []byte) error {
 	}
 
 	a.Password = newPass
-	return a.save()
+	return a.Save()
 }
 
-func (a *Account) save() error {
+func (a *Account) Save() error {
 	b, err := json.Marshal(a)
 	if err != nil {
 		pluto.Log.Error("Failed to marshal the account", zap.Error(err))
