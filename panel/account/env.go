@@ -1,4 +1,4 @@
-package pipeline
+package account
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 var Env EnvSpec
 
 type EnvSpec struct {
-	PipelinesPath string `envconfig:"PANEL_PIPELINES" default:"./var/pipelines/"`
+	AccountsPath string `envconfig:"PANEL_ACCOUNTS" default:"./var/accounts/"`
 }
 
 func init() {

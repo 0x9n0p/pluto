@@ -15,6 +15,8 @@ type ResponseWriter interface {
 	// NoContent sends a response with no body and a status code.
 	NoContent(code int) error
 
+	Error(HTTPResponseError) error
+
 	// SetCookie adds a `Set-Cookie` header in HTTP response.
 	SetCookie(cookie *http.Cookie)
 }

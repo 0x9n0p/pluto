@@ -1,12 +1,12 @@
 package delivery
 
 import (
-	"pluto/panel/auth"
+	"pluto/panel/account"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 )
 
 var DefaultJWTConfig = echojwt.Config{
-	SigningKey:  auth.JWTSecretKey,
+	SigningKey:  account.JWTSecretKey,
 	TokenLookup: "header:Authorization:Bearer ,cookie:token",
 }

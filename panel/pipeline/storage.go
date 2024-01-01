@@ -19,7 +19,7 @@ func GetStorage() *Storage {
 }
 
 func init() {
-	db, err := badger.Open(badger.DefaultOptions(Env.StoragePath + "/pipelines"))
+	db, err := badger.Open(badger.DefaultOptions(Env.PipelinesPath))
 	if err != nil {
 		pluto.Log.Fatal("Open storage of panel", zap.Error(err))
 	}
