@@ -12,6 +12,10 @@ import (
 	"go.uber.org/zap"
 )
 
+// TODO:
+//  SECURITY ISSUE
+//  Use a simple JSON DB instead of writing each account to a file
+
 type Account struct {
 	Email    string    `json:"email"`
 	Password Password  `json:"password"`

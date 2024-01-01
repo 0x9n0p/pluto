@@ -10,9 +10,12 @@ import (
 type Authenticator struct {
 	AuthenticationMethod int `json:"authentication_method"`
 
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	// It's required in any authentication method
+	Email string `json:"email" validate:"required,email"`
 
+	// Password authentication method
+	Password string `json:"password"`
+	// PublicKey authentication method
 	SignedMessage string `json:"signed_message"`
 
 	Authenticator account.Authenticator `json:"-"`
