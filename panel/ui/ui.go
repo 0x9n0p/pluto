@@ -2,7 +2,7 @@ package ui
 
 import (
 	"embed"
-	"pluto"
+	"pluto/panel/delivery"
 
 	"github.com/labstack/echo/v4"
 )
@@ -35,13 +35,12 @@ var (
 )
 
 func init() {
-	p := pluto.FindHTTPHost(pluto.PanelSubdomain)
-	p.StaticFS("/", UIPublicDir)
-	p.FileFS("/", "index.html", echo.MustSubFS(PageHome, "out"))
-	p.FileFS("/404", "404.html", echo.MustSubFS(PageNotFound, "out"))
-	p.FileFS("/auth", "auth.html", echo.MustSubFS(PageAuth, "out"))
-	p.FileFS("/logsview", "logsview.html", echo.MustSubFS(PageLogsView, "out"))
-	p.FileFS("/pipelines", "pipelines.html", echo.MustSubFS(PagePipelines, "out"))
-	p.FileFS("/pipelines/create", "pipelines/create.html", echo.MustSubFS(PagePipelinesCreate, "out"))
-	p.FileFS("/pipelines/edit", "pipelines/edit.html", echo.MustSubFS(PagePipelinesEdit, "out"))
+	delivery.HTTPServer.StaticFS("/", UIPublicDir)
+	delivery.HTTPServer.FileFS("/", "index.html", echo.MustSubFS(PageHome, "out"))
+	delivery.HTTPServer.FileFS("/404", "404.html", echo.MustSubFS(PageNotFound, "out"))
+	delivery.HTTPServer.FileFS("/auth", "auth.html", echo.MustSubFS(PageAuth, "out"))
+	delivery.HTTPServer.FileFS("/logsview", "logsview.html", echo.MustSubFS(PageLogsView, "out"))
+	delivery.HTTPServer.FileFS("/pipelines", "pipelines.html", echo.MustSubFS(PagePipelines, "out"))
+	delivery.HTTPServer.FileFS("/pipelines/create", "pipelines/create.html", echo.MustSubFS(PagePipelinesCreate, "out"))
+	delivery.HTTPServer.FileFS("/pipelines/edit", "pipelines/edit.html", echo.MustSubFS(PagePipelinesEdit, "out"))
 }

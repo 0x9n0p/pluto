@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"net/http"
-	"pluto"
 	"pluto/panel/account"
 	"pluto/panel/account/delivery/controller"
 	"pluto/panel/delivery"
@@ -13,7 +12,7 @@ import (
 )
 
 func init() {
-	v1 := pluto.FindHTTPHost(pluto.PanelSubdomain).Group("/api/v1").Group("/account")
+	v1 := delivery.HTTPServer.Group("/api/v1").Group("/account")
 	authenticated := v1.Group("", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.POST("/login",

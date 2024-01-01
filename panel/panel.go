@@ -2,12 +2,16 @@ package panel
 
 import (
 	"pluto"
+	"pluto/panel/pipeline"
+
+	_ "pluto/panel/delivery"
+
 	_ "pluto/panel/account/delivery"
 	_ "pluto/panel/logview/delivery"
-	"pluto/panel/pipeline"
 	_ "pluto/panel/pipeline/delivery"
 	_ "pluto/panel/processor/delivery"
 	_ "pluto/panel/statistics/delivery"
+
 	_ "pluto/panel/ui"
 
 	"go.uber.org/zap"

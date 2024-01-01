@@ -2,7 +2,6 @@ package delivery
 
 import (
 	"net/http"
-	"pluto"
 	"pluto/panel/delivery"
 	"pluto/panel/pkg/wrapper"
 	"pluto/panel/statistics"
@@ -11,8 +10,7 @@ import (
 )
 
 func init() {
-	panel := pluto.FindHTTPHost(pluto.PanelSubdomain)
-	v1 := panel.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
+	v1 := delivery.HTTPServer.Group("/api/v1", echojwt.WithConfig(delivery.DefaultJWTConfig))
 
 	v1.GET("/statistics",
 		wrapper.New[wrapper.EmptyRequest](func(_ wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {

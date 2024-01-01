@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"pluto"
 	"pluto/panel/account"
+	"pluto/panel/delivery"
 	"pluto/panel/logview"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -13,7 +14,7 @@ import (
 )
 
 func init() {
-	pluto.FindHTTPHost(pluto.PanelSubdomain).GET("/api/v1/logs/bind/:token", func(c echo.Context) error {
+	delivery.HTTPServer.GET("/api/v1/logs/bind/:token", func(c echo.Context) error {
 		ws, err := (&websocket.Upgrader{
 			CheckOrigin: func(r *http.Request) bool {
 				// TODO: Check the origin
