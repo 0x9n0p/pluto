@@ -1,20 +1,10 @@
 package pluto
 
+// Note:
+//   1. The returning errors should be pluto.Error
+//   2. Extensions are not going to resolve conflicts, they will change pipelines/processors if already exists
+
 type Extension interface {
 	Install() error
 	Uninstall() error
-	GetExtensionDescriptor() ExtensionDescriptor
-}
-
-type ExtensionDescriptor struct {
-	// ID such as extension_name-v1.2.3
-	ID   string
-	Name string
-
-	/*
-		Below pipelines and processors are added/deleted during the installation/uninstallation process.
-	*/
-
-	Processors []string
-	Pipelines  []string
 }

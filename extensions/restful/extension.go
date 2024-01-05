@@ -2,17 +2,16 @@ package restful
 
 import (
 	"pluto"
+	"pluto/extensions"
 )
 
-var V1 = Restful{
-	ExtensionDescriptor: pluto.ExtensionDescriptor{
-		ID:   "restful-v1",
-		Name: "Restful",
-		Processors: []string{
-			ProcessorName_WriteResponse,
-		},
-		Pipelines: []string{},
-	},
+const ExtensionID_V1 = "restful-v1"
+
+func init() {
+	extensions.Extensions[ExtensionID_V1] = V1
+}
+
+var V1 = &Restful{
 	install: func() error {
 		// V0.install() instead of struct composition.
 		pluto.PredefinedProcessors[ProcessorName_WriteResponse] = creator_WriteResponse
@@ -25,7 +24,6 @@ var V1 = Restful{
 }
 
 type Restful struct {
-	pluto.ExtensionDescriptor
 	install   func() error
 	uninstall func() error
 }
@@ -36,8 +34,4 @@ func (r *Restful) Install() error {
 
 func (r *Restful) Uninstall() error {
 	return r.uninstall()
-}
-
-func (r *Restful) GetExtensionDescriptor() pluto.ExtensionDescriptor {
-	return r.ExtensionDescriptor
 }

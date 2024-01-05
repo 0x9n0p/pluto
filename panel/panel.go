@@ -7,6 +7,7 @@ import (
 	_ "pluto/panel/delivery"
 
 	_ "pluto/panel/account/delivery"
+	_ "pluto/panel/extension/delivery"
 	_ "pluto/panel/logview/delivery"
 	_ "pluto/panel/pipeline/delivery"
 	_ "pluto/panel/processor/delivery"
