@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"pluto/panel/account"
+	"pluto/panel/database"
 	"pluto/panel/pkg/wrapper"
 )
 
@@ -14,15 +15,26 @@ type ChangePassword struct {
 func (c *ChangePassword) Exec(w wrapper.ResponseWriter) (err error) {
 	claims, err := wrapper.GetJWTClaims(w)
 	if err != nil {
-		return err
+		return wrapper.WriteError(err, w)
 	}
 
-	a, err := account.Find(claims["email"].(string))
+	tx, err := database.Get().NewTransaction(true)
 	if err != nil {
 		return wrapper.WriteError(err, w)
 	}
 
+	a, err := account.Find(tx, claims["email"].(string))
+	if err != nil {
+		_ = tx.Rollback()
+		return wrapper.WriteError(err, w)
+	}
+
 	if err := a.ChangePassword([]byte(c.OldPassword), []byte(c.NewPassword)); err != nil {
+		_ = tx.Rollback()
+		return wrapper.WriteError(err, w)
+	}
+
+	if err := tx.CommitOrRollback(); err != nil {
 		return wrapper.WriteError(err, w)
 	}
 

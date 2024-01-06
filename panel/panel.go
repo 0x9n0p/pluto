@@ -4,6 +4,7 @@ import (
 	"pluto"
 	"pluto/panel/pipeline"
 
+	_ "pluto/panel/database"
 	_ "pluto/panel/delivery"
 
 	_ "pluto/panel/account/delivery"
