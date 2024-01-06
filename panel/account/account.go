@@ -2,54 +2,20 @@ package account
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"pluto"
+	"pluto/panel/database"
 	"time"
 
 	"go.uber.org/zap"
 )
 
-// TODO:
-//  SECURITY ISSUE
-//  Use a simple JSON DB instead of writing each account to a file
-
 type Account struct {
 	Email    string    `json:"email"`
 	Password Password  `json:"password"`
 	SavedAt  time.Time `json:"saved_at"`
-}
 
-func Find(email string) (a Account, err error) {
-	f, err := os.OpenFile(StorageABSPath(email), os.O_RDWR, 0644)
-	if err != nil {
-		pluto.Log.Debug("Account not found or a system error occurred", zap.String("path", StorageABSPath(email)), zap.Error(err))
-		return Account{}, &pluto.Error{
-			HTTPCode: http.StatusNotFound,
-			Message:  "Can not find account",
-		}
-	}
-
-	b, err := io.ReadAll(f)
-	if err != nil {
-		pluto.Log.Error("Can not read account file", zap.Error(err))
-		return Account{}, &pluto.Error{
-			HTTPCode: http.StatusInternalServerError,
-			Message:  "Can not read account",
-		}
-	}
-
-	if err := json.Unmarshal(b, &a); err != nil {
-		pluto.Log.Error("Can not unmarshal account", zap.Error(err))
-		return Account{}, &pluto.Error{
-			HTTPCode: http.StatusInternalServerError,
-			Message:  "Can not read account",
-		}
-	}
-
-	return
+	Transaction *database.Transaction `json:"-"`
 }
 
 // ChangeEmail
@@ -90,31 +56,9 @@ func (a *Account) Save() error {
 		}
 	}
 
-	tmpABSPath := StorageABSPath(a.Email) + "-tmp"
-
-	f, err := os.OpenFile(tmpABSPath, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+	err = a.Transaction.Bucket(bucket).Put([]byte(a.Email), b)
 	if err != nil {
-		pluto.Log.Error("Failed to create temporary account", zap.String("path", tmpABSPath), zap.Error(err))
-		return &pluto.Error{
-			HTTPCode: http.StatusInternalServerError,
-			Message:  "Failed to save account",
-		}
-	}
-
-	if _, err := f.Write(b); err != nil {
-		pluto.Log.Error("Failed to write to temporary account", zap.String("path", tmpABSPath), zap.Error(err))
-		return &pluto.Error{
-			HTTPCode: http.StatusInternalServerError,
-			Message:  "Failed to save account",
-		}
-	}
-
-	if err := os.Rename(tmpABSPath, StorageABSPath(a.Email)); err != nil {
-		pluto.Log.Error("Failed to move temporary account",
-			zap.String("src", tmpABSPath),
-			zap.String("dst", StorageABSPath(a.Email)),
-			zap.Error(err),
-		)
+		pluto.Log.Error("Failed to put account", zap.Error(err))
 		return &pluto.Error{
 			HTTPCode: http.StatusInternalServerError,
 			Message:  "Failed to save account",
@@ -124,6 +68,13 @@ func (a *Account) Save() error {
 	return nil
 }
 
-func StorageABSPath(email string) string {
-	return filepath.Join(Env.AccountsPath, email)
+func (a *Account) unmarshal(b []byte) error {
+	if err := json.Unmarshal(b, &a); err != nil {
+		pluto.Log.Error("Can not unmarshal account", zap.Error(err))
+		return &pluto.Error{
+			HTTPCode: http.StatusInternalServerError,
+			Message:  "Failed to find account",
+		}
+	}
+	return nil
 }

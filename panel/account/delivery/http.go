@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"pluto/panel/account"
 	"pluto/panel/account/delivery/controller"
+	"pluto/panel/database"
 	"pluto/panel/delivery"
 	"pluto/panel/pkg/wrapper"
 	"time"
@@ -49,17 +50,24 @@ func init() {
 	)
 
 	authenticated.GET("",
-		wrapper.New[wrapper.EmptyRequest](func(_ wrapper.EmptyRequest, w wrapper.ResponseWriter) error {
+		wrapper.New[wrapper.EmptyRequest](func(_ wrapper.EmptyRequest, w wrapper.ResponseWriter) (err error) {
 			claims, err := wrapper.GetJWTClaims(w)
-			if err != nil {
-				return err
-			}
-
-			a, err := account.Find(claims["email"].(string))
 			if err != nil {
 				return wrapper.WriteError(err, w)
 			}
 
+			tx, err := database.Get().NewTransaction(false)
+			if err != nil {
+				return wrapper.WriteError(err, w)
+			}
+
+			a, err := account.Find(tx, claims["email"].(string))
+			if err != nil {
+				_ = tx.Rollback()
+				return wrapper.WriteError(err, w)
+			}
+
+			_ = tx.Commit()
 			return w.JSON(http.StatusOK, a)
 		}).Handle(),
 	)

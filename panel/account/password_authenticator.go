@@ -3,6 +3,7 @@ package account
 import (
 	"net/http"
 	"pluto"
+	"pluto/panel/database"
 )
 
 type PasswordAuthenticator struct {
@@ -10,8 +11,19 @@ type PasswordAuthenticator struct {
 	Password string
 }
 
-func (p *PasswordAuthenticator) Authenticate() error {
-	a, err := Find(p.Email)
+func (p *PasswordAuthenticator) Authenticate() (err error) {
+	tx, err := database.Get().NewTransaction(false)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err2 := tx.CommitOrRollback(); err2 != nil {
+			err = err2
+		}
+	}()
+
+	a, err := Find(tx, p.Email)
 	if err != nil {
 		return &pluto.Error{
 			HTTPCode: http.StatusUnauthorized,

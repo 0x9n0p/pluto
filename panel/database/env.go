@@ -1,4 +1,4 @@
-package account
+package database
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 var Env EnvSpec
 
 type EnvSpec struct {
-	AccountsPath string `envconfig:"PANEL_ACCOUNTS" default:"./var/accounts/"`
+	DatabasePath string `envconfig:"PANEL_DATABASE" default:"./var/panel.db"`
 }
 
 func init() {
@@ -20,4 +20,6 @@ func init() {
 		_, _ = fmt.Fprintf(os.Stderr, "Environment variables: %v\n", err)
 		os.Exit(1)
 	}
+
+	setup()
 }
