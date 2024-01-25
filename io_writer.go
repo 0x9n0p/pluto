@@ -10,7 +10,7 @@ const ProcessorName_IOWriter = "IO_WRITER"
 
 func init() {
 	PredefinedProcessors[ProcessorName_IOWriter] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_IOWriter, &err)()
+		defer CreatorPanicHandler(ProcessorName_IOWriter, &err)()
 		return IOWriter{
 			Writer: Find("io_interface", args...).Get().(io.Writer),
 		}, err

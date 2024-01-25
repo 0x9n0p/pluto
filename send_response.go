@@ -4,7 +4,7 @@ const ProcessorName_SendResponse = "SEND_RESPONSE"
 
 func init() {
 	PredefinedProcessors[ProcessorName_SendResponse] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_SendResponse, &err)()
+		defer CreatorPanicHandler(ProcessorName_SendResponse, &err)()
 		return SendResponse{
 			PipelineName: Find("pipeline_name", args...).Get().(string),
 		}, err

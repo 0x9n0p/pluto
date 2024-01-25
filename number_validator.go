@@ -6,7 +6,7 @@ const ProcessorName_NumberValidator = "NUMBER_VALIDATOR"
 
 func init() {
 	PredefinedProcessors[ProcessorName_NumberValidator] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_NumberValidator, &err)()
+		defer CreatorPanicHandler(ProcessorName_NumberValidator, &err)()
 		return NumberValidator{
 			Name:    Find("name", args...).Get().(string),
 			Minimum: Find("minimum", args...).Get().(int),

@@ -4,7 +4,7 @@ const ProcessorName_Fork = "FORK"
 
 func init() {
 	PredefinedProcessors[ProcessorName_Fork] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_Fork, &err)()
+		defer CreatorPanicHandler(ProcessorName_Fork, &err)()
 		return Fork{
 			Name: Find("name", args...).Get().(string),
 		}, err

@@ -4,7 +4,7 @@ const ProcessorName_JoinChannel = "JOIN_CHANNEL"
 
 func init() {
 	PredefinedProcessors[ProcessorName_JoinChannel] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_JoinChannel, &err)()
+		defer CreatorPanicHandler(ProcessorName_JoinChannel, &err)()
 		return JoinChannel{}, err
 	}
 }

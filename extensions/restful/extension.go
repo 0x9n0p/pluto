@@ -15,10 +15,12 @@ var V1 = &Restful{
 	install: func() error {
 		// V0.install() instead of struct composition.
 		pluto.PredefinedProcessors[ProcessorName_WriteResponse] = creator_WriteResponse
+		pluto.PredefinedProcessors[ProcessorName_CreateHTTPServer] = creator_CreateHTTPServer
 		return nil
 	},
 	uninstall: func() error {
 		delete(pluto.PredefinedProcessors, ProcessorName_WriteResponse)
+		delete(pluto.PredefinedProcessors, ProcessorName_CreateHTTPServer)
 		return nil
 	},
 }

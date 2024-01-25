@@ -4,7 +4,7 @@ const ProcessorName_Execute = "EXECUTE"
 
 func init() {
 	PredefinedProcessors[ProcessorName_Execute] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_Execute, &err)()
+		defer CreatorPanicHandler(ProcessorName_Execute, &err)()
 		return Execute{
 			Name:         Find("name", args...).Get().(string),
 			AppendResult: Find("append_result", args...).Get().(bool),

@@ -10,7 +10,7 @@ const ProcessorName_RuntimeProcessorCreator = "RUNTIME_PROCESSOR_CREATOR"
 
 func init() {
 	PredefinedProcessors[ProcessorName_RuntimeProcessorCreator] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_RuntimeProcessorCreator, &err)()
+		defer CreatorPanicHandler(ProcessorName_RuntimeProcessorCreator, &err)()
 		return RuntimeProcessorCreator{
 			ProcessorName: Find("processor_name", args...).Get().(string),
 			AppendName:    Find("append_name", args...).Get().(string),
