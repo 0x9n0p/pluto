@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"pluto"
+	"pluto/panel/database"
 	"pluto/panel/delivery"
 	"pluto/panel/pipeline"
 	"pluto/panel/pkg/wrapper"
@@ -25,21 +26,44 @@ func init() {
 
 	v1.GET("/pipelines",
 		wrapper.New[wrapper.EmptyRequest](func(request wrapper.EmptyRequest, writer wrapper.ResponseWriter) error {
-			list, err := pipeline.GetStorage().List()
+			tx, err := database.Get().NewTransaction(false)
 			if err != nil {
+				return wrapper.WriteError(err, writer)
+			}
+
+			list, err := pipeline.All(tx)
+			if err != nil {
+				_ = tx.Rollback()
 				return WriteError(err, writer)
 			}
+
+			if err := tx.Rollback(); err != nil {
+				return wrapper.WriteError(err, writer)
+			}
+
 			return writer.JSON(http.StatusOK, list)
 		}).Handle(),
 	)
 
 	v1.POST("/pipelines",
 		wrapper.New[pipeline.Pipeline](func(p pipeline.Pipeline, writer wrapper.ResponseWriter) error {
+			tx, err := database.Get().NewTransaction(true)
+			if err != nil {
+				return wrapper.WriteError(err, writer)
+			}
+
+			p.Transaction = tx
+
 			if err := p.Save(); err != nil {
+				_ = tx.Rollback()
 				return WriteError(err, writer)
 			}
 
-			if err := pipeline.GetStorage().ReloadExecutionCache(); err != nil {
+			if err := tx.CommitOrRollback(); err != nil {
+				return WriteError(err, writer)
+			}
+
+			if err := pipeline.ReloadExecutionCache(); err != nil {
 				return WriteError(fmt.Errorf("reload execution cache: %v", err), writer)
 			}
 
@@ -47,22 +71,36 @@ func init() {
 		}).Handle(),
 	)
 
+	// TODO: Add a controller
 	v1.DELETE("/pipelines",
 		wrapper.New[struct {
 			Name string `query:"name" validate:"required"`
 		}](func(r struct {
 			Name string `query:"name" validate:"required"`
 		}, writer wrapper.ResponseWriter) error {
-			p, err := pipeline.GetStorage().Find(r.Name)
+			tx, err := database.Get().NewTransaction(true)
 			if err != nil {
+				return wrapper.WriteError(err, writer)
+			}
+
+			p, err := pipeline.Find(tx, r.Name)
+			if err != nil {
+				_ = tx.Rollback()
 				return WriteError(err, writer)
 			}
 
 			if err := p.Delete(); err != nil {
+				_ = tx.Rollback()
 				return WriteError(err, writer)
 			}
 
-			if err := pipeline.GetStorage().ReloadExecutionCache(); err != nil {
+			if err := tx.CommitOrRollback(); err != nil {
+				return wrapper.WriteError(err, writer)
+			}
+
+			// TODO
+			if err := pipeline.ReloadExecutionCache(); err != nil {
+				_ = tx.Rollback()
 				return WriteError(fmt.Errorf("reload execution cache: %v", err), writer)
 			}
 

@@ -33,6 +33,8 @@ func init() {
 				return wrapper.WriteError(err, writer)
 			}
 
+			defer tx.Rollback()
+
 			extensions := []extension.Extension{}
 			for _, descriptor := range extension.Descriptors {
 				d, _ := extension.FindInstallationDetail(tx, descriptor.ID)
@@ -42,7 +44,6 @@ func init() {
 				})
 			}
 
-			_ = tx.CommitOrRollback()
 			return writer.JSON(http.StatusOK, extensions)
 		}).Handle(),
 	)

@@ -18,7 +18,7 @@ func (p *PasswordAuthenticator) Authenticate() (err error) {
 	}
 
 	defer func() {
-		if err2 := tx.CommitOrRollback(); err2 != nil {
+		if err2 := tx.Rollback(); err2 != nil {
 			err = err2
 		}
 	}()

@@ -1,8 +1,10 @@
 package pipeline
 
 import (
-	"fmt"
+	"encoding/json"
+	"net/http"
 	"pluto"
+	"pluto/panel/database"
 	"pluto/panel/processor"
 	"time"
 
@@ -13,6 +15,8 @@ type Pipeline struct {
 	Name       string                `json:"name" validate:"required"`
 	Processors []processor.Processor `json:"processors" validate:"required"`
 	SavedAt    time.Time             `json:"saved_at"`
+
+	Transaction *database.Transaction `json:"-"`
 }
 
 func (p *Pipeline) Create() (pluto.Pipeline, error) {
@@ -39,22 +43,41 @@ func (p *Pipeline) Active() error {
 }
 
 func (p *Pipeline) Delete() error {
-	if err := GetStorage().delete(p.Name); err != nil {
-		pluto.Log.Error("Delete pipeline", zap.String("pipeline_name", p.Name), zap.Error(err))
-		return fmt.Errorf("storage: %v", err)
+	err := p.Transaction.Bucket(bucket).Delete([]byte(p.Name))
+	if err != nil {
+		pluto.Log.Error("Failed to delete pipeline", zap.String("pipeline_name", p.Name), zap.Error(err))
+		return &pluto.Error{
+			HTTPCode: http.StatusInternalServerError,
+			Message:  "Failed to delete pipeline",
+		}
 	}
 	return nil
 }
 
 func (p *Pipeline) Save() error {
+	p.SavedAt = time.Now()
+
 	// Validation :)
 	if _, err := p.Create(); err != nil {
 		return err
 	}
 
-	if err := GetStorage().save(p); err != nil {
-		pluto.Log.Error("Save pipeline", zap.String("pipeline_name", p.Name), zap.Error(err))
-		return fmt.Errorf("storage: %v", err)
+	b, err := json.Marshal(p)
+	if err != nil {
+		pluto.Log.Error("Failed to marshal the pipeline", zap.Error(err))
+		return &pluto.Error{
+			HTTPCode: http.StatusInternalServerError,
+			Message:  "Failed to save pipeline",
+		}
+	}
+
+	err = p.Transaction.Bucket(bucket).Put([]byte(p.Name), b)
+	if err != nil {
+		pluto.Log.Error("Failed to put pipeline", zap.Error(err))
+		return &pluto.Error{
+			HTTPCode: http.StatusInternalServerError,
+			Message:  "Failed to save pipeline",
+		}
 	}
 
 	return nil

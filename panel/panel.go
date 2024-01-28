@@ -20,7 +20,7 @@ import (
 )
 
 func init() {
-	if err := pipeline.GetStorage().ReloadExecutionCache(); err != nil {
+	if err := pipeline.ReloadExecutionCache(); err != nil {
 		pluto.Log.Fatal("Reload execution cache", zap.Error(err))
 	}
 }
