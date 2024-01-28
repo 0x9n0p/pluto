@@ -2,6 +2,7 @@ package statistics
 
 import (
 	"pluto"
+	"pluto/extensions/tcp"
 	"runtime"
 	"time"
 
@@ -34,8 +35,8 @@ type Statistics struct {
 func Get() (s Statistics) {
 	// Connections
 	{
-		s.ConnectedClients = len(pluto.AuthenticatedConnections)
-		s.WaitingClients = len(pluto.AcceptedConnections)
+		s.ConnectedClients = len(tcp.AuthenticatedConnections)
+		s.WaitingClients = len(tcp.AcceptedConnections)
 	}
 
 	// Pipelines

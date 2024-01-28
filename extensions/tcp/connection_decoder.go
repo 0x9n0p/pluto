@@ -1,8 +1,9 @@
-package pluto
+package tcp
 
 import (
 	"encoding/json"
 	"net"
+	"pluto"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,11 +13,11 @@ import (
 type ConnectionDecoder struct {
 	MaxDecode          uint64
 	ReadDeadline       time.Duration
-	ProcessableBuilder func(context Processable, new OutComingProcessable) Processable
-	Processor          Processor
+	ProcessableBuilder func(context pluto.Processable, new pluto.OutComingProcessable) pluto.Processable
+	Processor          pluto.Processor
 }
 
-func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) {
+func (p ConnectionDecoder) Process(processable pluto.Processable) (pluto.Processable, bool) {
 	conn := processable.GetBody().(map[string]any)["connection"].(net.Conn)
 
 	decoder := json.NewDecoder(conn)
@@ -24,13 +25,13 @@ func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) 
 
 	for i := uint64(0); i < p.MaxDecode; i++ {
 		if err := conn.SetReadDeadline(time.Now().Add(p.ReadDeadline)); err != nil {
-			Log.Error("Set read deadline", zap.Error(err))
+			pluto.Log.Error("Set read deadline", zap.Error(err))
 			return processable, false
 		}
 
-		var outComingProcessable OutComingProcessable
+		var outComingProcessable pluto.OutComingProcessable
 		if err := decoder.Decode(&outComingProcessable); err != nil {
-			Log.Debug("Decoding out-coming processable", zap.Error(err))
+			pluto.Log.Debug("Decoding out-coming processable", zap.Error(err))
 			return processable, false
 		}
 
@@ -39,7 +40,7 @@ func (p ConnectionDecoder) Process(processable Processable) (Processable, bool) 
 		}
 	}
 
-	return &InternalProcessable{
+	return &pluto.InternalProcessable{
 		ID:        uuid.New(),
 		Body:      processable.GetBody(),
 		CreatedAt: time.Now(),

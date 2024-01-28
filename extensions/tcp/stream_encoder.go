@@ -1,8 +1,9 @@
-package pluto
+package tcp
 
 import (
 	"encoding/json"
 	"io"
+	"pluto"
 )
 
 type StreamEncoder interface {
@@ -30,7 +31,7 @@ func (e *JsonStreamEncoder) Close() error {
 }
 
 var DefaultChannelBasedStreamEncoder_OnError = func(err error) {
-	ApplicationLogger.Debug(ApplicationLog{
+	pluto.ApplicationLogger.Debug(pluto.ApplicationLog{
 		Message: "Stream encoder failed",
 		Extra: map[string]any{
 			"issuer": "ChannelBasedStreamEncoder",

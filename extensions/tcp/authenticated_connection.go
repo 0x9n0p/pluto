@@ -1,6 +1,7 @@
-package pluto
+package tcp
 
 import (
+	"pluto"
 	"sync"
 	"time"
 
@@ -15,15 +16,15 @@ var (
 
 type AuthenticatedConnection struct {
 	AcceptedConnection
-	Producer           Identifier
-	ProducerCredential Credential
+	Producer           pluto.Identifier
+	ProducerCredential pluto.Credential
 }
 
-var authenticator = NewConditionalProcessor(&ConnectionDecoder{
+var authenticator = pluto.NewConditionalProcessor(&ConnectionDecoder{
 	MaxDecode:          1,
 	ReadDeadline:       time.Second * 2,
-	ProcessableBuilder: func(context Processable, new OutComingProcessable) Processable { return &new },
-	Processor: NewInlineProcessor(func(processable Processable) (result Processable, succeed bool) {
+	ProcessableBuilder: func(context pluto.Processable, new pluto.OutComingProcessable) pluto.Processable { return &new },
+	Processor: pluto.NewInlineProcessor(func(processable pluto.Processable) (result pluto.Processable, succeed bool) {
 		defer func() { succeed = recover() == nil }()
 
 		var authenticatedConnection AuthenticatedConnection
@@ -46,11 +47,11 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 
 		// Authenticate Producer
 		{
-			p := processable.(*OutComingProcessable)
+			p := processable.(*pluto.OutComingProcessable)
 
 			validated, err := p.ProducerCredential.Validate(p.GetProducer())
 			if err != nil {
-				Log.Debug("Validate producer credential", zap.Error(err))
+				pluto.Log.Debug("Validate producer credential", zap.Error(err))
 				return processable, false
 			}
 
@@ -80,7 +81,7 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 			AcceptedConnectionsMutex.Unlock()
 		}
 
-		ApplicationLogger.Debug(ApplicationLog{
+		pluto.ApplicationLogger.Debug(pluto.ApplicationLog{
 			Message: "New connection successfully authenticated",
 			Extra: map[string]any{
 				"connection_id":  authenticatedConnection.ID,
@@ -90,8 +91,8 @@ var authenticator = NewConditionalProcessor(&ConnectionDecoder{
 
 		return processable, true
 	}),
-}).Fail(ProcessorBucket{Processors: []Processor{
-	NewInlineProcessor(func(processable Processable) (Processable, bool) {
+}).Fail(pluto.ProcessorBucket{Processors: []pluto.Processor{
+	pluto.NewInlineProcessor(func(processable pluto.Processable) (pluto.Processable, bool) {
 		defer func() { recover() }()
 
 		connectionID := processable.GetBody().(map[string]any)["connection_id"].(uuid.UUID)

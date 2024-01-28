@@ -1,8 +1,9 @@
-package pluto
+package tcp
 
 import (
 	"encoding/json"
 	"net"
+	"pluto"
 	"pluto/pkg/random"
 	"sync"
 	"time"
@@ -25,7 +26,7 @@ type AcceptedConnection struct {
 	Encoder  StreamEncoder `json:"-"`
 }
 
-var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bool) {
+var acceptor = pluto.NewInlineProcessor(func(processable pluto.Processable) (pluto.Processable, bool) {
 	connection := AcceptedConnection{
 		ID:      uuid.New(),
 		Token:   random.String(ConnectionTokenLength),
@@ -33,25 +34,25 @@ var acceptor = NewInlineProcessor(func(processable Processable) (Processable, bo
 		Encoder: NewChannelBasedStreamEncoder(NewJsonStreamEncoder(processable.GetBody().(map[string]any)["connection"].(net.Conn))),
 	}
 
-	b, err := json.Marshal(OutGoingProcessable{
-		Consumer: ExternalIdentifier{
+	b, err := json.Marshal(pluto.OutGoingProcessable{
+		Consumer: pluto.ExternalIdentifier{
 			Name: "CONNECTION_ACCEPTOR",
-			Kind: KindPipeline,
+			Kind: pluto.KindPipeline,
 		},
 		Body: connection,
 	})
 	if err != nil {
-		Log.Error("Marshal OutGoingProcessable", zap.Error(err))
+		pluto.Log.Error("Marshal OutGoingProcessable", zap.Error(err))
 		return processable, false
 	}
 
 	if err := connection.SetWriteDeadline(time.Now().Add(time.Second * 2)); err != nil {
-		Log.Error("Set write deadline", zap.Error(err))
+		pluto.Log.Error("Set write deadline", zap.Error(err))
 		return processable, false
 	}
 
 	if _, err := connection.Write(b); err != nil {
-		Log.Debug("Write bytes to connection", zap.Error(err))
+		pluto.Log.Debug("Write bytes to connection", zap.Error(err))
 		return processable, false
 	}
 

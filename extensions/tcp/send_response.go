@@ -1,12 +1,14 @@
-package pluto
+package tcp
+
+import "pluto"
 
 const ProcessorName_SendResponse = "SEND_RESPONSE"
 
 func init() {
-	PredefinedProcessors[ProcessorName_SendResponse] = func(args []Value) (p Processor, err error) {
-		defer creatorPanicHandler(ProcessorName_SendResponse, &err)()
+	pluto.PredefinedProcessors[ProcessorName_SendResponse] = func(args []pluto.Value) (p pluto.Processor, err error) {
+		defer pluto.creatorPanicHandler(ProcessorName_SendResponse, &err)()
 		return SendResponse{
-			PipelineName: Find("pipeline_name", args...).Get().(string),
+			PipelineName: pluto.Find("pipeline_name", args...).Get().(string),
 		}, err
 	}
 }
@@ -18,18 +20,18 @@ type SendResponse struct {
 	PipelineName string
 }
 
-func (p SendResponse) Process(processable Processable) (Processable, bool) {
-	outGoing := OutGoingProcessable{
-		Consumer: ExternalIdentifier{
+func (p SendResponse) Process(processable pluto.Processable) (pluto.Processable, bool) {
+	outGoing := pluto.OutGoingProcessable{
+		Consumer: pluto.ExternalIdentifier{
 			Name: p.PipelineName,
-			Kind: KindPipeline,
+			Kind: pluto.KindPipeline,
 		},
 		Body: processable.GetBody(),
 	}
 
-	outComing, ok := processable.(*OutComingProcessable)
+	outComing, ok := processable.(*pluto.OutComingProcessable)
 	if !ok {
-		ApplicationLogger.Error(ApplicationLog{
+		pluto.ApplicationLogger.Error(pluto.ApplicationLog{
 			Message: "The processable is not an out_coming_processable",
 			Extra:   map[string]any{"issuer": ProcessorName_SendResponse},
 		})
@@ -37,7 +39,7 @@ func (p SendResponse) Process(processable Processable) (Processable, bool) {
 	}
 
 	if err := outComing.Encoder.Encode(outGoing); err != nil {
-		ApplicationLogger.Error(ApplicationLog{
+		pluto.ApplicationLogger.Error(pluto.ApplicationLog{
 			Message: "Stream encoder failed",
 			Extra: map[string]any{
 				"issuer": ProcessorName_SendResponse,

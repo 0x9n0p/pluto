@@ -1,7 +1,8 @@
-package pluto
+package tcp
 
 import (
 	"net"
+	"pluto"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,35 +11,35 @@ import (
 
 const MAXRequestPerConnection = 1000
 
-var ConnectionHandler = Pipeline{
+var ConnectionHandler = pluto.Pipeline{
 	"TCP_CONNECTION_HANDLER",
-	ProcessorBucket{[]Processor{acceptor, authenticator, processor}},
+	pluto.ProcessorBucket{[]pluto.Processor{acceptor, authenticator, processor}},
 }
 
 func init() {
 	go func() {
-		l, err := net.Listen("tcp4", Env.TCPServerAddress)
+		l, err := net.Listen("tcp4", pluto.Env.TCPServerAddress)
 		if err != nil {
-			Log.Fatal("Create TCP listener", zap.String("address", Env.TCPServerAddress), zap.Error(err))
+			pluto.Log.Fatal("Create TCP listener", zap.String("address", pluto.Env.TCPServerAddress), zap.Error(err))
 		}
 
 		for {
-			Log.Debug("Waiting for connections")
+			pluto.Log.Debug("Waiting for connections")
 
 			// TODO: Any check or feature to accept new connections.
 
 			conn, err := l.Accept()
 			if err != nil {
-				Log.Debug("Failed to accept new connection", zap.Error(err))
+				pluto.Log.Debug("Failed to accept new connection", zap.Error(err))
 				continue
 			}
 
-			ApplicationLogger.Debug(ApplicationLog{
+			pluto.ApplicationLogger.Debug(pluto.ApplicationLog{
 				Message: "New TCP connection accepted",
 				Extra:   map[string]any{"remote_address": conn.RemoteAddr().String()},
 			})
 
-			go ConnectionHandler.Process(&InternalProcessable{
+			go ConnectionHandler.Process(&pluto.InternalProcessable{
 				ID:        uuid.New(),
 				Body:      map[string]any{"connection": conn},
 				CreatedAt: time.Now(),
@@ -47,31 +48,31 @@ func init() {
 	}()
 }
 
-var processor = NewFinalProcessor(
+var processor = pluto.NewFinalProcessor(
 	&ConnectionDecoder{
 		MaxDecode:    MAXRequestPerConnection,
 		ReadDeadline: time.Hour,
-		ProcessableBuilder: func(context Processable, new OutComingProcessable) Processable {
+		ProcessableBuilder: func(context pluto.Processable, new pluto.OutComingProcessable) pluto.Processable {
 			defer func() { recover() }()
 
 			AuthenticatedConnectionsMutex.RLock()
 			defer AuthenticatedConnectionsMutex.RUnlock()
 
 			connection := AuthenticatedConnections[context.GetBody().(map[string]any)["connection_id"].(uuid.UUID)]
-			new.Producer = connection.Producer.(ExternalIdentifier)
-			new.ProducerCredential = connection.ProducerCredential.(OutComingCredential)
+			new.Producer = connection.Producer.(pluto.ExternalIdentifier)
+			new.ProducerCredential = connection.ProducerCredential.(pluto.OutComingCredential)
 			new.Connection = connection.AcceptedConnection
 			new.Encoder = connection.AcceptedConnection.Encoder
 
 			return &new
 		},
-		Processor: NewInlineProcessor(func(processable Processable) (Processable, bool) {
-			Process(processable.(RoutableProcessable))
+		Processor: pluto.NewInlineProcessor(func(processable pluto.Processable) (pluto.Processable, bool) {
+			pluto.Process(processable.(pluto.RoutableProcessable))
 			return processable, true
 		}),
 	},
 ).Final(
-	NewInlineProcessor(func(processable Processable) (Processable, bool) {
+	pluto.NewInlineProcessor(func(processable pluto.Processable) (pluto.Processable, bool) {
 		AuthenticatedConnectionsMutex.Lock()
 		defer AuthenticatedConnectionsMutex.Unlock()
 		defer func() { recover() }()

@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"pluto"
+	"pluto/extensions/tcp"
 	"strings"
 )
 
@@ -125,7 +126,7 @@ var Processors = []Descriptor{
 		Category: Category_Flow,
 	},
 	{
-		Name:        pluto.ProcessorName_SendResponse,
+		Name:        tcp.ProcessorName_SendResponse,
 		Description: "Sends body to producer",
 		Icon:        "https://...",
 		Arguments: []pluto.ValueDescriptor{
