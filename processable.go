@@ -27,8 +27,6 @@ type OutComingProcessable struct {
 	Producer           ExternalIdentifier  `json:"producer"`
 	Consumer           ExternalIdentifier  `json:"consumer"`
 	ProducerCredential OutComingCredential `json:"producer_credential"`
-	Connection         AcceptedConnection  `json:"-"`
-	Encoder            StreamEncoder       `json:"-"`
 	Body               any                 `json:"body"`
 }
 

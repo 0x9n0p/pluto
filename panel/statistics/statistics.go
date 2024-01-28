@@ -34,8 +34,8 @@ type Statistics struct {
 func Get() (s Statistics) {
 	// Connections
 	{
-		s.ConnectedClients = len(pluto.AuthenticatedConnections)
-		s.WaitingClients = len(pluto.AcceptedConnections)
+		s.ConnectedClients = -1
+		s.WaitingClients = -1
 	}
 
 	// Pipelines
