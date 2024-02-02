@@ -1,4 +1,4 @@
-package restful
+package http
 
 import (
 	"pluto"
@@ -35,7 +35,7 @@ func (c *CreateHTTPServer) Process(processable pluto.Processable) (pluto.Process
 
 	if err := e.Start(c.Address); err != nil {
 		pluto.ApplicationLogger.Error(pluto.ApplicationLog{
-			Message: "Failed to start http server",
+			Message: "Failed to start HTTP server",
 			Extra: map[string]any{
 				"name":    c.Name,
 				"address": c.Address,

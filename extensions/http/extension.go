@@ -1,4 +1,4 @@
-package restful
+package http
 
 import (
 	"pluto"

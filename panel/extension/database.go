@@ -3,7 +3,7 @@ package extension
 import (
 	"encoding/json"
 	"pluto"
-	"pluto/extensions/restful"
+	ext_http "pluto/extensions/http"
 	"pluto/panel/database"
 
 	"go.uber.org/zap"
@@ -13,10 +13,10 @@ var bucket_InstalledExtensions = []byte("installed_extensions")
 
 var Descriptors = []Descriptor{
 	{
-		ID:   restful.ExtensionID_V1,
+		ID:   ext_http.ExtensionID_V1,
 		Name: "Restful",
 		Processors: []string{
-			restful.ProcessorName_WriteResponse,
+			ext_http.ProcessorName_WriteResponse,
 		},
 		Pipelines: []string{},
 	},
