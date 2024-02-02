@@ -12,17 +12,19 @@ import (
 )
 
 type Pipeline struct {
-	Name       string                `json:"name" validate:"required"`
-	Processors []processor.Processor `json:"processors" validate:"required"`
-	SavedAt    time.Time             `json:"saved_at"`
+	Name             string                `json:"name" validate:"required"`
+	ExecuteOnStartup bool                  `json:"execute_on_startup"  validate:"boolean"`
+	Processors       []processor.Processor `json:"processors" validate:"required"`
+	SavedAt          time.Time             `json:"saved_at"`
 
 	Transaction *database.Transaction `json:"-"`
 }
 
 func (p *Pipeline) Create() (pluto.Pipeline, error) {
 	pipeline := pluto.Pipeline{
-		Name:            p.Name,
-		ProcessorBucket: pluto.ProcessorBucket{Processors: []pluto.Processor{}},
+		Name:             p.Name,
+		ExecuteOnStartup: p.ExecuteOnStartup,
+		ProcessorBucket:  pluto.ProcessorBucket{Processors: []pluto.Processor{}},
 	}
 
 	for _, wantedProcessor := range p.Processors {

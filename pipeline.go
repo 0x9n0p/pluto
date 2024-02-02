@@ -12,8 +12,9 @@ var (
 )
 
 type Pipeline struct {
-	Name            string `json:"name"`
-	ProcessorBucket `json:"processor_bucket"`
+	Name             string `json:"name"`
+	ExecuteOnStartup bool   `json:"execute_on_startup"`
+	ProcessorBucket  `json:"processor_bucket"`
 }
 
 type PipelineIdentifier struct {

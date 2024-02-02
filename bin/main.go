@@ -15,6 +15,8 @@ func init() {
 		},
 		Processor: pluto.IOWriter{Writer: os.Stdout},
 	})
+
+	pluto.OnInitialized()
 }
 
 func main() {
